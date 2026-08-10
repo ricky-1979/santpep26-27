@@ -103,11 +103,12 @@
 
     function renderVenue(v){
       let daysHtml = "";
+      const hideCourt = /BUFAL/i.test(v.name); // a Bufalà no es mostra "Gimnàs"
       v.days.forEach((day, i) => {
         if(!day.length) return;
         const slots = day.map(s =>
           '<div class="slot"><span class="slot-time">' + s.time + '</span>' +
-          (s.court ? '<span class="slot-court">' + (/^H$/i.test(s.court)?"Gimnàs":"Pista "+s.court) + '</span>' : '') +
+          ((s.court && !hideCourt) ? '<span class="slot-court">' + (/^H$/i.test(s.court)?"Gimnàs":"Pista "+s.court) + '</span>' : '') +
           '<div class="slot-cat">' + s.cat + '</div></div>'
         ).join("");
         daysHtml += '<div class="day"><div class="day-name">' + DAYS[i] + '</div>' + slots + '</div>';
