@@ -52,6 +52,10 @@
     .daygroup-head { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:700; margin:0 0 10px; }
     .slotgroup { margin:0 0 14px; }
     .slotgroup:last-child { margin-bottom:0; }
+    /* Fora: blocs de franja en fila, d'esquerra a dreta per hora */
+    .slotrow { display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; }
+    .slotrow > .slotgroup { margin:0; flex:0 1 auto; }
+    .slotrow .games { grid-template-columns:1fr; }
     .slot-head { display:inline-block; font-size:0.82rem; font-weight:700; color:var(--brand-dark);
       background:var(--accent); padding:2px 10px; border-radius:6px; margin:0 0 8px; }
     .games { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px; }
@@ -224,13 +228,16 @@
             // Casa: graella horitzontal (files=pavelló, columnes=franja fixa)
             inner = homeGrid(gs);
           } else {
-            // Fora: llista agrupada per franja horària (ordre cronològic)
+            // Fora: blocs per franja horària en fila, d'esquerra a dreta (per hora)
             const slots=[]; const bySlot={};
             gs.forEach(function(g){ if(!(g.time in bySlot)){ bySlot[g.time]=[]; slots.push(g.time); } bySlot[g.time].push(g); });
+            slots.sort();
+            inner += '<div class="slotrow">';
             slots.forEach(function(t){
               inner += '<div class="slotgroup"><div class="slot-head">' + t + '</div><div class="games">' +
                 bySlot[t].map(gameCard).join('') + '</div></div>';
             });
+            inner += '</div>';
           }
           daysHtml += '<div class="daygroup"><div class="daygroup-head">' + d.name +
             ' · ' + fmtDate(addDays(wk.monday,d.off)) + '</div>' + inner + '</div>';
