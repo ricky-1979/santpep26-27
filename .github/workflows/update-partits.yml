@@ -11,7 +11,12 @@ name: Actualitza partits
 
 on:
   schedule:
-    - cron: "0 4 * * *" # cada dia a les 04:00 UTC (06:00 a Badalona a l'estiu)
+    # Mitjanit hora de Badalona tot l'any. GitHub cron és sempre UTC i Badalona
+    # canvia entre CEST (UTC+2, estiu) i CET (UTC+1, hivern), així que disparem
+    # a les dues hores possibles; el job "gate" deixa passar només el que a
+    # Badalona són les 00:00 i cancel·la l'altre (que allà és la 01:00).
+    - cron: "0 22 * * *" # 00:00 a Badalona a l'estiu (CEST, UTC+2)
+    - cron: "0 23 * * *" # 00:00 a Badalona a l'hivern (CET, UTC+1)
   workflow_dispatch: {}
 
 permissions:
@@ -25,7 +30,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Decideix si cal executar: sempre en dispar manual; en cron, només si a
+  # Badalona són les 00:00. Així el run que no toca acaba en "success" net,
+  # sense generar notificacions de fallida.
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "Dispar manual: s'executa."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          H=$(TZ="Europe/Madrid" date +%H)
+          echo "Hora local a Badalona: ${H}h"
+          if [ "$H" = "00" ]; then
+            echo "És mitjanit a Badalona: s'executa."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No és mitjanit local: es descarta aquesta execució."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
   update:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
