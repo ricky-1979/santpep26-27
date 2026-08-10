@@ -51,6 +51,7 @@
     .badge.away { background:var(--away); color:var(--away-ink); }
     .badge.sex.masc { background:#e3f2fd; color:#0d47a1; }
     .badge.sex.fem { background:#fce4ec; color:#880e4f; }
+    .badge.day { background:#ede7f6; color:#4527a0; }
     .game-team { font-weight:700; font-size:0.92rem; }
     .game-vs { font-size:0.86rem; color:var(--ink); }
     .game-vs .lbl { color:var(--muted); font-size:0.78rem; }
@@ -98,28 +99,30 @@
     }
 
     function gameCard(g){
-      const badge = g.home ? '<span class="badge home">Casa</span>' : '<span class="badge away">Fora</span>';
+      const dayName = g.dow===6 ? 'Dissabte' : 'Diumenge';
+      const dayBadge = '<span class="badge day">' + dayName + '</span>';
       const sexCls = g.sex==='F' ? 'fem' : 'masc';
       const sexLbl = g.sex==='F' ? 'Femení' : 'Masculí';
       const sexBadge = '<span class="badge sex ' + sexCls + '">' + sexLbl + '</span>';
       const vs = g.home
         ? '<div class="game-vs"><span class="lbl">vs</span> ' + g.rival + '</div>'
         : '<div class="game-vs"><span class="lbl">a camp de</span> ' + g.rival + '</div>';
-      const loc = g.loc ? '<div class="game-loc">📍 ' + g.loc + '</div>' : '';
-      return '<div class="game"><div class="game-top"><span class="game-time">' + g.time + '</span>' + badge + sexBadge +
+      // A casa el lloc sempre és La Colina: no cal repetir-lo
+      const loc = (!g.home && g.loc) ? '<div class="game-loc">📍 ' + g.loc + '</div>' : '';
+      return '<div class="game"><div class="game-top"><span class="game-time">' + g.time + '</span>' + dayBadge + sexBadge +
         '</div><div class="game-team">' + g.team + '</div>' + vs + loc + '</div>';
     }
 
     function renderWeek(wk){
-      const days=[{dow:6,name:'Dissabte'},{dow:0,name:'Diumenge'}];
+      const secs=[{home:true,name:'A La Colina (casa)'},{home:false,name:'A fora'}];
       let html='<div class="section-title">Cap de setmana ' + weekLabel(wk.monday) + '</div>' +
         '<p class="section-sub">Partits de dissabte i diumenge</p>';
       let any=false;
-      days.forEach(function(d){
-        const gs=wk.games.filter(function(g){ return g.dow===d.dow && passes(g); });
+      secs.forEach(function(sec){
+        const gs=wk.games.filter(function(g){ return g.home===sec.home && passes(g); });
         if(!gs.length) return;
         any=true;
-        html += '<div class="daygroup"><div class="daygroup-head">' + d.name + '</div><div class="games">' +
+        html += '<div class="daygroup"><div class="daygroup-head">' + sec.name + '</div><div class="games">' +
           gs.map(gameCard).join('') + '</div></div>';
       });
       return any ? html : '';
