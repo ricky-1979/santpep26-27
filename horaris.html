@@ -77,6 +77,10 @@
     .slot:last-child { border-bottom: none; }
     .slot-time { font-weight: 700; font-size: 0.82rem; color: var(--brand-dark); margin-bottom: 4px; }
     .slot-line { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+    /* Gènere identificat només per color (mateix codi que partits.html) */
+    .slot-line.masc, .slot-line.fem { padding: 3px 8px; border-radius: 6px; }
+    .slot-line.masc { border-left: 4px solid #1565c0; border-right: 4px solid #1565c0; background: #f2f8fe; }
+    .slot-line.fem { border-left: 4px solid #c2185b; border-right: 4px solid #c2185b; background: #fdf3f7; }
     .slot-cat { font-size: 0.82rem; color: var(--ink); }
     .slot-court { display: inline-block; flex-shrink: 0; min-width: 58px; text-align: center;
       font-size: 0.68rem; background: var(--accent); color: #4a3800;
@@ -119,6 +123,30 @@
 
     // --- Filtres per categoria ---
     const FAMILY_ORDER = ["SÈNIOR","JÚNIOR","CADET","INFANTIL","MINI","PREMINI","ESCOLA","TECNIFICACIÓ","ALTRES"];
+    // Gènere d'una categoria a partir del sufix MASC/FEM del text.
+    // Retorna 'masc', 'fem' o '' (sense gènere, p. ex. TECNIFICACIÓ, MIXTE).
+    function sexOf(cat){
+      const c = cat.toUpperCase();
+      const hasMasc = /\bMASC\b/.test(c);
+      const hasFem = /\bFEM\b/.test(c);
+      if(hasMasc && !hasFem) return 'masc';
+      if(hasFem && !hasMasc) return 'fem';
+      return ''; // sense gènere o mixt (no s'hi aplica color)
+    }
+
+    // Text de categoria sense el marcador de gènere (MASC/FEM), que ara
+    // s'identifica pel color. Neteja separadors i espais sobrants.
+    function catLabel(cat){
+      return cat
+        .replace(/\bMASC\b/gi, '')
+        .replace(/\bFEM\b/gi, '')
+        .replace(/\s*\/\s*/g, ' / ')
+        .replace(/\s{2,}/g, ' ')
+        .replace(/\s*\/\s*$/,'')
+        .replace(/^\s*\/\s*/,'')
+        .trim();
+    }
+
     function familyOf(cat){
       const c = cat.toUpperCase();
       const f = [];
@@ -154,13 +182,14 @@
           byTime[s.time].push(s);
         });
         const slots = groups.map(time => {
-          const lines = byTime[time].map(s =>
-            '<div class="slot-line">' +
-            ((s.court && !hideCourt)
-              ? '<span class="slot-court">' + (/^H$/i.test(s.court)?"Pista sencera":"Pista "+s.court) + '</span>'
-              : '') +
-            '<span class="slot-cat">' + s.cat + '</span></div>'
-          ).join("");
+          const lines = byTime[time].map(s => {
+            const sx = sexOf(s.cat); // '', 'masc' o 'fem' → color de gènere
+            return '<div class="slot-line' + (sx ? ' ' + sx : '') + '">' +
+              ((s.court && !hideCourt)
+                ? '<span class="slot-court">' + (/^H$/i.test(s.court)?"Pista sencera":"Pista "+s.court) + '</span>'
+                : '') +
+              '<span class="slot-cat">' + catLabel(s.cat) + '</span></div>';
+          }).join("");
           return '<div class="slot"><div class="slot-time">' + time + '</div>' + lines + '</div>';
         }).join("");
         daysHtml += '<div class="day"><div class="day-name">' + DAYS[i] + '</div>' + slots + '</div>';
