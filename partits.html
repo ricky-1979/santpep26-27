@@ -46,6 +46,9 @@
     .dayblock-date { font-size:0.82rem; font-weight:500; opacity:0.85; }
     .daygroup { margin:0 0 16px; padding-left:12px; border-left:3px solid var(--line); }
     .daygroup:last-child { margin-bottom:0; }
+    /* Fora: dissabte i diumenge un al costat de l'altre */
+    .daycols { display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; }
+    .daycols > .daygroup { flex:1 1 320px; min-width:280px; margin-bottom:0; }
     .daygroup-head { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:700; margin:0 0 10px; }
     .slotgroup { margin:0 0 14px; }
     .slotgroup:last-child { margin-bottom:0; }
@@ -160,15 +163,26 @@
     }
 
     // Graella horitzontal per a un dia de casa: files=pavelló, columnes=franja.
+    // Franges fixes de casa: bloc de matí i bloc de tarda.
+    const HOME_MORNING=['09:00','10:45','12:30'];
+    const HOME_AFTERNOON=['16:00','17:45','19:30'];
+
     function homeGrid(gs){
-      // Franges (columnes) i pavellons (files) presents, en ordre.
-      const slots=[]; const venues=[]; const cell={};
+      // Pavellons (files) presents, en ordre d'aparició.
+      const venues=[]; const cell={};
       gs.forEach(function(g){
-        if(slots.indexOf(g.time)<0) slots.push(g.time);
         const v=venueName(g.loc);
         if(venues.indexOf(v)<0) venues.push(v);
         (cell[v+'|'+g.time]=cell[v+'|'+g.time]||[]).push(g);
       });
+      // Columnes: blocs fixos (amb franges buides) que tinguin algun partit el dia,
+      // més qualsevol hora fora d'horari estàndard que hi pugui haver.
+      let slots=[];
+      const hasMorning=gs.some(function(g){ return HOME_MORNING.indexOf(g.time)>=0; });
+      const hasAfternoon=gs.some(function(g){ return HOME_AFTERNOON.indexOf(g.time)>=0; });
+      if(hasMorning) slots=slots.concat(HOME_MORNING);
+      if(hasAfternoon) slots=slots.concat(HOME_AFTERNOON);
+      gs.forEach(function(g){ if(slots.indexOf(g.time)<0) slots.push(g.time); });
       slots.sort();
       const cols = 1 + slots.length; // capçalera de fila + franges
       let h='<div class="hgrid-wrap"><div class="hgrid" style="grid-template-columns:auto repeat(' +
@@ -200,13 +214,14 @@
         if(!secGames.length) return;
         any=true;
         html += '<div class="dayblock"><h3 class="dayblock-head">' + sec.name + '</h3>';
+        let daysHtml='';
         days.forEach(function(d){
           const gs=secGames.filter(function(g){ return g.dow===d.dow; })
             .sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0; });
           if(!gs.length) return;
           let inner='';
           if(sec.home){
-            // Casa: graella horitzontal (files=pavelló, columnes=franja amb partit)
+            // Casa: graella horitzontal (files=pavelló, columnes=franja fixa)
             inner = homeGrid(gs);
           } else {
             // Fora: llista agrupada per franja horària (ordre cronològic)
@@ -217,9 +232,11 @@
                 bySlot[t].map(gameCard).join('') + '</div></div>';
             });
           }
-          html += '<div class="daygroup"><div class="daygroup-head">' + d.name +
+          daysHtml += '<div class="daygroup"><div class="daygroup-head">' + d.name +
             ' · ' + fmtDate(addDays(wk.monday,d.off)) + '</div>' + inner + '</div>';
         });
+        // Fora: dissabte i diumenge en fila (columnes); casa: apilat.
+        html += sec.home ? daysHtml : ('<div class="daycols">' + daysHtml + '</div>');
         html += '</div>';
       });
       return any ? html : '';
