@@ -79,9 +79,10 @@
     .slot-line { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 2px 0; }
     .slot-cat { text-align: center; }
     /* Gènere identificat només per color (mateix codi que partits.html) */
-    .slot-line.masc, .slot-line.fem { padding: 3px 8px; border-radius: 6px; }
+    .slot-line.masc, .slot-line.fem, .slot-line.tec { padding: 3px 8px; border-radius: 6px; }
     .slot-line.masc { border-left: 4px solid #1565c0; border-right: 4px solid #1565c0; background: #f2f8fe; }
     .slot-line.fem { border-left: 4px solid #c2185b; border-right: 4px solid #c2185b; background: #fdf3f7; }
+    .slot-line.tec { border-left: 4px solid #757575; border-right: 4px solid #757575; background: #f4f4f5; }
     .slot-cat { font-size: 0.82rem; color: var(--ink); }
     .slot-court { display: inline-block; flex-shrink: 0; min-width: 58px; text-align: center;
       font-size: 0.68rem; background: var(--accent); color: #4a3800;
@@ -128,6 +129,7 @@
     // Retorna 'masc', 'fem' o '' (sense gènere, p. ex. TECNIFICACIÓ, MIXTE).
     function sexOf(cat){
       const c = cat.toUpperCase();
+      if(/TECNIFICACI/.test(c)) return 'tec'; // gris (mateixa simbologia)
       const hasMasc = /\bMASC\b/.test(c);
       const hasFem = /\bFEM\b/.test(c);
       if(hasMasc && !hasFem) return 'masc';
