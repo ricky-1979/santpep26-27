@@ -44,6 +44,16 @@ const OWN = {
 // Només mostrem partits a partir d'aquesta data (inici temporada 26-27).
 const FROM = Date.UTC(2026, 7, 1); // 1 d'agost de 2026
 
+// Correccions manuals de pavelló. El calendari de Google situa alguns partits
+// locals a La Colina, però es juguen en una altra pista pròpia del club (p. ex.
+// quan hi ha més de 3 partits locals alhora, els que sobren van a Montigalà).
+// Clau: "dateISO|sigla" → { loc, home } (home força que compti com a local).
+const VENUE_OVERRIDES = {
+  "2026-09-13|IF":  { loc: "Pavelló de Montigalà", home: true }, // Infantil femení
+  "2026-09-13|IBM": { loc: "Pavelló de Montigalà", home: true }, // Infantil B masculí
+  "2026-09-13|IAM": { loc: "Pavelló de Montigalà", home: true }, // Infantil A masculí
+};
+
 function fetchText(url) {
   return new Promise((resolve, reject) => {
     https
@@ -120,13 +130,22 @@ function parseCalendar(ics) {
       parts.forEach((p, i) => { if (OWN[p]) { ownSide = i; sigla = p; } });
       if (ownSide < 0) return null; // partit sense equip propi identificable
       const rival = parts[ownSide === 0 ? 1 : 0] || "";
-      const home = /LA COLINA|GRAN BRETANYA/i.test(e.loc); // casa = pavelló propi
+      let home = /LA COLINA|GRAN BRETANYA/i.test(e.loc); // casa = pavelló propi
       const M = madrid(e.start.d);
       const info = OWN[sigla];
+      let loc = cleanLoc(e.loc);
+
+      // Aplica correcció manual de pavelló si n'hi ha per aquest partit
+      const ov = VENUE_OVERRIDES[M.date + "|" + sigla];
+      if (ov) {
+        if (ov.loc != null) loc = ov.loc;
+        if (ov.home != null) home = ov.home;
+      }
+
       return {
         date: M.date, dow: wdmap[M.wd], time: M.time,
         team: info.team, fam: info.fam, sex: info.sex,
-        rival, home, loc: cleanLoc(e.loc),
+        rival, home, loc,
       };
     })
     .filter(Boolean)
