@@ -117,8 +117,15 @@
     }
 
     const VIEWS = [];
+    // Rangs de dates (dilluns–diumenge) per detectar la setmana actual en carregar
+    const PRE_DATES = {
+      "17-21": ["2026-08-17","2026-08-23"],
+      "24-28": ["2026-08-24","2026-08-30"],
+      "31":    ["2026-08-31","2026-09-06"]
+    };
     DATA.pre.forEach(w => VIEWS.push({
       label: "Agost " + w.range,
+      dates: PRE_DATES[w.range] || null,
       render: () =>
         '<div class="section-title">Pretemporada · Agost ' + w.range + '</div>' +
         '<p class="section-sub">Setmana del ' + w.range + ' d\'agost</p>' +
@@ -126,6 +133,7 @@
     }));
     VIEWS.push({
       label: "Temporada 26-27",
+      dates: null,
       render: () => {
         let html = '<div class="section-title">Proposta horaris temporada 26-27</div>' +
           '<p class="section-sub">Horari setmanal per instal·lació</p>' +
@@ -148,7 +156,20 @@
       b.className="tab"; b.textContent=v.label; b.onclick=()=>show(i);
       tabsEl.appendChild(b);
     });
-    show(VIEWS.length-1); // per defecte: temporada 26-27
+    // Selecciona per defecte la vista de la setmana on estiguem (segons la data d'avui).
+    // Si avui cau dins d'un rang de pretemporada, obre aquella setmana; si no, la temporada 26-27.
+    function defaultView(){
+      const now = new Date();
+      const today = now.getFullYear() + "-" +
+        String(now.getMonth()+1).padStart(2,"0") + "-" +
+        String(now.getDate()).padStart(2,"0");
+      for(let i=0;i<VIEWS.length;i++){
+        const d = VIEWS[i].dates;
+        if(d && today >= d[0] && today <= d[1]) return i;
+      }
+      return VIEWS.length-1; // temporada 26-27
+    }
+    show(defaultView());
   </script>
 </body>
 </html>
