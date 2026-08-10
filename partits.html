@@ -46,9 +46,7 @@
     .dayblock-date { font-size:0.82rem; font-weight:500; opacity:0.85; }
     .daygroup { margin:0 0 16px; padding-left:12px; border-left:3px solid var(--line); }
     .daygroup:last-child { margin-bottom:0; }
-    /* Fora: dissabte i diumenge un al costat de l'altre */
-    .daycols { display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; }
-    .daycols > .daygroup { flex:1 1 320px; min-width:280px; margin-bottom:0; }
+
     .daygroup-head { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:700; margin:0 0 10px; }
     .slotgroup { margin:0 0 14px; }
     .slotgroup:last-child { margin-bottom:0; }
@@ -243,8 +241,9 @@
           daysHtml += '<div class="daygroup"><div class="daygroup-head">' + d.name +
             ' · ' + fmtDate(addDays(wk.monday,d.off)) + '</div>' + inner + '</div>';
         });
-        // Fora: dissabte i diumenge en fila (columnes); casa: apilat.
-        html += sec.home ? daysHtml : ('<div class="daycols">' + daysHtml + '</div>');
+        // Dissabte primer i diumenge a sota (apilats); dins de cada dia,
+        // els partits van d'esquerra a dreta per hora.
+        html += daysHtml;
         html += '</div>';
       });
       return any ? html : '';
