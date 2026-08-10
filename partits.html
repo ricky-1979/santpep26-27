@@ -69,24 +69,22 @@
     .badge.sex.masc { background:#e3f2fd; color:#0d47a1; }
     .badge.sex.fem { background:#fce4ec; color:#880e4f; }
     .badge.day { background:#ede7f6; color:#4527a0; }
-    /* Graella horitzontal (partits de casa): files=pavelló, columnes=franja */
-    .hgrid-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; }
-    .hgrid { display:grid; gap:8px; min-width:max-content; align-items:stretch; }
-    .hgrid-corner { }
+    /* Graella de casa: 3 columnes iguals (les 3 hores de la franja) */
+    .hgrid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+      align-items:start; margin:0 0 14px; }
+    .hgrid3:last-child { margin-bottom:0; }
     .hgrid-th { font-size:0.82rem; font-weight:700; color:var(--brand-dark);
-      background:var(--accent); padding:4px 12px; border-radius:6px; text-align:center;
-      align-self:end; }
-    .hgrid-rowhead { display:flex; align-items:center; font-size:0.8rem; font-weight:700;
-      color:var(--brand-dark); padding:0 12px 0 0; white-space:nowrap; }
-    .hgrid-cell { display:flex; flex-direction:column; gap:8px; }
-    .hgrid-cell.empty { }
+      background:var(--accent); padding:4px 12px; border-radius:6px; text-align:center; }
+    .hcell { display:flex; flex-direction:column; gap:10px; }
+    .hcell.empty { }
     .gchip { background:var(--card); border:1px solid var(--line); border-radius:10px;
-      box-shadow:var(--shadow); padding:8px 10px; display:flex; flex-direction:column; gap:4px;
-      min-width:200px; }
+      box-shadow:var(--shadow); padding:8px 10px; display:flex; flex-direction:column; gap:4px; }
     .gchip-top { display:flex; align-items:center; gap:6px; }
     .gchip-team { font-weight:700; font-size:0.88rem; }
     .gchip-vs { font-size:0.82rem; color:var(--muted); }
     .gchip-vs .lbl { color:var(--brand); font-weight:600; }
+    .gchip-loc { font-size:0.76rem; color:var(--muted); }
+    @media (max-width:520px){ .hgrid3 { grid-template-columns:1fr; } .hgrid3 .hgrid-th { text-align:left; } }
     .game-team { font-weight:700; font-size:0.92rem; }
     .game-vs { font-size:0.86rem; color:var(--ink); }
     .game-vs .lbl { color:var(--muted); font-size:0.78rem; }
@@ -156,14 +154,17 @@
       return loc;
     }
 
-    // Targeta compacta per a les cel·les de la graella horitzontal (casa).
+    // Targeta compacta per a les cel·les de la graella de casa.
     function gameChip(g){
       const sexCls = g.sex==='F' ? 'fem' : 'masc';
       const sexLbl = g.sex==='F' ? 'Femení' : 'Masculí';
       const sexBadge = '<span class="badge sex ' + sexCls + '">' + sexLbl + '</span>';
+      // Pavelló només si no és La Colina (implícit a casa).
+      const showLoc = g.loc && !/LA COLINA/i.test(g.loc);
+      const loc = showLoc ? '<div class="gchip-loc">📍 ' + venueName(g.loc) + '</div>' : '';
       return '<div class="gchip"><div class="gchip-top">' + sexBadge +
         '<span class="gchip-team">' + g.team + '</span></div>' +
-        '<div class="gchip-vs"><span class="lbl">vs</span> ' + g.rival + '</div></div>';
+        '<div class="gchip-vs"><span class="lbl">vs</span> ' + g.rival + '</div>' + loc + '</div>';
     }
 
     // Graella horitzontal per a un dia de casa: files=pavelló, columnes=franja.
@@ -171,39 +172,39 @@
     const HOME_MORNING=['09:00','10:45','12:30'];
     const HOME_AFTERNOON=['16:00','17:45','19:30'];
 
+    // Un bloc (matí o tarda): 3 columnes iguals per a les 3 hores fixes.
+    // Cada cel·la apila els partits d'aquella hora (2n partit = 2a fila).
+    function homeBlock(gs, cols){
+      const bySlot={};
+      gs.forEach(function(g){ (bySlot[g.time]=bySlot[g.time]||[]).push(g); });
+      let h='<div class="hgrid3">';
+      // Capçalera d'hores
+      cols.forEach(function(t){ h += '<div class="hgrid-th">' + t + '</div>'; });
+      // Cel·les (una per hora); cada una apila els seus partits
+      cols.forEach(function(t){
+        const list=bySlot[t]||[];
+        h += '<div class="hcell' + (list.length?'':' empty') + '">' +
+          list.map(gameChip).join('') + '</div>';
+      });
+      h += '</div>';
+      return h;
+    }
+
     function homeGrid(gs){
-      // Pavellons (files) presents, en ordre d'aparició.
-      const venues=[]; const cell={};
-      gs.forEach(function(g){
-        const v=venueName(g.loc);
-        if(venues.indexOf(v)<0) venues.push(v);
-        (cell[v+'|'+g.time]=cell[v+'|'+g.time]||[]).push(g);
+      const morning=gs.filter(function(g){ return HOME_MORNING.indexOf(g.time)>=0; });
+      const afternoon=gs.filter(function(g){ return HOME_AFTERNOON.indexOf(g.time)>=0; });
+      const other=gs.filter(function(g){
+        return HOME_MORNING.indexOf(g.time)<0 && HOME_AFTERNOON.indexOf(g.time)<0;
       });
-      // Columnes: blocs fixos (amb franges buides) que tinguin algun partit el dia,
-      // més qualsevol hora fora d'horari estàndard que hi pugui haver.
-      let slots=[];
-      const hasMorning=gs.some(function(g){ return HOME_MORNING.indexOf(g.time)>=0; });
-      const hasAfternoon=gs.some(function(g){ return HOME_AFTERNOON.indexOf(g.time)>=0; });
-      if(hasMorning) slots=slots.concat(HOME_MORNING);
-      if(hasAfternoon) slots=slots.concat(HOME_AFTERNOON);
-      gs.forEach(function(g){ if(slots.indexOf(g.time)<0) slots.push(g.time); });
-      slots.sort();
-      const cols = 1 + slots.length; // capçalera de fila + franges
-      let h='<div class="hgrid-wrap"><div class="hgrid" style="grid-template-columns:auto repeat(' +
-        slots.length + ',minmax(200px,1fr));">';
-      // Fila de capçaleres
-      h += '<div class="hgrid-corner"></div>';
-      slots.forEach(function(t){ h += '<div class="hgrid-th">' + t + '</div>'; });
-      // Files per pavelló
-      venues.forEach(function(v){
-        h += '<div class="hgrid-rowhead">' + v + '</div>';
-        slots.forEach(function(t){
-          const list=cell[v+'|'+t];
-          h += '<div class="hgrid-cell' + (list?'':' empty') + '">' +
-            (list ? list.map(gameChip).join('') : '') + '</div>';
-        });
-      });
-      h += '</div></div>';
+      let h='';
+      if(morning.length) h += homeBlock(morning, HOME_MORNING);
+      if(afternoon.length) h += homeBlock(afternoon, HOME_AFTERNOON);
+      // Hores fora d'horari estàndard: bloc propi amb les seves columnes.
+      if(other.length){
+        const cols=[]; other.forEach(function(g){ if(cols.indexOf(g.time)<0) cols.push(g.time); });
+        cols.sort();
+        h += homeBlock(other, cols);
+      }
       return h;
     }
 
