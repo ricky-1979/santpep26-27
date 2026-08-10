@@ -44,6 +44,18 @@
     }
     .tab:hover { border-color: var(--brand); }
     .tab.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .filters { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    .filters-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted); font-weight: 700; margin-right: 2px; }
+    .chip {
+      border: 1px solid var(--line); background: var(--card); color: var(--ink);
+      padding: 5px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .chip:hover { border-color: var(--brand); }
+    .chip.active { background: var(--accent); color: #4a3800; border-color: var(--accent); }
+    .chip-all.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .empty-filter { color: var(--muted); font-style: italic; text-align: center; padding: 40px 0; }
     .section-title {
       font-size: 1.15rem; font-weight: 700; margin: 26px 0 4px; color: var(--brand-dark);
     }
@@ -90,6 +102,7 @@
   </header>
   <main>
     <div class="tabs" id="tabs"></div>
+    <div class="filters" id="filters"></div>
     <div id="content"></div>
   </main>
   <footer>Actualitzat des de la coordinació · CB Sant Josep de Badalona</footer>
@@ -103,15 +116,39 @@
 
     function venuePin(name){ return "📍"; }
 
+    // --- Filtres per categoria ---
+    const FAMILY_ORDER = ["SÈNIOR","JÚNIOR","CADET","INFANTIL","MINI","PREMINI","ESCOLA","TECNIFICACIÓ","ALTRES"];
+    function familyOf(cat){
+      const c = cat.toUpperCase();
+      const f = [];
+      if(/INFANTIL/.test(c)) f.push("INFANTIL");
+      if(/CADET/.test(c)) f.push("CADET");
+      if(/JUNIOR/.test(c)) f.push("JÚNIOR");
+      if(/SENIOR/.test(c)) f.push("SÈNIOR");
+      if(/PREMINI/.test(c)) f.push("PREMINI");
+      else if(/\bMINI\b/.test(c)) f.push("MINI");
+      if(/ESCOLA/.test(c)) f.push("ESCOLA");
+      if(/TECNIFICAC/.test(c)) f.push("TECNIFICACIÓ");
+      if(/ESTRELLA|\bPAM\b|\bPBM\b/.test(c)) f.push("ALTRES");
+      if(!f.length) f.push("ALTRES");
+      return f;
+    }
+    const activeFilters = new Set(); // buit = mostra-ho tot
+    function passesFilter(cat){
+      if(activeFilters.size === 0) return true;
+      return familyOf(cat).some(fam => activeFilters.has(fam));
+    }
+
     function renderVenue(v){
       let daysHtml = "";
       const hideCourt = /BUFAL/i.test(v.name); // a Bufalà no es mostra l'etiqueta de pista
       v.days.forEach((day, i) => {
-        if(!day.length) return;
+        const day0 = day.filter(s => passesFilter(s.cat));
+        if(!day0.length) return;
         // Agrupa les entrades per hora, mantenint l'ordre d'aparició
         const groups = [];
         const byTime = {};
-        day.forEach(s => {
+        day0.forEach(s => {
           if(!(s.time in byTime)){ byTime[s.time] = []; groups.push(s.time); }
           byTime[s.time].push(s);
         });
@@ -127,6 +164,7 @@
         }).join("");
         daysHtml += '<div class="day"><div class="day-name">' + DAYS[i] + '</div>' + slots + '</div>';
       });
+      if(!daysHtml) return ""; // cap franja passa el filtre en aquesta instal·lació
       return '<div class="venue"><div class="venue-head"><span class="pin">' + venuePin(v.name) +
         '</span>' + v.name + '</div><div class="days">' + daysHtml + '</div></div>';
     }
@@ -161,8 +199,16 @@
       }
     });
 
+    let currentIdx = 0;
+    function renderContent(){
+      const html = VIEWS[currentIdx].render();
+      content.innerHTML = html.trim()
+        ? html
+        : '<p class="empty-filter">Cap entrenament per als filtres seleccionats.</p>';
+    }
     function show(idx){
-      content.innerHTML = VIEWS[idx].render();
+      currentIdx = idx;
+      renderContent();
       [...tabsEl.children].forEach((t,i)=>t.classList.toggle("active", i===idx));
       window.scrollTo({top:0, behavior:"smooth"});
     }
@@ -171,6 +217,43 @@
       b.className="tab"; b.textContent=v.label; b.onclick=()=>show(i);
       tabsEl.appendChild(b);
     });
+
+    // Construeix els chips de filtre per categoria (només famílies presents a les dades)
+    function buildFilters(){
+      const present = new Set();
+      const scan = v => v.days.forEach(day => day.forEach(s => familyOf(s.cat).forEach(f=>present.add(f))));
+      DATA.pre.forEach(w => w.venues.forEach(scan));
+      DATA.season.venues.forEach(scan);
+      const fams = FAMILY_ORDER.filter(f => present.has(f));
+
+      const filtersEl = document.getElementById("filters");
+      filtersEl.innerHTML = "";
+      const lbl = document.createElement("span");
+      lbl.className = "filters-label"; lbl.textContent = "Filtra:";
+      filtersEl.appendChild(lbl);
+
+      const allChip = document.createElement("button");
+      allChip.className = "chip chip-all active"; allChip.textContent = "Tots";
+      allChip.onclick = () => { activeFilters.clear(); syncChips(); renderContent(); };
+      filtersEl.appendChild(allChip);
+
+      fams.forEach(fam => {
+        const b = document.createElement("button");
+        b.className = "chip"; b.textContent = fam; b.dataset.fam = fam;
+        b.onclick = () => {
+          if(activeFilters.has(fam)) activeFilters.delete(fam); else activeFilters.add(fam);
+          syncChips(); renderContent();
+        };
+        filtersEl.appendChild(b);
+      });
+
+      function syncChips(){
+        allChip.classList.toggle("active", activeFilters.size === 0);
+        [...filtersEl.querySelectorAll(".chip[data-fam]")].forEach(c =>
+          c.classList.toggle("active", activeFilters.has(c.dataset.fam)));
+      }
+    }
+    buildFilters();
     // Selecciona per defecte la vista de la setmana on estiguem (segons la data d'avui).
     // Si avui cau dins d'un rang de pretemporada, obre aquella setmana; si no, la temporada 26-27.
     function defaultView(){
