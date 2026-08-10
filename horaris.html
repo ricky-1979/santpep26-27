@@ -60,12 +60,14 @@
     .day:last-child { border-right: none; }
     .day-name { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
       color: var(--muted); font-weight: 700; margin-bottom: 8px; }
-    .slot { padding: 6px 0; border-bottom: 1px dashed var(--line); }
+    .slot { padding: 7px 0; border-bottom: 1px dashed var(--line); }
     .slot:last-child { border-bottom: none; }
-    .slot-time { font-weight: 700; font-size: 0.82rem; color: var(--brand-dark); }
+    .slot-time { font-weight: 700; font-size: 0.82rem; color: var(--brand-dark); margin-bottom: 4px; }
+    .slot-line { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
     .slot-cat { font-size: 0.82rem; color: var(--ink); }
-    .slot-court { display: inline-block; font-size: 0.68rem; background: var(--accent);
-      color: #4a3800; padding: 1px 6px; border-radius: 6px; font-weight: 700; margin-left: 4px; }
+    .slot-court { display: inline-block; flex-shrink: 0; min-width: 58px; text-align: center;
+      font-size: 0.68rem; background: var(--accent); color: #4a3800;
+      padding: 2px 6px; border-radius: 6px; font-weight: 700; }
     .notes { background: #fff8dc; border: 1px solid #f0e0a0; border-radius: 10px;
       padding: 12px 16px; margin-top: 16px; font-size: 0.85rem; color: #5a4a00; }
     .notes strong { display: block; margin-bottom: 4px; }
@@ -106,11 +108,23 @@
       const hideCourt = /BUFAL/i.test(v.name); // a Bufalà no es mostra "Gimnàs"
       v.days.forEach((day, i) => {
         if(!day.length) return;
-        const slots = day.map(s =>
-          '<div class="slot"><span class="slot-time">' + s.time + '</span>' +
-          ((s.court && !hideCourt) ? '<span class="slot-court">' + (/^H$/i.test(s.court)?"Gimnàs":"Pista "+s.court) + '</span>' : '') +
-          '<div class="slot-cat">' + s.cat + '</div></div>'
-        ).join("");
+        // Agrupa les entrades per hora, mantenint l'ordre d'aparició
+        const groups = [];
+        const byTime = {};
+        day.forEach(s => {
+          if(!(s.time in byTime)){ byTime[s.time] = []; groups.push(s.time); }
+          byTime[s.time].push(s);
+        });
+        const slots = groups.map(time => {
+          const lines = byTime[time].map(s =>
+            '<div class="slot-line">' +
+            ((s.court && !hideCourt)
+              ? '<span class="slot-court">' + (/^H$/i.test(s.court)?"Gimnàs":"Pista "+s.court) + '</span>'
+              : '') +
+            '<span class="slot-cat">' + s.cat + '</span></div>'
+          ).join("");
+          return '<div class="slot"><div class="slot-time">' + time + '</div>' + lines + '</div>';
+        }).join("");
         daysHtml += '<div class="day"><div class="day-name">' + DAYS[i] + '</div>' + slots + '</div>';
       });
       return '<div class="venue"><div class="venue-head"><span class="pin">' + venuePin(v.name) +
