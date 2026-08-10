@@ -1,8 +1,13 @@
 name: Actualitza partits
 
 # Baixa els calendaris de partits (masculí i femení), regenera les dades
-# incrustades a partits.html i, si hi ha canvis, fa commit a main. El push
-# resultant dispara el workflow de desplegament (pages.yml).
+# incrustades a partits.html, fa commit a main si hi ha canvis i, tot seguit,
+# desplega a GitHub Pages dins el mateix run.
+#
+# Per què desplega aquí mateix: un commit fet pel github-actions[bot] amb el
+# GITHUB_TOKEN NO dispara altres workflows (limitació de GitHub), així que el
+# workflow de desplegament (pages.yml) no s'activaria per aquest commit. Per
+# tenir l'actualització 100% automàtica, publiquem des d'aquest mateix job.
 
 on:
   schedule:
@@ -11,14 +16,20 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
+# Comparteix grup amb pages.yml perquè els desplegaments se serialitzin.
 concurrency:
-  group: update-partits
+  group: pages
   cancel-in-progress: false
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy1.outputs.page_url || steps.deploy2.outputs.page_url || steps.deploy3.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,10 +44,39 @@ jobs:
         run: |
           if git diff --quiet -- partits.html; then
             echo "Sense canvis als partits."
-            exit 0
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add partits.html
+            git commit -m "Actualitza partits des dels calendaris (masc + fem)"
+            git push
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add partits.html
-          git commit -m "Actualitza partits des dels calendaris (masc + fem)"
-          git push
+
+      # --- Desplegament a Pages (des dels fitxers ja actualitzats) ---
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      # El backend de Pages retorna sovint "Deployment failed, try again
+      # later." al primer intent (error transitori, no del build). Reintentem
+      # automàticament fins a 3 cops perquè no calgui re-desplegar a mà.
+      - id: deploy1
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - if: steps.deploy1.outcome == 'failure'
+        run: sleep 15
+
+      - id: deploy2
+        if: steps.deploy1.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        run: sleep 30
+
+      # Tercer intent: aquest SÍ fa fallar el job si també falla.
+      - id: deploy3
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        uses: actions/deploy-pages@v4
