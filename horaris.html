@@ -189,7 +189,7 @@
             const sx = sexOf(s.cat); // '', 'masc' o 'fem' → color de gènere
             return '<div class="slot-line' + (sx ? ' ' + sx : '') + '">' +
               ((s.court && !hideCourt)
-                ? '<span class="slot-court">' + (/^H$/i.test(s.court)?"Pista sencera":"Pista "+s.court) + '</span>'
+                ? '<span class="slot-court">' + (/^H$/i.test(s.court)?"Tota pista":"Pista "+s.court) + '</span>'
                 : '') +
               '<span class="slot-cat">' + catLabel(s.cat) + '</span></div>';
           }).join("");
