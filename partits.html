@@ -62,6 +62,24 @@
     .badge.sex.masc { background:#e3f2fd; color:#0d47a1; }
     .badge.sex.fem { background:#fce4ec; color:#880e4f; }
     .badge.day { background:#ede7f6; color:#4527a0; }
+    /* Graella horitzontal (partits de casa): files=pavelló, columnes=franja */
+    .hgrid-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; }
+    .hgrid { display:grid; gap:8px; min-width:max-content; align-items:stretch; }
+    .hgrid-corner { }
+    .hgrid-th { font-size:0.82rem; font-weight:700; color:var(--brand-dark);
+      background:var(--accent); padding:4px 12px; border-radius:6px; text-align:center;
+      align-self:end; }
+    .hgrid-rowhead { display:flex; align-items:center; font-size:0.8rem; font-weight:700;
+      color:var(--brand-dark); padding:0 12px 0 0; white-space:nowrap; }
+    .hgrid-cell { display:flex; flex-direction:column; gap:8px; }
+    .hgrid-cell.empty { }
+    .gchip { background:var(--card); border:1px solid var(--line); border-radius:10px;
+      box-shadow:var(--shadow); padding:8px 10px; display:flex; flex-direction:column; gap:4px;
+      min-width:200px; }
+    .gchip-top { display:flex; align-items:center; gap:6px; }
+    .gchip-team { font-weight:700; font-size:0.88rem; }
+    .gchip-vs { font-size:0.82rem; color:var(--muted); }
+    .gchip-vs .lbl { color:var(--brand); font-weight:600; }
     .game-team { font-weight:700; font-size:0.92rem; }
     .game-vs { font-size:0.86rem; color:var(--ink); }
     .game-vs .lbl { color:var(--muted); font-size:0.78rem; }
@@ -123,6 +141,54 @@
         '</div><div class="game-team">' + g.team + '</div>' + vs + loc + '</div>';
     }
 
+    // Nom curt de pavelló per a les capçaleres de fila de la graella de casa.
+    function venueName(loc){
+      if(!loc) return 'Pista';
+      if(/LA COLINA/i.test(loc)) return 'La Colina';
+      if(/MONTIGAL/i.test(loc)) return 'Montigalà';
+      return loc;
+    }
+
+    // Targeta compacta per a les cel·les de la graella horitzontal (casa).
+    function gameChip(g){
+      const sexCls = g.sex==='F' ? 'fem' : 'masc';
+      const sexLbl = g.sex==='F' ? 'Femení' : 'Masculí';
+      const sexBadge = '<span class="badge sex ' + sexCls + '">' + sexLbl + '</span>';
+      return '<div class="gchip"><div class="gchip-top">' + sexBadge +
+        '<span class="gchip-team">' + g.team + '</span></div>' +
+        '<div class="gchip-vs"><span class="lbl">vs</span> ' + g.rival + '</div></div>';
+    }
+
+    // Graella horitzontal per a un dia de casa: files=pavelló, columnes=franja.
+    function homeGrid(gs){
+      // Franges (columnes) i pavellons (files) presents, en ordre.
+      const slots=[]; const venues=[]; const cell={};
+      gs.forEach(function(g){
+        if(slots.indexOf(g.time)<0) slots.push(g.time);
+        const v=venueName(g.loc);
+        if(venues.indexOf(v)<0) venues.push(v);
+        (cell[v+'|'+g.time]=cell[v+'|'+g.time]||[]).push(g);
+      });
+      slots.sort();
+      const cols = 1 + slots.length; // capçalera de fila + franges
+      let h='<div class="hgrid-wrap"><div class="hgrid" style="grid-template-columns:auto repeat(' +
+        slots.length + ',minmax(200px,1fr));">';
+      // Fila de capçaleres
+      h += '<div class="hgrid-corner"></div>';
+      slots.forEach(function(t){ h += '<div class="hgrid-th">' + t + '</div>'; });
+      // Files per pavelló
+      venues.forEach(function(v){
+        h += '<div class="hgrid-rowhead">' + v + '</div>';
+        slots.forEach(function(t){
+          const list=cell[v+'|'+t];
+          h += '<div class="hgrid-cell' + (list?'':' empty') + '">' +
+            (list ? list.map(gameChip).join('') : '') + '</div>';
+        });
+      });
+      h += '</div></div>';
+      return h;
+    }
+
     function renderWeek(wk){
       const days=[{dow:6,name:'Dissabte',off:5},{dow:0,name:'Diumenge',off:6}];
       const secs=[{home:true,name:'A La Colina (casa)'},{home:false,name:'A fora'}];
@@ -138,14 +204,19 @@
           const gs=secGames.filter(function(g){ return g.dow===d.dow; })
             .sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0; });
           if(!gs.length) return;
-          // Agrupa per franja horària, mantenint l'ordre cronològic
-          const slots=[]; const bySlot={};
-          gs.forEach(function(g){ if(!(g.time in bySlot)){ bySlot[g.time]=[]; slots.push(g.time); } bySlot[g.time].push(g); });
           let inner='';
-          slots.forEach(function(t){
-            inner += '<div class="slotgroup"><div class="slot-head">' + t + '</div><div class="games">' +
-              bySlot[t].map(gameCard).join('') + '</div></div>';
-          });
+          if(sec.home){
+            // Casa: graella horitzontal (files=pavelló, columnes=franja amb partit)
+            inner = homeGrid(gs);
+          } else {
+            // Fora: llista agrupada per franja horària (ordre cronològic)
+            const slots=[]; const bySlot={};
+            gs.forEach(function(g){ if(!(g.time in bySlot)){ bySlot[g.time]=[]; slots.push(g.time); } bySlot[g.time].push(g); });
+            slots.forEach(function(t){
+              inner += '<div class="slotgroup"><div class="slot-head">' + t + '</div><div class="games">' +
+                bySlot[t].map(gameCard).join('') + '</div></div>';
+            });
+          }
           html += '<div class="daygroup"><div class="daygroup-head">' + d.name +
             ' · ' + fmtDate(addDays(wk.monday,d.off)) + '</div>' + inner + '</div>';
         });
