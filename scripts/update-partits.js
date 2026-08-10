@@ -54,6 +54,13 @@ const VENUE_OVERRIDES = {
   "2026-09-13|IAM": { loc: "Pavelló de Montigalà", home: true }, // Infantil A masculí
 };
 
+// Ordre manual de les files dins d'una franja de la graella de casa. Per
+// defecte els partits d'una mateixa hora s'ordenen per nom d'equip; aquí es
+// pot forçar l'ordre desitjat (de dalt a baix). Clau: "dateISO|time".
+const ROW_ORDER = {
+  "2026-09-13|19:30": ["Infantil A", "Cadet B"], // Infantil A a dalt, Cadet B a sota
+};
+
 function fetchText(url) {
   return new Promise((resolve, reject) => {
     https
@@ -154,15 +161,28 @@ function parseCalendar(ics) {
 
 function buildData(calendars) {
   // calendars: [{ ics }] — s'uneixen tots els partits dels dos gèneres
+  // Índex d'ordre manual per franja (ROW_ORDER): retorna la posició de l'equip
+  // dins la llista forçada, o Infinity si no hi és (queda darrere).
+  const rowRank = (g) => {
+    const order = ROW_ORDER[g.date + "|" + g.time];
+    if (!order) return null;
+    const i = order.indexOf(g.team);
+    return i < 0 ? Infinity : i;
+  };
+
   const games = calendars
     .flatMap((c) => parseCalendar(c.ics))
-    .sort((a, b) =>
-      a.date < b.date ? -1 : a.date > b.date ? 1 :
-      a.time < b.time ? -1 : a.time > b.time ? 1 :
-      a.sex < b.sex ? -1 : a.sex > b.sex ? 1 :
-      a.team < b.team ? -1 : a.team > b.team ? 1 :
-      a.rival < b.rival ? -1 : a.rival > b.rival ? 1 : 0
-    );
+    .sort((a, b) => {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      if (a.time !== b.time) return a.time < b.time ? -1 : 1;
+      // Ordre manual de files dins la mateixa franja, si està definit.
+      const ra = rowRank(a), rb = rowRank(b);
+      if (ra !== null && rb !== null && ra !== rb) return ra - rb;
+      if (a.sex !== b.sex) return a.sex < b.sex ? -1 : 1;
+      if (a.team !== b.team) return a.team < b.team ? -1 : 1;
+      if (a.rival !== b.rival) return a.rival < b.rival ? -1 : 1;
+      return 0;
+    });
 
   const byWeek = {};
   games.forEach((g) => {
