@@ -140,7 +140,9 @@ function buildData(calendars) {
     .sort((a, b) =>
       a.date < b.date ? -1 : a.date > b.date ? 1 :
       a.time < b.time ? -1 : a.time > b.time ? 1 :
-      a.sex < b.sex ? -1 : 1
+      a.sex < b.sex ? -1 : a.sex > b.sex ? 1 :
+      a.team < b.team ? -1 : a.team > b.team ? 1 :
+      a.rival < b.rival ? -1 : a.rival > b.rival ? 1 : 0
     );
 
   const byWeek = {};
