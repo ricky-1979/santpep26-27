@@ -40,9 +40,11 @@
     .section-title { font-size:1.15rem; font-weight:700; margin:26px 0 4px; color:var(--brand-dark); }
     .section-sub { color:var(--muted); font-size:0.85rem; margin:0 0 14px; }
     .dayblock { margin-bottom:28px; }
-    .dayblock-head { display:flex; align-items:baseline; gap:8px; margin:18px 0 12px;
+    .dayblock-head { display:flex; align-items:center; gap:8px; margin:18px 0 12px;
       padding:8px 14px; background:var(--brand); color:#fff; border-radius:10px;
       font-size:1rem; font-weight:700; }
+    .dayblock-head .count { margin-left:auto; font-size:0.78rem; font-weight:700;
+      background:var(--accent); color:var(--brand-dark); padding:2px 10px; border-radius:20px; }
     .dayblock-date { font-size:0.82rem; font-weight:500; opacity:0.85; }
     .daygroup { margin:0 0 16px; padding-left:12px; border-left:3px solid var(--line); }
     .daygroup:last-child { margin-bottom:0; }
@@ -216,7 +218,10 @@
         const secGames=wk.games.filter(function(g){ return g.home===sec.home && passes(g); });
         if(!secGames.length) return;
         any=true;
-        html += '<div class="dayblock"><h3 class="dayblock-head">' + sec.name + '</h3>';
+        const n=secGames.length;
+        const cntLbl=n + (n===1 ? ' partit' : ' partits');
+        html += '<div class="dayblock"><h3 class="dayblock-head">' + sec.name +
+          '<span class="count">' + cntLbl + '</span></h3>';
         let daysHtml='';
         days.forEach(function(d){
           const gs=secGames.filter(function(g){ return g.dow===d.dow; })
