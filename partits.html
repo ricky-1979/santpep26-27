@@ -67,9 +67,15 @@
     .badge { font-size:0.66rem; font-weight:700; padding:2px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.03em; }
     .badge.home { background:var(--home); color:var(--home-ink); }
     .badge.away { background:var(--away); color:var(--away-ink); }
-    .badge.sex.masc { background:#e3f2fd; color:#0d47a1; }
-    .badge.sex.fem { background:#fce4ec; color:#880e4f; }
     .badge.day { background:#ede7f6; color:#4527a0; }
+    /* Gènere identificat només per color (vora + fons suau) */
+    .game.masc, .gchip.masc { border-left:5px solid #1565c0; background:#f2f8fe; }
+    .game.fem, .gchip.fem { border-left:5px solid #c2185b; background:#fdf3f7; }
+    /* Chips de filtre de gènere: mateix codi de color */
+    .chip.sex-masc.active { background:#1565c0; color:#fff; border-color:#1565c0; }
+    .chip.sex-fem.active { background:#c2185b; color:#fff; border-color:#c2185b; }
+    .chip.sex-masc { border-color:#1565c0; color:#1565c0; }
+    .chip.sex-fem { border-color:#c2185b; color:#c2185b; }
     /* Graella de casa: 3 columnes iguals (les 3 hores de la franja) */
     .hgrid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
       align-items:start; margin:0 0 14px; }
@@ -134,8 +140,6 @@
 
     function gameCard(g){
       const sexCls = g.sex==='F' ? 'fem' : 'masc';
-      const sexLbl = g.sex==='F' ? 'Femení' : 'Masculí';
-      const sexBadge = '<span class="badge sex ' + sexCls + '">' + sexLbl + '</span>';
       const vs = g.home
         ? '<div class="game-vs"><span class="lbl">vs</span> ' + g.rival + '</div>'
         : '<div class="game-vs"><span class="lbl">a camp de</span> ' + g.rival + '</div>';
@@ -143,8 +147,9 @@
       // pista pròpia (p. ex. Montigalà) sí que es mostra.
       const showLoc = g.loc && (!g.home || !/LA COLINA/i.test(g.loc));
       const loc = showLoc ? '<div class="game-loc">📍 ' + g.loc + '</div>' : '';
-      return '<div class="game"><div class="game-top">' + sexBadge +
-        '</div><div class="game-team">' + g.team + '</div>' + vs + loc + '</div>';
+      // El gènere s'identifica pel color de la targeta (masc/fem), sense text.
+      return '<div class="game ' + sexCls + '"><div class="game-team">' + g.team + '</div>' +
+        vs + loc + '</div>';
     }
 
     // Nom curt de pavelló per a les capçaleres de fila de la graella de casa.
@@ -158,12 +163,11 @@
     // Targeta compacta per a les cel·les de la graella de casa.
     function gameChip(g){
       const sexCls = g.sex==='F' ? 'fem' : 'masc';
-      const sexLbl = g.sex==='F' ? 'Femení' : 'Masculí';
-      const sexBadge = '<span class="badge sex ' + sexCls + '">' + sexLbl + '</span>';
       // Pavelló només si no és La Colina (implícit a casa).
       const showLoc = g.loc && !/LA COLINA/i.test(g.loc);
       const loc = showLoc ? '<div class="gchip-loc">📍 ' + venueName(g.loc) + '</div>' : '';
-      return '<div class="gchip"><div class="gchip-top">' + sexBadge +
+      // El gènere s'identifica pel color de la targeta (masc/fem), sense text.
+      return '<div class="gchip ' + sexCls + '"><div class="gchip-top">' +
         '<span class="gchip-team">' + g.team + '</span></div>' +
         '<div class="gchip-vs"><span class="lbl">vs</span> ' + g.rival + '</div>' + loc + '</div>';
     }
@@ -326,7 +330,9 @@
         const allS=document.createElement('button'); allS.className='chip chip-all sex-all active'; allS.textContent='Tots';
         allS.onclick=function(){ activeSex.clear(); sync(); renderContent(); }; el.appendChild(allS);
         sexes.forEach(function(s){
-          const b=document.createElement('button'); b.className='chip'; b.textContent=s[1]; b.dataset.sex=s[0];
+          const b=document.createElement('button');
+          b.className='chip ' + (s[0]==='F' ? 'sex-fem' : 'sex-masc');
+          b.textContent=s[1]; b.dataset.sex=s[0];
           b.onclick=function(){ if(activeSex.has(s[0])) activeSex.delete(s[0]); else activeSex.add(s[0]); sync(); renderContent(); };
           el.appendChild(b);
         });
