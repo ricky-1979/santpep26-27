@@ -123,16 +123,17 @@
       let html='<div class="section-title">Cap de setmana ' + weekLabel(wk.monday) + '</div>' +
         '<p class="section-sub">Partits de dissabte i diumenge</p>';
       let any=false;
-      days.forEach(function(d){
-        const dayGames=wk.games.filter(function(g){ return g.dow===d.dow && passes(g); });
-        if(!dayGames.length) return;
+      secs.forEach(function(sec){
+        const secGames=wk.games.filter(function(g){ return g.home===sec.home && passes(g); });
+        if(!secGames.length) return;
         any=true;
-        html += '<div class="dayblock"><h3 class="dayblock-head">' + d.name +
-          ' <span class="dayblock-date">' + fmtDate(addDays(wk.monday,d.off)) + '</span></h3>';
-        secs.forEach(function(sec){
-          const gs=dayGames.filter(function(g){ return g.home===sec.home; });
+        html += '<div class="dayblock"><h3 class="dayblock-head">' + sec.name + '</h3>';
+        days.forEach(function(d){
+          const gs=secGames.filter(function(g){ return g.dow===d.dow; })
+            .sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0; });
           if(!gs.length) return;
-          html += '<div class="daygroup"><div class="daygroup-head">' + sec.name + '</div><div class="games">' +
+          html += '<div class="daygroup"><div class="daygroup-head">' + d.name +
+            ' · ' + fmtDate(addDays(wk.monday,d.off)) + '</div><div class="games">' +
             gs.map(gameCard).join('') + '</div></div>';
         });
         html += '</div>';
