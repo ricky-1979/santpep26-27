@@ -1,0 +1,42 @@
+name: Actualitza partits
+
+# Baixa els calendaris de partits (masculí i femení), regenera les dades
+# incrustades a partits.html i, si hi ha canvis, fa commit a main. El push
+# resultant dispara el workflow de desplegament (pages.yml).
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # cada dia a les 04:00 UTC (06:00 a Badalona a l'estiu)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-partits
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Actualitza les dades de partits
+        run: node scripts/update-partits.js
+
+      - name: Commit si hi ha canvis
+        run: |
+          if git diff --quiet -- partits.html; then
+            echo "Sense canvis als partits."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add partits.html
+          git commit -m "Actualitza partits des dels calendaris (masc + fem)"
+          git push
