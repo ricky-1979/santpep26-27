@@ -47,6 +47,10 @@
     .daygroup { margin:0 0 16px; padding-left:12px; border-left:3px solid var(--line); }
     .daygroup:last-child { margin-bottom:0; }
     .daygroup-head { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:700; margin:0 0 10px; }
+    .slotgroup { margin:0 0 14px; }
+    .slotgroup:last-child { margin-bottom:0; }
+    .slot-head { display:inline-block; font-size:0.82rem; font-weight:700; color:var(--brand-dark);
+      background:var(--accent); padding:2px 10px; border-radius:6px; margin:0 0 8px; }
     .games { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px; }
     .game { background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
       box-shadow:var(--shadow); padding:12px 14px; display:flex; flex-direction:column; gap:6px; }
@@ -115,7 +119,7 @@
       // pista pròpia (p. ex. Montigalà) sí que es mostra.
       const showLoc = g.loc && (!g.home || !/LA COLINA/i.test(g.loc));
       const loc = showLoc ? '<div class="game-loc">📍 ' + g.loc + '</div>' : '';
-      return '<div class="game"><div class="game-top"><span class="game-time">' + g.time + '</span>' + sexBadge +
+      return '<div class="game"><div class="game-top">' + sexBadge +
         '</div><div class="game-team">' + g.team + '</div>' + vs + loc + '</div>';
     }
 
@@ -134,9 +138,16 @@
           const gs=secGames.filter(function(g){ return g.dow===d.dow; })
             .sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:a.time<b.time?-1:a.time>b.time?1:0; });
           if(!gs.length) return;
+          // Agrupa per franja horària, mantenint l'ordre cronològic
+          const slots=[]; const bySlot={};
+          gs.forEach(function(g){ if(!(g.time in bySlot)){ bySlot[g.time]=[]; slots.push(g.time); } bySlot[g.time].push(g); });
+          let inner='';
+          slots.forEach(function(t){
+            inner += '<div class="slotgroup"><div class="slot-head">' + t + '</div><div class="games">' +
+              bySlot[t].map(gameCard).join('') + '</div></div>';
+          });
           html += '<div class="daygroup"><div class="daygroup-head">' + d.name +
-            ' · ' + fmtDate(addDays(wk.monday,d.off)) + '</div><div class="games">' +
-            gs.map(gameCard).join('') + '</div></div>';
+            ' · ' + fmtDate(addDays(wk.monday,d.off)) + '</div>' + inner + '</div>';
         });
         html += '</div>';
       });
