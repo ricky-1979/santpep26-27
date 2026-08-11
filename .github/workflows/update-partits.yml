@@ -63,11 +63,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy1.outputs.page_url || steps.deploy2.outputs.page_url || steps.deploy3.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Actualitza les dades de partits
         run: node scripts/update-partits.js
@@ -85,8 +85,8 @@ jobs:
           fi
 
       # --- Desplegament a Pages (des dels fitxers ja actualitzats) ---
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: .
 
@@ -95,7 +95,7 @@ jobs:
       # automàticament fins a 3 cops perquè no calgui re-desplegar a mà.
       - id: deploy1
         continue-on-error: true
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - if: steps.deploy1.outcome == 'failure'
         run: sleep 15
@@ -103,7 +103,7 @@ jobs:
       - id: deploy2
         if: steps.deploy1.outcome == 'failure'
         continue-on-error: true
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
         run: sleep 30
@@ -111,4 +111,4 @@ jobs:
       # Tercer intent: aquest SÍ fa fallar el job si també falla.
       - id: deploy3
         if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
