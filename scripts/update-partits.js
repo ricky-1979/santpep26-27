@@ -131,6 +131,8 @@ function parseCalendar(ics) {
     }))
     .filter((e) => e.start && !e.start.allday && e.start.d.getTime() >= FROM)
     .map((e) => {
+      // La 🤝 al títol marca un partit amistós.
+      const friendly = /🤝/.test(e.sum);
       const s = e.sum.replace(/🏀|🤝|🍼/g, "").trim();
       const parts = s.split(/\s+Vs\s+/i).map((x) => x.trim());
       let ownSide = -1, sigla = "";
@@ -153,6 +155,7 @@ function parseCalendar(ics) {
         date: M.date, dow: wdmap[M.wd], time: M.time,
         team: info.team, fam: info.fam, sex: info.sex,
         rival, home, loc,
+        ...(friendly ? { friendly: true } : {}),
       };
     })
     .filter(Boolean)
