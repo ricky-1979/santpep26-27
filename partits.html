@@ -143,7 +143,7 @@
       const sexCls = g.sex==='F' ? 'fem' : 'masc';
       const vs = g.home
         ? '<div class="game-vs"><span class="lbl">vs</span> ' + g.rival + '</div>'
-        : '<div class="game-vs"><span class="lbl">a camp de</span> ' + g.rival + '</div>';
+        : '<div class="game-vs"><span class="lbl">l\'equip rival és</span> ' + g.rival + '</div>';
       // A casa normalment és La Colina (no cal repetir-lo); si és una altra
       // pista pròpia (p. ex. Montigalà) sí que es mostra.
       const showLoc = g.loc && (!g.home || !/LA COLINA/i.test(g.loc));
