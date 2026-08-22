@@ -81,6 +81,7 @@
     .hgrid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
       align-items:start; margin:0 0 14px; }
     .hgrid3:last-child { margin-bottom:0; }
+    .hslot { display:flex; flex-direction:column; gap:10px; }
     .hgrid-th { font-size:0.82rem; font-weight:700; color:var(--brand-dark);
       background:var(--accent); padding:4px 12px; border-radius:6px; text-align:center; }
     .hcell { display:flex; flex-direction:column; gap:10px; }
@@ -188,13 +189,11 @@
       const bySlot={};
       gs.forEach(function(g){ (bySlot[g.time]=bySlot[g.time]||[]).push(g); });
       let h='<div class="hgrid3">';
-      // Capçalera d'hores
-      cols.forEach(function(t){ h += '<div class="hgrid-th">' + t + '</div>'; });
-      // Cel·les (una per hora); cada una apila els seus partits
       cols.forEach(function(t){
         const list=bySlot[t]||[];
-        h += '<div class="hcell' + (list.length?'':' empty') + '">' +
-          list.map(gameChip).join('') + '</div>';
+        h += '<div class="hslot"><div class="hgrid-th">' + t + '</div>' +
+          '<div class="hcell' + (list.length?'':' empty') + '">' +
+          list.map(gameChip).join('') + '</div></div>';
       });
       h += '</div>';
       return h;
