@@ -250,7 +250,7 @@
       if(key === "tov") return safeDiv(otherValue, ownValue + otherValue);
       return safeDiv(ownValue, ownValue + otherValue);
     }
-    function winRate(ownFactors, otherFactors){
+    function factorWinRate(ownFactors, otherFactors){
       let weighted = 0;
       let totalWeight = 0;
       Object.entries(factorWeights).forEach(([key, weight]) => {
@@ -261,6 +261,24 @@
       });
       return totalWeight > 0 ? weighted / totalWeight : NaN;
     }
+    function scoreWinRate(side, other){
+      const ownPoints = points(side);
+      const otherPoints = points(other);
+      if(ownPoints === 0 && otherPoints === 0) return NaN;
+      if(ownPoints === otherPoints) return 0.5;
+      const exponent = 3;
+      return safeDiv(Math.pow(ownPoints, exponent), Math.pow(ownPoints, exponent) + Math.pow(otherPoints, exponent));
+    }
+    function winRate(side, other, ownFactors, otherFactors){
+      const scoreRate = scoreWinRate(side, other);
+      const factorRate = factorWinRate(ownFactors, otherFactors);
+      if(!Number.isFinite(scoreRate)) return factorRate;
+      if(!Number.isFinite(factorRate)) return scoreRate;
+      const pointMargin = Math.abs(points(side) - points(other));
+      const totalPoints = points(side) + points(other);
+      const scoreWeight = Math.min(0.95, 0.45 + pointMargin / 50 * 0.35 + totalPoints / 160 * 0.10);
+      return scoreRate * scoreWeight + factorRate * (1 - scoreWeight);
+    }
     function updateScore(side, scoreId){
       document.getElementById(scoreId).value = points(side);
     }
@@ -270,7 +288,7 @@
       const der = defensiveEfficiency(other);
       const ownFactors = calc(side, other);
       const otherFactors = calc(other, side);
-      const win = winRate(ownFactors, otherFactors);
+      const win = winRate(side, other, ownFactors, otherFactors);
       document.getElementById(summaryId).innerHTML =
         '<div class="summary-item"><span>Win Rate</span><strong>' + wholePct(win) + '</strong></div>' +
         '<div class="summary-item"><span>Possessions</span><strong>' + whole(poss) + '</strong></div>' +
