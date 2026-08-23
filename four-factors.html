@@ -70,7 +70,7 @@
     .stepper.plus:hover { background:#ffe75a; }
     input { width:100%; border:1px solid #d7d7d7; border-radius:8px; padding:7px 8px;
       font:inherit; font-size:1rem; color:var(--ink); background:#fff; }
-    .counter input { text-align:center; font-weight:900; border-radius:8px; }
+    .counter input { text-align:center; font-weight:900; border-radius:8px; cursor:default; }
     input:focus { outline:2px solid rgba(113,63,151,0.18); border-color:var(--brand); }
     .formula { margin:14px 0 0; color:var(--muted); font-size:0.82rem; }
     .formula code { color:var(--ink); background:#fff; border:1px solid var(--line);
@@ -221,7 +221,7 @@
       return '<label for="' + inputId(side, key) + '">' + label + '<span class="counter">' +
           '<button class="stepper minus" type="button" data-target="' + inputId(side, key) +
           '" data-delta="-1" aria-label="Decrementa ' + label + '">−</button>' +
-          '<input id="' + inputId(side, key) + '" inputmode="decimal" type="number" min="0" step="1" value="0" />' +
+          '<input id="' + inputId(side, key) + '" inputmode="decimal" type="number" min="0" step="1" value="0" readonly />' +
           '<button class="stepper plus" type="button" data-target="' + inputId(side, key) +
           '" data-delta="1" aria-label="Incrementa ' + label + '">+</button></span></label>';
     }
