@@ -31,6 +31,7 @@
       border-radius:8px; padding:9px 12px; font:inherit; font-size:0.85rem; font-weight:800;
       cursor:pointer; }
     .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
+    .team-names { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:0 0 16px; }
     .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; align-items:start; }
     .panel { background:var(--card); border:1px solid var(--line); border-radius:12px;
       box-shadow:var(--shadow); padding:14px; }
@@ -60,6 +61,7 @@
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
     @media (max-width:780px) {
       .grid { grid-template-columns:1fr; }
+      .team-names { grid-template-columns:1fr; }
       .fields { grid-template-columns:1fr; }
       .results { grid-template-columns:1fr; }
     }
@@ -79,24 +81,33 @@
       <button class="btn" type="button" id="clearBtn">Neteja</button>
     </div>
 
+    <section class="team-names">
+      <label for="localName" class="panel">Equip local
+        <input id="localName" type="text" placeholder="Nom de l'equip local" />
+      </label>
+      <label for="visitorName" class="panel">Equip visitant
+        <input id="visitorName" type="text" placeholder="Nom de l'equip visitant" />
+      </label>
+    </section>
+
     <section class="grid">
       <article class="panel">
-        <h2>Equip local</h2>
+        <h2 id="teamStatsTitle">Equip local</h2>
         <div class="fields" data-side="team"></div>
       </article>
       <article class="panel">
-        <h2>Equip Visitant</h2>
+        <h2 id="oppStatsTitle">Equip Visitant</h2>
         <div class="fields" data-side="opp"></div>
       </article>
     </section>
 
     <section class="results">
       <article class="panel">
-        <h2>4 factors Equip local</h2>
+        <h2 id="teamFactorsTitle">4 factors Equip local</h2>
         <div class="factor-list" id="teamFactors"></div>
       </article>
       <article class="panel">
-        <h2>4 factors Equip Visitant</h2>
+        <h2 id="oppFactorsTitle">4 factors Equip Visitant</h2>
         <div class="factor-list" id="oppFactors"></div>
       </article>
     </section>
@@ -162,8 +173,21 @@
     function render(){
       const team = calc("team", "opp");
       const opp = calc("opp", "team");
+      renderTeamNames();
       document.getElementById("teamFactors").innerHTML = renderFactorRows(team);
       document.getElementById("oppFactors").innerHTML = renderFactorRows(opp);
+    }
+    function teamLabel(id, fallback){
+      const value = document.getElementById(id).value.trim();
+      return value || fallback;
+    }
+    function renderTeamNames(){
+      const local = teamLabel("localName", "Equip local");
+      const visitor = teamLabel("visitorName", "Equip Visitant");
+      document.getElementById("teamStatsTitle").textContent = local;
+      document.getElementById("oppStatsTitle").textContent = visitor;
+      document.getElementById("teamFactorsTitle").textContent = "4 factors " + local;
+      document.getElementById("oppFactorsTitle").textContent = "4 factors " + visitor;
     }
     function buildInputs(){
       document.querySelectorAll(".fields").forEach(box => {
@@ -203,7 +227,7 @@
       "opp-ft": 14, "opp-orb": 9, "opp-drb": 25, "opp-tov": 15
     });
     document.getElementById("clearBtn").onclick = () => {
-      document.querySelectorAll("input").forEach(input => { input.value = "0"; });
+      document.querySelectorAll('input[type="number"]').forEach(input => { input.value = "0"; });
       render();
     };
     buildInputs();
