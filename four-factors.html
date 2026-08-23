@@ -47,18 +47,13 @@
     input { width:100%; border:1px solid var(--line); border-radius:0; padding:9px 10px;
       font:inherit; font-size:1rem; color:var(--ink); background:#fff; }
     input:focus { outline:2px solid rgba(113,63,151,0.18); border-color:var(--brand); }
-    .results { margin-top:16px; }
-    table { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line);
-      border-radius:12px; overflow:hidden; box-shadow:var(--shadow); }
-    th, td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; }
-    th { background:#fbf9fd; color:var(--brand-dark); font-size:0.76rem;
-      text-transform:uppercase; letter-spacing:0.03em; }
-    td { font-size:0.9rem; }
-    tr:last-child td { border-bottom:0; }
-    .metric { font-weight:800; color:var(--brand-dark); }
-    .value { font-variant-numeric:tabular-nums; font-weight:800; }
-    .edge.good { color:var(--good); }
-    .edge.bad { color:var(--bad); }
+    .results { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:16px; }
+    .factor-list { display:grid; gap:10px; }
+    .factor-row { display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fbf9fd; }
+    .factor-name { min-width:0; color:var(--brand-dark); font-size:0.78rem;
+      font-weight:800; text-transform:uppercase; letter-spacing:0.03em; }
+    .factor-value { flex-shrink:0; font-variant-numeric:tabular-nums; font-weight:900; font-size:1rem; }
     .formula { margin:14px 0 0; color:var(--muted); font-size:0.82rem; }
     .formula code { color:var(--ink); background:#fff; border:1px solid var(--line);
       border-radius:6px; padding:1px 5px; }
@@ -66,8 +61,7 @@
     @media (max-width:780px) {
       .grid { grid-template-columns:1fr; }
       .fields { grid-template-columns:1fr; }
-      table { min-width:700px; }
-      .results { overflow:auto; }
+      .results { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -97,17 +91,14 @@
     </section>
 
     <section class="results">
-      <table>
-        <thead>
-          <tr>
-            <th>Factor</th>
-            <th>Equip local</th>
-            <th>Equip Visitant</th>
-            <th>Diferència</th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody"></tbody>
-      </table>
+      <article class="panel">
+        <h2>4 factors Equip local</h2>
+        <div class="factor-list" id="teamFactors"></div>
+      </article>
+      <article class="panel">
+        <h2>4 factors Equip Visitant</h2>
+        <div class="factor-list" id="oppFactors"></div>
+      </article>
     </section>
 
     <p class="formula">
@@ -161,25 +152,18 @@
         ftfga: safeDiv(ft, fga)
       };
     }
-    function edgeClass(key, value){
-      if(!Number.isFinite(value) || value === 0) return "";
-      const good = key === "tov" ? value < 0 : value > 0;
-      return good ? " good" : " bad";
+    function renderFactorRows(values){
+      return ["efg", "tov", "orb", "ftfga"].map(key => {
+        const formatter = key === "ftfga" ? ratio : pct;
+        return '<div class="factor-row"><span class="factor-name">' + labels[key] + '</span>' +
+          '<span class="factor-value">' + formatter(values[key]) + '</span></div>';
+      }).join("");
     }
     function render(){
       const team = calc("team", "opp");
       const opp = calc("opp", "team");
-      const rows = ["efg", "tov", "orb", "ftfga"].map(key => {
-        const formatter = key === "ftfga" ? ratio : pct;
-        const diff = team[key] - opp[key];
-        return '<tr><td class="metric">' + labels[key] + '</td>' +
-          '<td class="value">' + formatter(team[key]) + '</td>' +
-          '<td class="value">' + formatter(opp[key]) + '</td>' +
-          '<td class="value edge' + edgeClass(key, diff) + '">' +
-          (Number.isFinite(diff) ? (diff > 0 ? "+" : "") + formatter(diff) : "-") +
-          '</td></tr>';
-      }).join("");
-      document.getElementById("resultsBody").innerHTML = rows;
+      document.getElementById("teamFactors").innerHTML = renderFactorRows(team);
+      document.getElementById("oppFactors").innerHTML = renderFactorRows(opp);
     }
     function buildInputs(){
       document.querySelectorAll(".fields").forEach(box => {
