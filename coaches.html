@@ -346,11 +346,11 @@
       render();
     });
     const script = document.createElement("script");
-    script.src = SHEET_URL;
+    script.src = SHEET_URL + "&cache=" + Date.now();
     script.onerror = fail;
     document.head.appendChild(script);
     const titleScript = document.createElement("script");
-    titleScript.src = TITLES_URL;
+    titleScript.src = TITLES_URL + "&cache=" + Date.now();
     document.head.appendChild(titleScript);
   </script>
 </body>
