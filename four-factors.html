@@ -58,6 +58,12 @@
     .factor-result strong { font-size:1.4rem; line-height:1.1; color:#62666c; }
     .factor-result.good strong { color:#22b66f; }
     .factor-result.bad strong { color:#ef4438; }
+    .team-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;
+      margin-top:18px; padding:12px; border-radius:12px; background:var(--brand-dark); color:#fff; }
+    .summary-item { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; }
+    .summary-item span { color:rgba(255,255,255,0.78); font-size:0.68rem; font-weight:800;
+      text-transform:uppercase; letter-spacing:0.03em; text-align:center; }
+    .summary-item strong { font-size:1.05rem; font-weight:900; font-variant-numeric:tabular-nums; }
     label { display:flex; flex-direction:column; gap:4px; min-width:0; font-size:0.72rem;
       text-transform:uppercase; letter-spacing:0.04em; color:#62666c; font-weight:800; text-align:center; }
     .counter { display:grid; grid-template-columns:38px minmax(0,1fr) 38px; align-items:stretch; }
@@ -93,6 +99,8 @@
       .counter input { padding:5px 4px; }
       .factor-result span { font-size:0.95rem; }
       .factor-result strong { font-size:1.15rem; }
+      .team-summary { grid-template-columns:1fr; padding:10px 8px; }
+      .summary-item strong { font-size:0.95rem; }
     }
   </style>
 </head>
@@ -122,6 +130,7 @@
           </label>
         </div>
         <div class="factor-stack" data-side="team"></div>
+        <div class="team-summary" id="teamSummary"></div>
       </article>
       <article class="team-card visitor" data-side="opp">
         <div class="team-header">
@@ -133,6 +142,7 @@
           </label>
         </div>
         <div class="factor-stack" data-side="opp"></div>
+        <div class="team-summary" id="oppSummary"></div>
       </article>
     </section>
 
@@ -176,7 +186,10 @@
       return Number.isFinite(value) ? value : 0;
     }
     function pct(value){ return Number.isFinite(value) ? (value * 100).toFixed(1) + "%" : "-"; }
+    function wholePct(value){ return Number.isFinite(value) ? Math.round(value * 100) + "%" : "-"; }
     function ratio(value){ return Number.isFinite(value) ? value.toFixed(3) : "-"; }
+    function decimal(value){ return Number.isFinite(value) ? value.toFixed(1) : "-"; }
+    function whole(value){ return Number.isFinite(value) ? Math.round(value) : "-"; }
     function safeDiv(a, b){ return b > 0 ? a / b : NaN; }
     function factorFormatter(key){ return key === "ftfga" ? ratio : pct; }
     function factorTone(key, own, other){
@@ -209,12 +222,41 @@
       updateScore("opp", "visitorScore");
       updateFactors("team", team, opp);
       updateFactors("opp", opp, team);
+      updateSummary("team", "opp", "teamSummary");
+      updateSummary("opp", "team", "oppSummary");
     }
     function points(side){
       return n(side, "fg") * 2 + n(side, "tp") * 3 + n(side, "ft");
     }
+    function possessions(side){
+      return n(side, "fga") - n(side, "orb") + n(side, "tov") + 0.44 * n(side, "fta");
+    }
+    function offensiveEfficiency(side){
+      return safeDiv(points(side), possessions(side)) * 100;
+    }
+    function defensiveEfficiency(other){
+      return offensiveEfficiency(other);
+    }
+    function winRate(oer, der){
+      if(!Number.isFinite(oer) || !Number.isFinite(der) || oer <= 0 || der <= 0) return NaN;
+      const exponent = 14;
+      const attack = Math.pow(oer, exponent);
+      const defense = Math.pow(der, exponent);
+      return safeDiv(attack, attack + defense);
+    }
     function updateScore(side, scoreId){
       document.getElementById(scoreId).value = points(side);
+    }
+    function updateSummary(side, other, summaryId){
+      const poss = possessions(side);
+      const oer = offensiveEfficiency(side);
+      const der = defensiveEfficiency(other);
+      const win = winRate(oer, der);
+      document.getElementById(summaryId).innerHTML =
+        '<div class="summary-item"><span>Win Rate</span><strong>' + wholePct(win) + '</strong></div>' +
+        '<div class="summary-item"><span>Possessions</span><strong>' + whole(poss) + '</strong></div>' +
+        '<div class="summary-item"><span>OER</span><strong>' + decimal(oer) + '</strong></div>' +
+        '<div class="summary-item"><span>DER</span><strong>' + decimal(der) + '</strong></div>';
     }
     function controlHtml(side, key){
       const label = fieldLabels[key];
