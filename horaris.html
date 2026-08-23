@@ -204,11 +204,11 @@
 
     const VIEWS = [];
     // Rangs de dates per detectar la setmana que s'ha de mostrar en carregar.
-    // El diumenge ja es considera preparació de la setmana següent.
+    // Dissabte i diumenge ja es consideren preparació de la setmana següent.
     const PRE_DATES = {
-      "17-21": ["0000-01-01","2026-08-22"],
-      "24-28": ["2026-08-23","2026-08-29"],
-      "31":    ["2026-08-30","2026-09-05"]
+      "17-21": ["0000-01-01","2026-08-21"],
+      "24-28": ["2026-08-22","2026-08-28"],
+      "31":    ["2026-08-29","2026-09-04"]
     };
     DATA.pre.forEach(w => VIEWS.push({
       label: "Agost " + w.range,
