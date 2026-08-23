@@ -118,7 +118,7 @@
             <input id="localName" type="text" placeholder="Local" />
           </label>
           <label for="localScore" class="score-field">Punts
-            <input id="localScore" type="number" min="0" step="1" value="0" />
+            <input id="localScore" type="number" min="0" step="1" value="0" readonly />
           </label>
         </div>
         <div class="factor-stack" data-side="team"></div>
@@ -129,7 +129,7 @@
             <input id="visitorName" type="text" placeholder="Visitant" />
           </label>
           <label for="visitorScore" class="score-field">Punts
-            <input id="visitorScore" type="number" min="0" step="1" value="0" />
+            <input id="visitorScore" type="number" min="0" step="1" value="0" readonly />
           </label>
         </div>
         <div class="factor-stack" data-side="opp"></div>
@@ -137,7 +137,7 @@
     </section>
 
     <p class="formula">
-      Fórmules: <code>eFG% = (FG + 0.5 * 3P) / FGA</code>,
+      Fórmules: <code>eFG% = (FGM + 1.5 * 3PM) / FGA</code>,
       <code>TOV% = TOV / (FGA + 0.44 * FTA + TOV)</code>,
       <code>ORB% = ORB / (ORB + Opp DRB)</code>,
       <code>FT/FGA = FT / FGA</code>.
@@ -196,7 +196,7 @@
       const tov = n(side, "tov");
       const oppDrb = n(other, "drb");
       return {
-        efg: safeDiv(fg + 0.5 * tp, fga),
+        efg: safeDiv(fg + 1.5 * tp, fga),
         tov: safeDiv(tov, fga + 0.44 * fta + tov),
         orb: safeDiv(orb, orb + oppDrb),
         ftfga: safeDiv(ft, fga)
@@ -205,8 +205,16 @@
     function render(){
       const team = calc("team", "opp");
       const opp = calc("opp", "team");
+      updateScore("team", "localScore");
+      updateScore("opp", "visitorScore");
       updateFactors("team", team, opp);
       updateFactors("opp", opp, team);
+    }
+    function points(side){
+      return n(side, "fg") * 2 + n(side, "tp") * 3 + n(side, "ft");
+    }
+    function updateScore(side, scoreId){
+      document.getElementById(scoreId).value = points(side);
     }
     function controlHtml(side, key){
       const label = fieldLabels[key];
@@ -260,14 +268,14 @@
       render();
     }
     document.getElementById("sampleBtn").onclick = () => setValues({
-      "localName": "IAM", "visitorName": "SESE", "localScore": 18, "visitorScore": 39,
-      "team-fg": 30, "team-fga": 68, "team-tp": 8, "team-fta": 18,
-      "team-ft": 13, "team-orb": 11, "team-drb": 27, "team-tov": 12,
-      "opp-fg": 27, "opp-fga": 64, "opp-tp": 6, "opp-fta": 20,
-      "opp-ft": 14, "opp-orb": 9, "opp-drb": 25, "opp-tov": 15
+      "localName": "IAM", "visitorName": "SESE",
+      "team-fg": 7, "team-fga": 23, "team-tp": 0, "team-fta": 11,
+      "team-ft": 4, "team-orb": 8, "team-drb": 15, "team-tov": 21,
+      "opp-fg": 16, "opp-fga": 39, "opp-tp": 2, "opp-fta": 13,
+      "opp-ft": 5, "opp-orb": 8, "opp-drb": 11, "opp-tov": 8
     });
     document.getElementById("clearBtn").onclick = () => {
-      document.querySelectorAll('input[type="number"]').forEach(input => { input.value = "0"; });
+      document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
       render();
     };
     document.getElementById("resetBtn").onclick = () => {
@@ -275,7 +283,7 @@
       if(!ok) return;
       document.getElementById("localName").value = "";
       document.getElementById("visitorName").value = "";
-      document.querySelectorAll('input[type="number"]').forEach(input => { input.value = "0"; });
+      document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
       render();
     };
     buildInputs();
