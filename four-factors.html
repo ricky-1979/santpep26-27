@@ -179,6 +179,12 @@
       orb: "OR%",
       ftfga: "FT"
     };
+    const factorWeights = {
+      efg: 0.40,
+      tov: 0.25,
+      orb: 0.20,
+      ftfga: 0.15
+    };
 
     function inputId(side, key){ return side + "-" + key; }
     function n(side, key){
@@ -236,12 +242,24 @@
     function defensiveEfficiency(other){
       return offensiveEfficiency(other);
     }
-    function winRate(oer, der){
-      if(!Number.isFinite(oer) || !Number.isFinite(der) || oer <= 0 || der <= 0) return NaN;
-      const exponent = 14;
-      const attack = Math.pow(oer, exponent);
-      const defense = Math.pow(der, exponent);
-      return safeDiv(attack, attack + defense);
+    function factorShare(key, own, other){
+      const ownValue = own[key];
+      const otherValue = other[key];
+      if(!Number.isFinite(ownValue) || !Number.isFinite(otherValue)) return NaN;
+      if(ownValue === 0 && otherValue === 0) return 0.5;
+      if(key === "tov") return safeDiv(otherValue, ownValue + otherValue);
+      return safeDiv(ownValue, ownValue + otherValue);
+    }
+    function winRate(ownFactors, otherFactors){
+      let weighted = 0;
+      let totalWeight = 0;
+      Object.entries(factorWeights).forEach(([key, weight]) => {
+        const share = factorShare(key, ownFactors, otherFactors);
+        if(!Number.isFinite(share)) return;
+        weighted += share * weight;
+        totalWeight += weight;
+      });
+      return totalWeight > 0 ? weighted / totalWeight : NaN;
     }
     function updateScore(side, scoreId){
       document.getElementById(scoreId).value = points(side);
@@ -250,7 +268,9 @@
       const poss = possessions(side);
       const oer = offensiveEfficiency(side);
       const der = defensiveEfficiency(other);
-      const win = winRate(oer, der);
+      const ownFactors = calc(side, other);
+      const otherFactors = calc(other, side);
+      const win = winRate(ownFactors, otherFactors);
       document.getElementById(summaryId).innerHTML =
         '<div class="summary-item"><span>Win Rate</span><strong>' + wholePct(win) + '</strong></div>' +
         '<div class="summary-item"><span>Possessions</span><strong>' + whole(poss) + '</strong></div>' +
