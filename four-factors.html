@@ -58,7 +58,6 @@
     .factor-result strong { font-size:1.4rem; line-height:1.1; color:#62666c; }
     .factor-result.good strong { color:#22b66f; }
     .factor-result.bad strong { color:#ef4438; }
-    .factor-result.warn strong { color:#e9c400; }
     label { display:flex; flex-direction:column; gap:4px; min-width:0; font-size:0.72rem;
       text-transform:uppercase; letter-spacing:0.04em; color:#62666c; font-weight:800; text-align:center; }
     .counter { display:grid; grid-template-columns:38px minmax(0,1fr) 38px; align-items:stretch; }
@@ -180,11 +179,12 @@
     function ratio(value){ return Number.isFinite(value) ? value.toFixed(3) : "-"; }
     function safeDiv(a, b){ return b > 0 ? a / b : NaN; }
     function factorFormatter(key){ return key === "ftfga" ? ratio : pct; }
-    function factorTone(key, values){
-      if(key === "ftfga") return " warn";
-      if(!Number.isFinite(values[key])) return "";
-      if(key === "tov") return values[key] <= 0.18 ? " good" : " bad";
-      return values[key] >= 0.4 ? " good" : " bad";
+    function factorTone(key, own, other){
+      const ownValue = own[key];
+      const otherValue = other[key];
+      if(!Number.isFinite(ownValue) || !Number.isFinite(otherValue) || ownValue === otherValue) return "";
+      const ownIsBetter = key === "tov" ? ownValue < otherValue : ownValue > otherValue;
+      return ownIsBetter ? " good" : " bad";
     }
     function calc(side, other){
       const fg = n(side, "fg");
@@ -205,8 +205,8 @@
     function render(){
       const team = calc("team", "opp");
       const opp = calc("opp", "team");
-      updateFactors("team", team);
-      updateFactors("opp", opp);
+      updateFactors("team", team, opp);
+      updateFactors("opp", opp, team);
     }
     function controlHtml(side, key){
       const label = fieldLabels[key];
@@ -238,10 +238,10 @@
         button.addEventListener("click", () => adjustInput(button.dataset.target, Number(button.dataset.delta)));
       });
     }
-    function updateFactors(side, values){
+    function updateFactors(side, values, otherValues){
       factorGroups.forEach(group => {
         const el = document.getElementById(side + "-factor-" + group.key);
-        el.className = "factor-result" + factorTone(group.key, values);
+        el.className = "factor-result" + factorTone(group.key, values, otherValues);
         el.querySelector("strong").textContent = factorFormatter(group.key)(values[group.key]);
       });
     }
