@@ -188,7 +188,7 @@
           '<label for="' + inputId(side, key) + '">' + label + '<span class="counter">' +
           '<button class="stepper minus" type="button" data-target="' + inputId(side, key) +
           '" data-delta="-1" aria-label="Decrementa ' + label + '">-</button>' +
-          '<input id="' + inputId(side, key) + '" inputmode="decimal" type="number" min="0" step="1" />' +
+          '<input id="' + inputId(side, key) + '" inputmode="decimal" type="number" min="0" step="1" value="0" />' +
           '<button class="stepper plus" type="button" data-target="' + inputId(side, key) +
           '" data-delta="1" aria-label="Incrementa ' + label + '">+</button></span></label>'
         ).join("");
@@ -219,7 +219,7 @@
       "opp-ft": 14, "opp-orb": 9, "opp-drb": 25, "opp-tov": 15
     });
     document.getElementById("clearBtn").onclick = () => {
-      document.querySelectorAll("input").forEach(input => { input.value = ""; });
+      document.querySelectorAll("input").forEach(input => { input.value = "0"; });
       render();
     };
     buildInputs();
