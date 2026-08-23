@@ -128,6 +128,10 @@
         "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
       }[c]));
     }
+    function titleCaseName(s){
+      return clean(s).toLocaleLowerCase("ca").replace(/(^|[\s'-])(\p{L})/gu,
+        (_, sep, letter) => sep + letter.toLocaleUpperCase("ca"));
+    }
     function findHeader(headers, names){
       const wanted = names.map(key);
       return headers.findIndex(h => wanted.includes(key(h)));
@@ -302,7 +306,7 @@
       const titleCell = r => "<td>" + (esc(r.title) || '<span class="missing">-</span>') + "</td>";
       els.table.innerHTML = '<table><thead><tr><th>Coach</th><th>Equip</th>' + titleHead +
         '<th>Polo</th><th>Desuadora</th><th>Pantaló</th></tr></thead><tbody>' +
-        rows.map(r => '<tr><td class="name">' + esc(r.name + " " + r.surname) + '</td>' +
+        rows.map(r => '<tr><td class="name">' + esc(titleCaseName(r.name + " " + r.surname)) + '</td>' +
           '<td><span class="team">' + esc(r.team) + '</span></td>' +
           titleCell(r) + '<td>' + piece(r.polo) + '</td><td>' + piece(r.hoodie) +
           '</td><td>' + piece(r.pants) + '</td></tr>').join("") +
