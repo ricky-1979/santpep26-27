@@ -125,6 +125,7 @@
 
     // --- Filtres per categoria ---
     const FAMILY_ORDER = ["SÈNIOR","JÚNIOR","CADET","INFANTIL","MINI","PREMINI","ESCOLA","TECNIFICACIÓ","ALTRES"];
+    const SEASON_ONLY_FILTERS = new Set(["MINI","ESCOLA","TECNIFICACIÓ","ALTRES"]);
     // Gènere d'una categoria a partir del sufix MASC/FEM del text.
     // Retorna 'masc', 'fem' o '' (sense gènere, p. ex. TECNIFICACIÓ, MIXTE).
     function sexOf(cat){
@@ -242,6 +243,7 @@
     }
     function show(idx){
       currentIdx = idx;
+      buildFilters();
       renderContent();
       [...tabsEl.children].forEach((t,i)=>t.classList.toggle("active", i===idx));
       window.scrollTo({top:0, behavior:"smooth"});
@@ -256,9 +258,16 @@
     function buildFilters(){
       const present = new Set();
       const scan = v => v.days.forEach(day => day.forEach(s => familyOf(s.cat).forEach(f=>present.add(f))));
-      DATA.pre.forEach(w => w.venues.forEach(scan));
-      DATA.season.venues.forEach(scan);
-      const fams = FAMILY_ORDER.filter(f => present.has(f));
+      const currentView = VIEWS[currentIdx];
+      const isSeason = !currentView.dates;
+      if(isSeason) DATA.season.venues.forEach(scan);
+      else DATA.pre[currentIdx].venues.forEach(scan);
+      const fams = FAMILY_ORDER.filter(f =>
+        present.has(f) && (isSeason || !SEASON_ONLY_FILTERS.has(f))
+      );
+      activeFilters.forEach(f => {
+        if(!fams.includes(f)) activeFilters.delete(f);
+      });
 
       const filtersEl = document.getElementById("filters");
       filtersEl.innerHTML = "";
