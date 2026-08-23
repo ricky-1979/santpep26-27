@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>Roba coachs Pentex · CB Sant Josep</title>
+  <style>
+    :root {
+      --brand:#713f97; --brand-dark:#5a2f7d; --accent:#fcdb20;
+      --bg:#f5f3f8; --card:#ffffff; --ink:#2a2233; --muted:#7a7085;
+      --line:#e6e0ee; --shadow:0 1px 3px rgba(60,40,90,0.08),0 4px 16px rgba(60,40,90,0.06); --radius:14px;
+      --ok:#0f766e; --empty:#c7bfce;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); min-height:100vh;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.45; -webkit-font-smoothing:antialiased; }
+    header { display:flex; align-items:center; gap:14px; padding:16px 20px;
+      background:var(--brand); color:#fff; box-shadow:var(--shadow); }
+    .logo { display:grid; place-items:center; width:48px; height:48px; flex-shrink:0;
+      background:#fff; color:var(--brand); border-radius:10px; font-weight:800; text-decoration:none; }
+    .htext h1 { margin:0; font-size:1.05rem; font-weight:700; }
+    .htext h1 .club { display:block; font-size:0.72rem; font-weight:500; opacity:0.85;
+      letter-spacing:0.04em; text-transform:uppercase; }
+    .htext p { margin:2px 0 0; font-size:0.8rem; opacity:0.9; }
+    main { max-width:1120px; margin:0 auto; padding:22px 14px 60px; }
+    .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:0 0 14px; }
+    .search { flex:1 1 240px; min-width:0; border:1px solid var(--line); border-radius:8px;
+      padding:10px 12px; font:inherit; background:#fff; color:var(--ink); }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; }
+    .tab { border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:999px;
+      padding:8px 12px; font-weight:700; font-size:0.82rem; cursor:pointer; }
+    .tab.active { background:var(--brand); color:#fff; border-color:var(--brand); }
+    .status { margin:16px 0; color:var(--muted); font-size:0.9rem; }
+    .notes { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; }
+    .note { background:#fff8c7; border:1px solid #ead46d; color:#594800;
+      border-radius:8px; padding:7px 10px; font-size:0.82rem; font-weight:650; }
+    .summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:0 0 18px; }
+    .summary-card { background:var(--card); border:1px solid var(--line); border-radius:10px;
+      box-shadow:var(--shadow); padding:12px; }
+    .summary-title { display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin:0 0 8px; font-size:0.9rem; color:var(--brand-dark); font-weight:800; }
+    .summary-total { font-size:0.8rem; color:var(--muted); font-weight:700; }
+    .sizes { display:flex; flex-wrap:wrap; gap:6px; }
+    .size { display:inline-flex; align-items:center; gap:5px; background:#f7f3fb;
+      border:1px solid var(--line); border-radius:999px; padding:5px 8px; font-size:0.8rem; font-weight:700; }
+    .size b { color:var(--brand-dark); }
+    .table-wrap { background:var(--card); border:1px solid var(--line); border-radius:12px;
+      box-shadow:var(--shadow); overflow:auto; }
+    table { width:100%; border-collapse:collapse; min-width:760px; }
+    th, td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:middle; }
+    th { position:sticky; top:0; background:#fbf9fd; color:var(--brand-dark); font-size:0.78rem;
+      text-transform:uppercase; letter-spacing:0.03em; z-index:1; }
+    td { font-size:0.9rem; }
+    tr:last-child td { border-bottom:0; }
+    .name { font-weight:750; }
+    .team { display:inline-flex; align-items:center; justify-content:center; min-width:48px;
+      border-radius:999px; padding:4px 8px; background:#f0e9f7; color:var(--brand-dark); font-weight:800; font-size:0.8rem; }
+    .piece { display:inline-flex; min-width:38px; justify-content:center; border-radius:7px;
+      padding:4px 7px; background:#ecfdf5; color:var(--ok); border:1px solid #b7ebd6; font-weight:800; }
+    .missing { color:var(--empty); font-weight:700; }
+    .empty { padding:32px 16px; text-align:center; color:var(--muted); }
+    footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
+    @media (max-width:640px) {
+      main { padding:16px 10px 48px; }
+      .toolbar { align-items:stretch; }
+      .tabs { width:100%; }
+      .tab { flex:1 1 auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="index.html" title="Tornar a l'inici">SP</a>
+    <div class="htext">
+      <h1><span class="club">CB Sant Josep de Badalona</span> Roba coachs Pentex</h1>
+      <p>Talles i comanda per equip</p>
+    </div>
+  </header>
+  <main>
+    <div class="toolbar">
+      <input class="search" id="search" type="search" placeholder="Cerca coach o equip" autocomplete="off" />
+      <div class="tabs" id="teams"></div>
+    </div>
+    <div id="notes" class="notes"></div>
+    <div id="status" class="status">Carregant dades...</div>
+    <section id="summary" class="summary"></section>
+    <section class="table-wrap" id="tableWrap"></section>
+  </main>
+  <footer>Dades: Google Sheet de roba Pentex · CB Sant Josep de Badalona</footer>
+
+  <script>
+    const SHEET_ID = "1tls9XYHTJ9Ru_Ex25eHgE-PsiWIrj68nr8QYOj99W5I";
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
+      "/gviz/tq?tqx=out:json;responseHandler:loadCoachSheet";
+    const state = { rows: [], notes: [], team: "Tots", query: "", hasTitle: false };
+    const els = {
+      status: document.getElementById("status"),
+      notes: document.getElementById("notes"),
+      summary: document.getElementById("summary"),
+      table: document.getElementById("tableWrap"),
+      teams: document.getElementById("teams"),
+      search: document.getElementById("search")
+    };
+
+    function val(cell){ return cell && cell.v != null ? String(cell.v).trim() : ""; }
+    function clean(s){ return String(s || "").replace(/\s+/g, " ").trim(); }
+    function key(s){ return clean(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+    function esc(s){
+      return clean(s).replace(/[&<>"']/g, c => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+      }[c]));
+    }
+    function findHeader(headers, names){
+      const wanted = names.map(key);
+      return headers.findIndex(h => wanted.includes(key(h)));
+    }
+    function piece(value){
+      return value ? '<span class="piece">' + esc(value) + '</span>' : '<span class="missing">-</span>';
+    }
+    function parseRows(table){
+      const raw = table.rows.map(r => (r.c || []).map(val));
+      const headers = raw[0] || [];
+      const titleIdx = findHeader(headers, ["Títol", "Titol", "Titulació", "Titulacio"]);
+      state.hasTitle = titleIdx >= 0;
+      state.notes = [...new Set(raw.flatMap(row => row.slice(6).map(clean)).filter(Boolean))];
+      return raw.slice(1).map(row => ({
+        name: clean(row[0]),
+        surname: clean(row[1]),
+        team: clean(row[2]),
+        polo: clean(row[3]),
+        hoodie: clean(row[4]),
+        pants: clean(row[5]),
+        title: titleIdx >= 0 ? clean(row[titleIdx]) : ""
+      })).filter(r => r.name || r.surname || r.team);
+    }
+    function filteredRows(){
+      const q = key(state.query);
+      return state.rows.filter(r => {
+        const okTeam = state.team === "Tots" || r.team === state.team;
+        const okQuery = !q || key([r.name, r.surname, r.team, r.title].join(" ")).includes(q);
+        return okTeam && okQuery;
+      });
+    }
+    function renderTeams(){
+      const teams = ["Tots", ...[...new Set(state.rows.map(r => r.team).filter(Boolean))].sort()];
+      els.teams.innerHTML = teams.map(t =>
+        '<button class="tab' + (state.team === t ? " active" : "") +
+        '" type="button" data-team="' + esc(t) + '">' + esc(t) + '</button>'
+      ).join("");
+      els.teams.querySelectorAll("button").forEach(b => {
+        b.onclick = () => { state.team = b.dataset.team; render(); };
+      });
+    }
+    function counts(rows, field){
+      const out = {};
+      rows.forEach(r => { if(r[field]) out[r[field]] = (out[r[field]] || 0) + 1; });
+      return Object.entries(out).sort((a,b) => a[0].localeCompare(b[0], "ca"));
+    }
+    function renderSummary(rows){
+      const items = [
+        ["Polo negre", "polo"],
+        ["Desuadora negra", "hoodie"],
+        ["Pantaló llarg xandall", "pants"]
+      ];
+      els.summary.innerHTML = items.map(([label, field]) => {
+        const cs = counts(rows, field);
+        const total = cs.reduce((sum, x) => sum + x[1], 0);
+        return '<article class="summary-card"><h2 class="summary-title">' + label +
+          '<span class="summary-total">' + total + '</span></h2><div class="sizes">' +
+          (cs.length ? cs.map(([size, n]) => '<span class="size"><b>' + esc(size) +
+          '</b>' + n + '</span>').join("") : '<span class="missing">Sense talles</span>') +
+          '</div></article>';
+      }).join("");
+    }
+    function renderTable(rows){
+      if(!rows.length){
+        els.table.innerHTML = '<div class="empty">Cap coach amb aquests filtres.</div>';
+        return;
+      }
+      const titleHead = state.hasTitle ? "<th>Títol</th>" : "";
+      const titleCell = r => state.hasTitle ? "<td>" + (esc(r.title) || '<span class="missing">-</span>') + "</td>" : "";
+      els.table.innerHTML = '<table><thead><tr><th>Coach</th><th>Equip</th><th>Polo</th>' +
+        '<th>Desuadora</th><th>Pantaló</th>' + titleHead + '</tr></thead><tbody>' +
+        rows.map(r => '<tr><td class="name">' + esc(r.name + " " + r.surname) + '</td>' +
+          '<td><span class="team">' + esc(r.team) + '</span></td>' +
+          '<td>' + piece(r.polo) + '</td><td>' + piece(r.hoodie) + '</td><td>' +
+          piece(r.pants) + '</td>' + titleCell(r) + '</tr>').join("") +
+        '</tbody></table>';
+    }
+    function renderNotes(){
+      els.notes.innerHTML = state.notes.map(n => '<span class="note">' + esc(n) + '</span>').join("");
+    }
+    function render(){
+      const rows = filteredRows();
+      renderTeams();
+      renderNotes();
+      renderSummary(rows);
+      renderTable(rows);
+      els.status.textContent = rows.length + " coachs";
+    }
+    function fail(){
+      els.status.textContent = "No s'han pogut carregar les dades del Google Sheet.";
+      els.table.innerHTML = '<div class="empty">Revisa que el full sigui accessible amb l\'enllaç públic.</div>';
+    }
+    window.loadCoachSheet = function(payload){
+      if(!payload || payload.status !== "ok" || !payload.table) return fail();
+      state.rows = parseRows(payload.table);
+      render();
+    };
+    els.search.addEventListener("input", () => {
+      state.query = els.search.value;
+      render();
+    });
+    const script = document.createElement("script");
+    script.src = SHEET_URL;
+    script.onerror = fail;
+    document.head.appendChild(script);
+  </script>
+</body>
+</html>
