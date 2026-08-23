@@ -244,7 +244,16 @@
         const okQuery = !q || key([r.name, r.surname, r.team, r.title].join(" ")).includes(q);
         const okSize = !state.sizeFilter || r[state.sizeFilter.field] === state.sizeFilter.size;
         return okTeam && okQuery && okSize;
-      });
+      }).sort(compareCoachRows);
+    }
+    function compareCoachRows(a, b){
+      const titleA = a.title || "zzz";
+      const titleB = b.title || "zzz";
+      return a.team.localeCompare(b.team, "ca", { numeric: true }) ||
+        titleA.localeCompare(titleB, "ca", { numeric: true }) ||
+        titleCaseName(a.name + " " + a.surname).localeCompare(
+          titleCaseName(b.name + " " + b.surname), "ca", { numeric: true }
+        );
     }
     function baseRows(){
       const sizeFilter = state.sizeFilter;
