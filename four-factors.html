@@ -38,7 +38,13 @@
     .fields { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
     label { display:flex; flex-direction:column; gap:4px; min-width:0; font-size:0.72rem;
       text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); font-weight:800; }
-    input { width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 10px;
+    .counter { display:grid; grid-template-columns:34px minmax(0,1fr) 34px; align-items:stretch; }
+    .stepper { border:1px solid var(--line); background:#fbf9fd; color:var(--brand-dark);
+      font:inherit; font-size:1.05rem; font-weight:900; cursor:pointer; }
+    .stepper.minus { border-radius:8px 0 0 8px; }
+    .stepper.plus { border-radius:0 8px 8px 0; }
+    .stepper:hover { background:#f0e9f7; border-color:var(--brand); }
+    input { width:100%; border:1px solid var(--line); border-radius:0; padding:9px 10px;
       font:inherit; font-size:1rem; color:var(--ink); background:#fff; }
     input:focus { outline:2px solid rgba(113,63,151,0.18); border-color:var(--brand); }
     .results { margin-top:16px; }
@@ -179,11 +185,25 @@
       document.querySelectorAll(".fields").forEach(box => {
         const side = box.dataset.side;
         box.innerHTML = fields.map(([key, label]) =>
-          '<label for="' + inputId(side, key) + '">' + label +
-          '<input id="' + inputId(side, key) + '" inputmode="decimal" type="number" min="0" step="1" /></label>'
+          '<label for="' + inputId(side, key) + '">' + label + '<span class="counter">' +
+          '<button class="stepper minus" type="button" data-target="' + inputId(side, key) +
+          '" data-delta="-1" aria-label="Decrementa ' + label + '">-</button>' +
+          '<input id="' + inputId(side, key) + '" inputmode="decimal" type="number" min="0" step="1" />' +
+          '<button class="stepper plus" type="button" data-target="' + inputId(side, key) +
+          '" data-delta="1" aria-label="Incrementa ' + label + '">+</button></span></label>'
         ).join("");
       });
       document.querySelectorAll("input").forEach(input => input.addEventListener("input", render));
+      document.querySelectorAll(".stepper").forEach(button => {
+        button.addEventListener("click", () => adjustInput(button.dataset.target, Number(button.dataset.delta)));
+      });
+    }
+    function adjustInput(id, delta){
+      const input = document.getElementById(id);
+      if(!input) return;
+      const current = Number(input.value) || 0;
+      input.value = Math.max(0, current + delta);
+      render();
     }
     function setValues(values){
       Object.entries(values).forEach(([id, value]) => {
