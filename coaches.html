@@ -272,10 +272,19 @@
         b.onclick = () => { state.team = b.dataset.team; render(); };
       });
     }
+    function sizeRank(size){
+      const order = ["6XL", "5XL", "4XL", "3XL", "2XL", "XXL", "XL", "L", "M", "S", "XS", "2XS", "XXS"];
+      const idx = order.indexOf(key(size).toUpperCase());
+      return idx >= 0 ? idx : order.length;
+    }
+    function compareSizes(a, b){
+      const rank = sizeRank(a[0]) - sizeRank(b[0]);
+      return rank || a[0].localeCompare(b[0], "ca", { numeric: true });
+    }
     function counts(rows, field){
       const out = {};
       rows.forEach(r => { if(r[field]) out[r[field]] = (out[r[field]] || 0) + 1; });
-      return Object.entries(out).sort((a,b) => a[0].localeCompare(b[0], "ca"));
+      return Object.entries(out).sort(compareSizes);
     }
     function renderSummary(rows){
       const items = [
