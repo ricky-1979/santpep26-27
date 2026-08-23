@@ -58,8 +58,8 @@
     .factor-result strong { font-size:1.4rem; line-height:1.1; color:#62666c; }
     .factor-result.good strong { color:#22b66f; }
     .factor-result.bad strong { color:#ef4438; }
-    .team-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;
-      margin-top:18px; padding:12px; border-radius:12px; background:var(--brand-dark); color:#fff; }
+    .team-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px;
+      margin-top:18px; padding:14px; border-radius:12px; background:var(--brand-dark); color:#fff; }
     .summary-item { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; }
     .summary-item span { color:rgba(255,255,255,0.78); font-size:0.68rem; font-weight:800;
       text-transform:uppercase; letter-spacing:0.03em; text-align:center; }
@@ -99,7 +99,7 @@
       .counter input { padding:5px 4px; }
       .factor-result span { font-size:0.95rem; }
       .factor-result strong { font-size:1.15rem; }
-      .team-summary { grid-template-columns:1fr; padding:10px 8px; }
+      .team-summary { grid-template-columns:repeat(4,minmax(0,1fr)); padding:10px 8px; }
       .summary-item strong { font-size:0.95rem; }
     }
   </style>
@@ -130,7 +130,6 @@
           </label>
         </div>
         <div class="factor-stack" data-side="team"></div>
-        <div class="team-summary" id="teamSummary"></div>
       </article>
       <article class="team-card visitor" data-side="opp">
         <div class="team-header">
@@ -142,9 +141,10 @@
           </label>
         </div>
         <div class="factor-stack" data-side="opp"></div>
-        <div class="team-summary" id="oppSummary"></div>
       </article>
     </section>
+
+    <section class="team-summary" id="teamSummary" aria-label="Resum de l'equip local"></section>
 
     <p class="formula">
       Fórmules: <code>eFG% = (FGM + 1.5 * 3PM) / FGA</code>,
@@ -223,7 +223,6 @@
       updateFactors("team", team, opp);
       updateFactors("opp", opp, team);
       updateSummary("team", "opp", "teamSummary");
-      updateSummary("opp", "team", "oppSummary");
     }
     function points(side){
       return n(side, "fg") * 2 + n(side, "tp") * 3 + n(side, "ft");
