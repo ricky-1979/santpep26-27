@@ -283,7 +283,7 @@
       document.getElementById(scoreId).value = points(side);
     }
     function updateSummary(side, other, summaryId){
-      const poss = possessions(side) + possessions(other);
+      const poss = possessions(side);
       const oer = offensiveEfficiency(side);
       const der = defensiveEfficiency(other);
       const ownFactors = calc(side, other);
