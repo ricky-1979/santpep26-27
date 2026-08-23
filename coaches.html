@@ -190,12 +190,12 @@
       }
       const titleHead = "<th>Títol</th>";
       const titleCell = r => "<td>" + (esc(r.title) || '<span class="missing">-</span>') + "</td>";
-      els.table.innerHTML = '<table><thead><tr><th>Coach</th><th>Equip</th><th>Polo</th>' +
-        '<th>Desuadora</th><th>Pantaló</th>' + titleHead + '</tr></thead><tbody>' +
+      els.table.innerHTML = '<table><thead><tr><th>Coach</th><th>Equip</th>' + titleHead +
+        '<th>Polo</th><th>Desuadora</th><th>Pantaló</th></tr></thead><tbody>' +
         rows.map(r => '<tr><td class="name">' + esc(r.name + " " + r.surname) + '</td>' +
           '<td><span class="team">' + esc(r.team) + '</span></td>' +
-          '<td>' + piece(r.polo) + '</td><td>' + piece(r.hoodie) + '</td><td>' +
-          piece(r.pants) + '</td>' + titleCell(r) + '</tr>').join("") +
+          titleCell(r) + '<td>' + piece(r.polo) + '</td><td>' + piece(r.hoodie) +
+          '</td><td>' + piece(r.pants) + '</td></tr>').join("") +
         '</tbody></table>';
     }
     function renderNotes(){
