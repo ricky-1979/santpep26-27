@@ -25,46 +25,73 @@
     .htext h1 .club { display:block; font-size:0.72rem; font-weight:500; opacity:0.85;
       letter-spacing:0.04em; text-transform:uppercase; }
     .htext p { margin:2px 0 0; font-size:0.8rem; opacity:0.9; }
-    main { max-width:1120px; margin:0 auto; padding:22px 14px 60px; }
+    main { max-width:860px; margin:0 auto; padding:22px 14px 60px; }
     .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:0 0 16px; }
     .btn { border:1px solid var(--line); background:#fff; color:var(--brand-dark);
       border-radius:8px; padding:9px 12px; font:inherit; font-size:0.85rem; font-weight:800;
       cursor:pointer; }
     .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
     .btn.danger { color:var(--bad); }
-    .team-names { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:0 0 16px; }
-    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; align-items:start; }
-    .panel { background:var(--card); border:1px solid var(--line); border-radius:12px;
-      box-shadow:var(--shadow); padding:14px; }
-    .panel h2 { margin:0 0 12px; font-size:1rem; color:var(--brand-dark); }
-    .fields { display:grid; grid-template-columns:1fr; gap:10px; }
+    .scoreboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
+    .team-card { background:var(--card); border:1px solid var(--line); border-radius:18px;
+      box-shadow:var(--shadow); padding:18px 18px 20px; }
+    .team-card.local { --team-color:#3498db; }
+    .team-card.visitor { --team-color:#ef4438; }
+    .team-header { display:grid; grid-template-columns:minmax(0,1fr) 76px; gap:10px; align-items:end;
+      border-bottom:4px solid var(--team-color); padding-bottom:12px; margin-bottom:18px; }
+    .team-field { color:var(--team-color); }
+    .team-field input { color:var(--team-color); font-size:1.35rem; font-weight:900; border:0;
+      border-radius:8px; padding:6px 0; background:transparent; text-transform:uppercase; }
+    .team-field input::placeholder { color:var(--team-color); opacity:0.65; }
+    .score-field input { color:var(--team-color); font-size:1.55rem; font-weight:900; text-align:right;
+      border:0; border-radius:8px; padding:6px 0; background:transparent; }
+    .factor-stack { display:grid; gap:0; }
+    .factor-section { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(88px,0.85fr);
+      gap:14px; align-items:center; padding:22px 0; border-bottom:1px dashed var(--line); }
+    .factor-section:last-child { border-bottom:0; padding-bottom:0; }
+    .team-card.visitor .factor-section { grid-template-columns:minmax(88px,0.85fr) minmax(0,1.15fr); }
+    .control-stack { display:grid; gap:12px; }
+    .factor-result { display:flex; flex-direction:column; gap:2px; align-items:flex-start; color:#2c4054; }
+    .team-card.local .factor-result { align-items:flex-start; }
+    .team-card.visitor .factor-result { align-items:flex-end; }
+    .factor-result span { font-size:1.08rem; font-weight:900; letter-spacing:0; }
+    .factor-result strong { font-size:1.4rem; line-height:1.1; color:#62666c; }
+    .factor-result.good strong { color:#22b66f; }
+    .factor-result.bad strong { color:#ef4438; }
+    .factor-result.warn strong { color:#e9c400; }
     label { display:flex; flex-direction:column; gap:4px; min-width:0; font-size:0.72rem;
-      text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); font-weight:800; }
-    .counter { display:grid; grid-template-columns:34px minmax(0,1fr) 34px; align-items:stretch; }
-    .stepper { border:1px solid var(--line); background:#fbf9fd; color:var(--brand-dark);
-      font:inherit; font-size:1.05rem; font-weight:900; cursor:pointer; }
-    .stepper.minus { border-radius:8px 0 0 8px; }
-    .stepper.plus { border-radius:0 8px 8px 0; }
-    .stepper:hover { background:#f0e9f7; border-color:var(--brand); }
-    input { width:100%; border:1px solid var(--line); border-radius:0; padding:9px 10px;
+      text-transform:uppercase; letter-spacing:0.04em; color:#62666c; font-weight:800; text-align:center; }
+    .counter { display:grid; grid-template-columns:38px minmax(0,1fr) 38px; align-items:stretch; }
+    .stepper { border:0; color:#fff; font:inherit; font-size:1.25rem; font-weight:900;
+      cursor:pointer; width:38px; height:38px; border-radius:50%; align-self:center; }
+    .stepper.minus { background:#ef4438; }
+    .stepper.plus { background:#20b86b; }
+    .stepper:hover { filter:brightness(0.95); }
+    input { width:100%; border:1px solid #d7d7d7; border-radius:8px; padding:7px 8px;
       font:inherit; font-size:1rem; color:var(--ink); background:#fff; }
+    .counter input { text-align:center; font-weight:900; border-radius:8px; }
     input:focus { outline:2px solid rgba(113,63,151,0.18); border-color:var(--brand); }
-    .results { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:16px; }
-    .factor-list { display:grid; gap:10px; }
-    .factor-row { display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fbf9fd; }
-    .factor-name { min-width:0; color:var(--brand-dark); font-size:0.78rem;
-      font-weight:800; text-transform:uppercase; letter-spacing:0.03em; }
-    .factor-value { flex-shrink:0; font-variant-numeric:tabular-nums; font-weight:900; font-size:1rem; }
     .formula { margin:14px 0 0; color:var(--muted); font-size:0.82rem; }
     .formula code { color:var(--ink); background:#fff; border:1px solid var(--line);
       border-radius:6px; padding:1px 5px; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
     @media (max-width:780px) {
-      .grid { grid-template-columns:1fr; }
-      .team-names { grid-template-columns:1fr; }
-      .fields { grid-template-columns:1fr; }
-      .results { grid-template-columns:1fr; }
+      main { padding-inline:8px; }
+      .scoreboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+      .team-card { padding:12px 10px 16px; border-radius:14px; }
+      .team-header { grid-template-columns:minmax(0,1fr) 52px; gap:6px; }
+      .team-field input { font-size:1rem; }
+      .score-field input { font-size:1.2rem; }
+      .factor-section { grid-template-columns:minmax(0,1fr) 58px; gap:8px; padding:16px 0; }
+      .team-card.visitor .factor-section { grid-template-columns:58px minmax(0,1fr); }
+      .team-card.visitor .factor-result { align-items:flex-start; }
+      .control-stack { gap:8px; }
+      label { font-size:0.66rem; }
+      .counter { grid-template-columns:30px minmax(0,1fr) 30px; }
+      .stepper { width:30px; height:30px; font-size:1rem; }
+      .counter input { padding:5px 4px; }
+      .factor-result span { font-size:0.95rem; }
+      .factor-result strong { font-size:1.15rem; }
     }
   </style>
 </head>
@@ -83,34 +110,28 @@
       <button class="btn danger" type="button" id="resetBtn">Reinicia</button>
     </div>
 
-    <section class="team-names">
-      <label for="localName" class="panel">Equip local
-        <input id="localName" type="text" placeholder="Nom de l'equip local" />
-      </label>
-      <label for="visitorName" class="panel">Equip visitant
-        <input id="visitorName" type="text" placeholder="Nom de l'equip visitant" />
-      </label>
-    </section>
-
-    <section class="grid">
-      <article class="panel">
-        <h2 id="teamStatsTitle">Equip local</h2>
-        <div class="fields" data-side="team"></div>
+    <section class="scoreboard-grid">
+      <article class="team-card local" data-side="team">
+        <div class="team-header">
+          <label for="localName" class="team-field">Equip local
+            <input id="localName" type="text" placeholder="Local" />
+          </label>
+          <label for="localScore" class="score-field">Punts
+            <input id="localScore" type="number" min="0" step="1" value="0" />
+          </label>
+        </div>
+        <div class="factor-stack" data-side="team"></div>
       </article>
-      <article class="panel">
-        <h2 id="oppStatsTitle">Equip Visitant</h2>
-        <div class="fields" data-side="opp"></div>
-      </article>
-    </section>
-
-    <section class="results">
-      <article class="panel">
-        <h2 id="teamFactorsTitle">4 factors Equip local</h2>
-        <div class="factor-list" id="teamFactors"></div>
-      </article>
-      <article class="panel">
-        <h2 id="oppFactorsTitle">4 factors Equip Visitant</h2>
-        <div class="factor-list" id="oppFactors"></div>
+      <article class="team-card visitor" data-side="opp">
+        <div class="team-header">
+          <label for="visitorName" class="team-field">Equip visitant
+            <input id="visitorName" type="text" placeholder="Visitant" />
+          </label>
+          <label for="visitorScore" class="score-field">Punts
+            <input id="visitorScore" type="number" min="0" step="1" value="0" />
+          </label>
+        </div>
+        <div class="factor-stack" data-side="opp"></div>
       </article>
     </section>
 
@@ -125,20 +146,27 @@
 
   <script>
     const fields = [
-      ["fg", "FG"],
+      ["fg", "FGM"],
       ["fga", "FGA"],
-      ["tp", "3P"],
+      ["tp", "3PM"],
       ["fta", "FTA"],
-      ["ft", "FT"],
-      ["orb", "ORB"],
-      ["drb", "DRB"],
-      ["tov", "TOV"]
+      ["ft", "FTM"],
+      ["orb", "OREB"],
+      ["drb", "DREB"],
+      ["tov", "TO"]
+    ];
+    const fieldLabels = Object.fromEntries(fields);
+    const factorGroups = [
+      { key:"efg", fields:["fg", "fga", "tp"] },
+      { key:"tov", fields:["tov"] },
+      { key:"orb", fields:["orb", "drb"] },
+      { key:"ftfga", fields:["ft", "fta"] }
     ];
     const labels = {
-      efg: "Effective FG%",
-      tov: "Turnover %",
-      orb: "Offensive Reb%",
-      ftfga: "Free Throws / FGA"
+      efg: "eFG%",
+      tov: "TOV%",
+      orb: "OR%",
+      ftfga: "FT"
     };
 
     function inputId(side, key){ return side + "-" + key; }
@@ -149,6 +177,13 @@
     function pct(value){ return Number.isFinite(value) ? (value * 100).toFixed(1) + "%" : "-"; }
     function ratio(value){ return Number.isFinite(value) ? value.toFixed(3) : "-"; }
     function safeDiv(a, b){ return b > 0 ? a / b : NaN; }
+    function factorFormatter(key){ return key === "ftfga" ? ratio : pct; }
+    function factorTone(key, values){
+      if(key === "ftfga") return " warn";
+      if(!Number.isFinite(values[key])) return "";
+      if(key === "tov") return values[key] <= 0.18 ? " good" : " bad";
+      return values[key] >= 0.4 ? " good" : " bad";
+    }
     function calc(side, other){
       const fg = n(side, "fg");
       const fga = n(side, "fga");
@@ -165,47 +200,47 @@
         ftfga: safeDiv(ft, fga)
       };
     }
-    function renderFactorRows(values){
-      return ["efg", "tov", "orb", "ftfga"].map(key => {
-        const formatter = key === "ftfga" ? ratio : pct;
-        return '<div class="factor-row"><span class="factor-name">' + labels[key] + '</span>' +
-          '<span class="factor-value">' + formatter(values[key]) + '</span></div>';
-      }).join("");
-    }
     function render(){
       const team = calc("team", "opp");
       const opp = calc("opp", "team");
-      renderTeamNames();
-      document.getElementById("teamFactors").innerHTML = renderFactorRows(team);
-      document.getElementById("oppFactors").innerHTML = renderFactorRows(opp);
+      updateFactors("team", team);
+      updateFactors("opp", opp);
     }
-    function teamLabel(id, fallback){
-      const value = document.getElementById(id).value.trim();
-      return value || fallback;
-    }
-    function renderTeamNames(){
-      const local = teamLabel("localName", "Equip local");
-      const visitor = teamLabel("visitorName", "Equip Visitant");
-      document.getElementById("teamStatsTitle").textContent = local;
-      document.getElementById("oppStatsTitle").textContent = visitor;
-      document.getElementById("teamFactorsTitle").textContent = "4 factors " + local;
-      document.getElementById("oppFactorsTitle").textContent = "4 factors " + visitor;
-    }
-    function buildInputs(){
-      document.querySelectorAll(".fields").forEach(box => {
-        const side = box.dataset.side;
-        box.innerHTML = fields.map(([key, label]) =>
-          '<label for="' + inputId(side, key) + '">' + label + '<span class="counter">' +
+    function controlHtml(side, key){
+      const label = fieldLabels[key];
+      return '<label for="' + inputId(side, key) + '">' + label + '<span class="counter">' +
           '<button class="stepper minus" type="button" data-target="' + inputId(side, key) +
           '" data-delta="-1" aria-label="Decrementa ' + label + '">-</button>' +
           '<input id="' + inputId(side, key) + '" inputmode="decimal" type="number" min="0" step="1" value="0" />' +
           '<button class="stepper plus" type="button" data-target="' + inputId(side, key) +
-          '" data-delta="1" aria-label="Incrementa ' + label + '">+</button></span></label>'
-        ).join("");
+          '" data-delta="1" aria-label="Incrementa ' + label + '">+</button></span></label>';
+    }
+    function factorHtml(side, key){
+      return '<div class="factor-result" id="' + side + "-factor-" + key + '">' +
+        '<span>' + labels[key] + '</span><strong>-</strong></div>';
+    }
+    function buildInputs(){
+      document.querySelectorAll(".factor-stack").forEach(box => {
+        const side = box.dataset.side;
+        const mirrored = side === "opp";
+        box.innerHTML = factorGroups.map(group => {
+          const controls = '<div class="control-stack">' +
+            group.fields.map(key => controlHtml(side, key)).join("") + '</div>';
+          const factor = factorHtml(side, group.key);
+          return '<section class="factor-section">' +
+            (mirrored ? factor + controls : controls + factor) + '</section>';
+        }).join("");
       });
       document.querySelectorAll("input").forEach(input => input.addEventListener("input", render));
       document.querySelectorAll(".stepper").forEach(button => {
         button.addEventListener("click", () => adjustInput(button.dataset.target, Number(button.dataset.delta)));
+      });
+    }
+    function updateFactors(side, values){
+      factorGroups.forEach(group => {
+        const el = document.getElementById(side + "-factor-" + group.key);
+        el.className = "factor-result" + factorTone(group.key, values);
+        el.querySelector("strong").textContent = factorFormatter(group.key)(values[group.key]);
       });
     }
     function adjustInput(id, delta){
@@ -223,6 +258,7 @@
       render();
     }
     document.getElementById("sampleBtn").onclick = () => setValues({
+      "localName": "IAM", "visitorName": "SESE", "localScore": 18, "visitorScore": 39,
       "team-fg": 30, "team-fga": 68, "team-tp": 8, "team-fta": 18,
       "team-ft": 13, "team-orb": 11, "team-drb": 27, "team-tov": 12,
       "opp-fg": 27, "opp-fga": 64, "opp-tp": 6, "opp-fta": 20,
