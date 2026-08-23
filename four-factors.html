@@ -299,7 +299,7 @@
       if(!input) return;
       const current = Number(input.value) || 0;
       input.value = Math.max(0, current + delta);
-      render();
+      input.dispatchEvent(new Event("input", { bubbles:true }));
     }
     function setValues(values){
       Object.entries(values).forEach(([id, value]) => {
