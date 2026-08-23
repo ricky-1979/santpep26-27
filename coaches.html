@@ -95,9 +95,21 @@
 
   <script>
     const SHEET_ID = "1tls9XYHTJ9Ru_Ex25eHgE-PsiWIrj68nr8QYOj99W5I";
+    const SHEET_BASE = "https://docs.google.com/spreadsheets/d/" + SHEET_ID;
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
       "/gviz/tq?tqx=out:json;responseHandler:loadCoachSheet";
-    const state = { rows: [], notes: [], team: "Tots", query: "", sizeFilter: null, hasTitle: false };
+    const TITLES_URL = SHEET_BASE +
+      "/gviz/tq?tqx=out:json;responseHandler:loadTitleSheet&sheet=T%C3%ADtols";
+    const state = {
+      rows: [],
+      notes: [],
+      team: "Tots",
+      query: "",
+      sizeFilter: null,
+      hasTitle: false,
+      titleMap: {},
+      titleRows: []
+    };
     const els = {
       status: document.getElementById("status"),
       notes: document.getElementById("notes"),
@@ -118,6 +130,79 @@
     function findHeader(headers, names){
       const wanted = names.map(key);
       return headers.findIndex(h => wanted.includes(key(h)));
+    }
+    function personKeys(name, surname){
+      const firstName = key(name).split(" ").filter(Boolean)[0] || "";
+      const surnameKey = key(surname);
+      const firstSurname = surnameKey.split(" ").filter(Boolean)[0] || "";
+      return [...new Set([
+        key([name, surname].join(" ")),
+        [firstName, firstSurname].filter(Boolean).join(" "),
+        firstName && firstSurname ? firstName[0] + "|" + firstSurname : ""
+      ])].filter(Boolean);
+    }
+    function setTitle(map, k, title){
+      if(!k || !title) return;
+      if(!map[k]) map[k] = title;
+      else if(map[k] !== title) map[k] = "";
+    }
+    function oneEditApart(a, b){
+      if(!a || !b || Math.abs(a.length - b.length) > 1) return false;
+      let i = 0, j = 0, edits = 0;
+      while(i < a.length && j < b.length){
+        if(a[i] === b[j]) { i++; j++; continue; }
+        edits++;
+        if(edits > 1) return false;
+        if(a.length > b.length) i++;
+        else if(a.length < b.length) j++;
+        else { i++; j++; }
+      }
+      return edits + (i < a.length ? 1 : 0) + (j < b.length ? 1 : 0) <= 1;
+    }
+    function lookupTitle(name, surname){
+      const direct = personKeys(name, surname).map(k => state.titleMap[k]).find(Boolean);
+      if(direct) return direct;
+      const firstName = key(name).split(" ").filter(Boolean)[0] || "";
+      const firstSurname = key(surname).split(" ").filter(Boolean)[0] || "";
+      const fuzzy = state.titleRows.find(r => r.firstInitial === firstName[0] &&
+        oneEditApart(r.firstSurname, firstSurname));
+      return fuzzy ? fuzzy.title : "";
+    }
+    function parseTitles(table){
+      const raw = table.rows.map(r => (r.c || []).map(val));
+      const headers = raw[0] || [];
+      const nameIdx = findHeader(headers, ["Nom"]);
+      const surnameIdx = findHeader(headers, ["Cognoms", "Cognom"]);
+      const titleIdx = findHeader(headers, [
+        "Tipus Titulació",
+        "Tipus Titulacio",
+        "Títol",
+        "Titol",
+        "Titulació",
+        "Titulacio"
+      ]);
+      const out = {};
+      const titleRows = [];
+      raw.slice(1).forEach(row => {
+        const name = clean(row[nameIdx >= 0 ? nameIdx : 0]);
+        const surname = clean(row[surnameIdx >= 0 ? surnameIdx : 1]);
+        const title = clean(row[titleIdx >= 0 ? titleIdx : 2]);
+        if(!name || !surname || !title) return;
+        personKeys(name, surname).forEach(k => setTitle(out, k, title));
+        titleRows.push({
+          title,
+          firstInitial: (key(name).split(" ").filter(Boolean)[0] || "")[0] || "",
+          firstSurname: key(surname).split(" ").filter(Boolean)[0] || ""
+        });
+      });
+      state.titleMap = out;
+      state.titleRows = titleRows;
+    }
+    function applyTitles(){
+      state.rows = state.rows.map(r => ({
+        ...r,
+        title: r.title || lookupTitle(r.name, r.surname)
+      }));
     }
     function piece(value){
       return value ? '<span class="piece">' + esc(value) + '</span>' : '<span class="missing">-</span>';
@@ -242,7 +327,14 @@
     window.loadCoachSheet = function(payload){
       if(!payload || payload.status !== "ok" || !payload.table) return fail();
       state.rows = parseRows(payload.table);
+      applyTitles();
       render();
+    };
+    window.loadTitleSheet = function(payload){
+      if(!payload || payload.status !== "ok" || !payload.table) return;
+      parseTitles(payload.table);
+      applyTitles();
+      if(state.rows.length) render();
     };
     els.search.addEventListener("input", () => {
       state.query = els.search.value;
@@ -252,6 +344,9 @@
     script.src = SHEET_URL;
     script.onerror = fail;
     document.head.appendChild(script);
+    const titleScript = document.createElement("script");
+    titleScript.src = TITLES_URL;
+    document.head.appendChild(titleScript);
   </script>
 </body>
 </html>
