@@ -44,8 +44,11 @@
     .summary-total { font-size:0.8rem; color:var(--muted); font-weight:700; }
     .sizes { display:flex; flex-wrap:wrap; gap:6px; }
     .size { display:inline-flex; align-items:center; gap:5px; background:#f7f3fb;
-      border:1px solid var(--line); border-radius:999px; padding:5px 8px; font-size:0.8rem; font-weight:700; }
+      border:1px solid var(--line); border-radius:999px; padding:5px 8px; font:inherit;
+      font-size:0.8rem; font-weight:700; color:var(--ink); cursor:pointer; }
+    .size.active { background:var(--brand); color:#fff; border-color:var(--brand); }
     .size b { color:var(--brand-dark); }
+    .size.active b { color:#fff; }
     .table-wrap { background:var(--card); border:1px solid var(--line); border-radius:12px;
       box-shadow:var(--shadow); overflow:auto; }
     table { width:100%; border-collapse:collapse; min-width:760px; }
@@ -94,7 +97,7 @@
     const SHEET_ID = "1tls9XYHTJ9Ru_Ex25eHgE-PsiWIrj68nr8QYOj99W5I";
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID +
       "/gviz/tq?tqx=out:json;responseHandler:loadCoachSheet";
-    const state = { rows: [], notes: [], team: "Tots", query: "", hasTitle: false };
+    const state = { rows: [], notes: [], team: "Tots", query: "", sizeFilter: null, hasTitle: false };
     const els = {
       status: document.getElementById("status"),
       notes: document.getElementById("notes"),
@@ -149,8 +152,16 @@
       return state.rows.filter(r => {
         const okTeam = state.team === "Tots" || r.team === state.team;
         const okQuery = !q || key([r.name, r.surname, r.team, r.title].join(" ")).includes(q);
-        return okTeam && okQuery;
+        const okSize = !state.sizeFilter || r[state.sizeFilter.field] === state.sizeFilter.size;
+        return okTeam && okQuery && okSize;
       });
+    }
+    function baseRows(){
+      const sizeFilter = state.sizeFilter;
+      state.sizeFilter = null;
+      const rows = filteredRows();
+      state.sizeFilter = sizeFilter;
+      return rows;
     }
     function renderTeams(){
       const teams = ["Tots", ...[...new Set(state.rows.map(r => r.team).filter(Boolean))].sort()];
@@ -178,10 +189,23 @@
         const total = cs.reduce((sum, x) => sum + x[1], 0);
         return '<article class="summary-card"><h2 class="summary-title">' + label +
           '<span class="summary-total">' + total + '</span></h2><div class="sizes">' +
-          (cs.length ? cs.map(([size, n]) => '<span class="size"><b>' + esc(size) +
-          '</b>' + n + '</span>').join("") : '<span class="missing">Sense talles</span>') +
+          (cs.length ? cs.map(([size, n]) => {
+            const active = state.sizeFilter && state.sizeFilter.field === field && state.sizeFilter.size === size;
+            return '<button class="size' + (active ? " active" : "") + '" type="button" data-field="' +
+              esc(field) + '" data-size="' + esc(size) + '" title="Filtra per ' + esc(label) + ' ' +
+              esc(size) + '"><b>' + esc(size) + '</b>' + n + '</button>';
+          }).join("") : '<span class="missing">Sense talles</span>') +
           '</div></article>';
       }).join("");
+      els.summary.querySelectorAll(".size").forEach(b => {
+        b.onclick = () => {
+          const next = { field: b.dataset.field, size: b.dataset.size };
+          const active = state.sizeFilter && state.sizeFilter.field === next.field &&
+            state.sizeFilter.size === next.size;
+          state.sizeFilter = active ? null : next;
+          render();
+        };
+      });
     }
     function renderTable(rows){
       if(!rows.length){
@@ -203,11 +227,13 @@
     }
     function render(){
       const rows = filteredRows();
+      const summaryRows = baseRows();
       renderTeams();
       renderNotes();
-      renderSummary(rows);
+      renderSummary(summaryRows);
       renderTable(rows);
-      els.status.textContent = rows.length + " coachs";
+      const suffix = state.sizeFilter ? " · " + state.sizeFilter.size : "";
+      els.status.textContent = rows.length + " coachs" + suffix;
     }
     function fail(){
       els.status.textContent = "No s'han pogut carregar les dades del Google Sheet.";
