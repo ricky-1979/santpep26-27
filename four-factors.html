@@ -152,7 +152,7 @@
       <code>TOV% = 100 * (TO / Total Jugades)</code>,
       <code>ORB% = 100 * OREB / (OREB + DREB rival)</code>,
       <code>DRB% = 100 * DREB / (DREB + OREB rival)</code>,
-      <code>FT/FGA = FT / FGA</code>.
+      <code>FT/FGA = FTM / FGA</code>.
     </p>
   </main>
   <footer>CB Sant Josep de Badalona · 4 Factors</footer>
@@ -171,16 +171,16 @@
     const fieldLabels = Object.fromEntries(fields);
     const factorGroups = [
       { key:"efg", fields:["fg", "fga", "tp"] },
-      { key:"tov", fields:["tov"] },
+      { key:"tov", fields:["tov", "fta"] },
       { key:"orb", keys:["orb", "drb"], fields:["orb", "drb"] },
-      { key:"ftfga", fields:["ft", "fta"] }
+      { key:"ftfga", fields:["ft"] }
     ];
     const labels = {
       efg: "eFG%",
       tov: "TOV%",
       orb: "ORB%",
       drb: "DRB%",
-      ftfga: "FT"
+      ftfga: "FT/FGA"
     };
     const factorWeights = {
       efg: 0.40,
