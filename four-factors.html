@@ -147,7 +147,7 @@
     <section class="team-summary" id="teamSummary" aria-label="Resum de l'equip local"></section>
 
     <p class="formula">
-      Fórmules: <code>eFG% = (FGM + 1.5 * 3PM) / FGA</code>,
+      Fórmules: <code>eFG% = (FGM + 0.5 * 3PM) / FGA</code>,
       <code>TOV% = TOV / (FGA + 0.44 * FTA + TOV)</code>,
       <code>ORB% = ORB / (ORB + Opp DRB)</code>,
       <code>FT/FGA = FT / FGA</code>.
@@ -215,7 +215,7 @@
       const tov = n(side, "tov");
       const oppDrb = n(other, "drb");
       return {
-        efg: safeDiv(fg + 1.5 * tp, fga),
+        efg: safeDiv(fg + 0.5 * tp, fga),
         tov: safeDiv(tov, fga + 0.44 * fta + tov),
         orb: safeDiv(orb, orb + oppDrb),
         ftfga: safeDiv(ft, fga)
@@ -231,7 +231,7 @@
       updateSummary("team", "opp", "teamSummary");
     }
     function points(side){
-      return n(side, "fg") * 2 + n(side, "tp") * 3 + n(side, "ft");
+      return n(side, "fg") * 2 + n(side, "tp") + n(side, "ft");
     }
     function possessions(side){
       return n(side, "fga") - n(side, "orb") + n(side, "tov") + 0.44 * n(side, "fta");
