@@ -222,7 +222,7 @@
     </section>
 
     <p class="formula">
-      Fórmules: <code>eFG% = (2PM + 1.5 * 3PM) / FGA</code>,
+      Fórmules: <code>eFG% = (FGM + 0.5 * 3PM) / FGA</code>,
       <code>TOV% = 100 * (TO / Total Jugades)</code>,
       <code>REB% = (OREB + DREB) / rebots totals del partit</code>,
       <code>ORB% = 100 * OREB / (OREB + DREB rival)</code>,
@@ -301,7 +301,7 @@
       const drbRate = safeDiv(drb, drb + n(other, "orb"));
       const reboundRate = safeDiv(orb + drb, orb + drb + otherOrb + otherDrb);
       return {
-        efg: safeDiv(fg + 1.5 * tp, fga),
+        efg: safeDiv(fieldGoalsMade(side) + 0.5 * tp, fga),
         tov: safeDiv(tov, totalPlays(side)),
         reb: reboundRate,
         orb: orbRate,
@@ -322,6 +322,9 @@
     }
     function points(side){
       return n(side, "fg") * 2 + n(side, "tp") * 3 + n(side, "ft");
+    }
+    function fieldGoalsMade(side){
+      return n(side, "fg") + n(side, "tp");
     }
     function totalPlays(side){
       return n(side, "fga") + 0.44 * n(side, "fta") + n(side, "tov");
