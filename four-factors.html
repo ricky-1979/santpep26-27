@@ -32,6 +32,14 @@
       cursor:pointer; }
     .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
     .btn.danger { color:var(--bad); }
+    .match-panel { display:grid; grid-template-columns:150px minmax(0,1fr) minmax(0,1.4fr);
+      gap:10px; margin:0 0 16px; padding:12px; border:1px solid var(--line);
+      border-radius:12px; background:#fff; box-shadow:var(--shadow); }
+    .match-panel label { text-align:left; }
+    textarea { width:100%; min-height:39px; border:1px solid #d7d7d7; border-radius:8px;
+      padding:7px 8px; font:inherit; font-size:0.92rem; color:var(--ink); background:#fff;
+      resize:vertical; }
+    textarea:focus { outline:2px solid rgba(113,63,151,0.18); border-color:var(--brand); }
     .scoreboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
     .team-card { background:var(--card); border:1px solid var(--line); border-radius:18px;
       box-shadow:var(--shadow); padding:18px 18px 20px; }
@@ -84,6 +92,18 @@
     .formula { margin:14px 0 0; color:var(--muted); font-size:0.82rem; }
     .formula code { color:var(--ink); background:#fff; border:1px solid var(--line);
       border-radius:6px; padding:1px 5px; }
+    .saved-games { margin-top:18px; padding:12px; border:1px solid var(--line);
+      border-radius:12px; background:#fff; box-shadow:var(--shadow); }
+    .saved-games-header { display:flex; justify-content:space-between; gap:10px; align-items:center; }
+    .saved-games h2 { margin:0; font-size:0.98rem; color:var(--brand-dark); }
+    .saved-count { color:var(--muted); font-size:0.78rem; font-weight:800; }
+    .saved-list { display:grid; gap:8px; margin-top:10px; }
+    .saved-empty { color:var(--muted); font-size:0.85rem; margin:8px 0 0; }
+    .saved-game { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:8px;
+      align-items:center; padding:9px; border:1px solid var(--line); border-radius:8px; }
+    .saved-game-title { font-weight:900; color:var(--ink); overflow-wrap:anywhere; }
+    .saved-game-meta { color:var(--muted); font-size:0.75rem; overflow-wrap:anywhere; }
+    .status-line { color:var(--muted); font-size:0.78rem; margin-top:8px; min-height:1.1em; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
     @media (max-width:780px) {
       main { padding-inline:8px; }
@@ -104,6 +124,9 @@
       .factor-result strong { font-size:1.15rem; }
       .team-summary { grid-template-columns:repeat(4,minmax(0,1fr)); padding:10px 8px; }
       .summary-item strong { font-size:0.95rem; }
+      .match-panel { grid-template-columns:1fr; }
+      .saved-game { grid-template-columns:1fr; }
+      .saved-game .btn { width:100%; }
     }
   </style>
 </head>
@@ -118,9 +141,22 @@
   <main>
     <div class="toolbar">
       <button class="btn primary" type="button" id="sampleBtn">Exemple</button>
+      <button class="btn primary" type="button" id="saveGameBtn">Guardar partit</button>
       <button class="btn" type="button" id="clearBtn">Neteja</button>
       <button class="btn danger" type="button" id="resetBtn">Reinicia</button>
     </div>
+
+    <section class="match-panel" aria-label="Dades del partit">
+      <label for="gameDate">Data
+        <input id="gameDate" type="date" />
+      </label>
+      <label for="gameCompetition">Competició
+        <input id="gameCompetition" type="text" placeholder="Lliga, amistós..." />
+      </label>
+      <label for="gameNotes">Notes
+        <textarea id="gameNotes" placeholder="Pavelló, categoria, jornada..."></textarea>
+      </label>
+    </section>
 
     <section class="scoreboard-grid">
       <article class="team-card local" data-side="team">
@@ -148,6 +184,15 @@
     </section>
 
     <section class="team-summary" id="teamSummary" aria-label="Resum de l'equip local"></section>
+
+    <section class="saved-games" aria-label="Partits guardats">
+      <div class="saved-games-header">
+        <h2>Partits guardats</h2>
+        <span class="saved-count" id="savedGamesCount">0 partits</span>
+      </div>
+      <div class="saved-list" id="savedGamesList"></div>
+      <div class="status-line" id="saveStatus" role="status" aria-live="polite"></div>
+    </section>
 
     <p class="formula">
       Fórmules: <code>eFG% = (2PM + 1.5 * 3PM) / FGA</code>,
@@ -192,6 +237,8 @@
       reb: 0.20,
       ftfga: 0.15
     };
+    const STORAGE_KEY = "santpep.fourFactors.games.v1";
+    let currentGameId = null;
 
     function inputId(side, key){ return side + "-" + key; }
     function n(side, key){
@@ -373,6 +420,176 @@
       });
       render();
     }
+    function gameId(){
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+    function readSavedGames(){
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const games = raw ? JSON.parse(raw) : [];
+        return Array.isArray(games) ? games : [];
+      } catch(error) {
+        setSaveStatus("No s'han pogut llegir els partits guardats.");
+        return [];
+      }
+    }
+    function writeSavedGames(games){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+    }
+    function collectCounters(side){
+      return Object.fromEntries(fields.map(([key]) => [key, n(side, key)]));
+    }
+    function summaryValues(side, other, ownFactors, otherFactors){
+      return {
+        winRate: winRate(side, other, ownFactors, otherFactors),
+        possessions: possessions(side),
+        oer: offensiveEfficiency(side),
+        der: defensiveEfficiency(other)
+      };
+    }
+    function buildGamePayload(existing){
+      const teamFactors = calc("team", "opp");
+      const oppFactors = calc("opp", "team");
+      const now = new Date().toISOString();
+      return {
+        id: existing ? existing.id : gameId(),
+        savedAt: existing ? existing.savedAt : now,
+        updatedAt: now,
+        meta: {
+          date: document.getElementById("gameDate").value,
+          competition: document.getElementById("gameCompetition").value.trim(),
+          notes: document.getElementById("gameNotes").value.trim()
+        },
+        teams: {
+          team: {
+            name: document.getElementById("localName").value.trim(),
+            score: points("team"),
+            counters: collectCounters("team"),
+            factors: teamFactors
+          },
+          opp: {
+            name: document.getElementById("visitorName").value.trim(),
+            score: points("opp"),
+            counters: collectCounters("opp"),
+            factors: oppFactors
+          }
+        },
+        summary: summaryValues("team", "opp", teamFactors, oppFactors)
+      };
+    }
+    function saveGame(){
+      try {
+        const games = readSavedGames();
+        const existingIndex = currentGameId ? games.findIndex(game => game.id === currentGameId) : -1;
+        const payload = buildGamePayload(existingIndex >= 0 ? games[existingIndex] : null);
+        if(existingIndex >= 0) {
+          games[existingIndex] = payload;
+        } else {
+          games.unshift(payload);
+          currentGameId = payload.id;
+        }
+        writeSavedGames(games);
+        renderSavedGames();
+        setSaveStatus("Partit guardat.");
+      } catch(error) {
+        setSaveStatus("No s'ha pogut guardar el partit en aquest navegador.");
+      }
+    }
+    function setCounters(side, counters){
+      fields.forEach(([key]) => {
+        const input = document.getElementById(inputId(side, key));
+        if(input) input.value = counters && counters[key] !== undefined ? counters[key] : 0;
+      });
+    }
+    function loadGame(id){
+      const game = readSavedGames().find(item => item.id === id);
+      if(!game) {
+        setSaveStatus("Aquest partit ja no existeix.");
+        renderSavedGames();
+        return;
+      }
+      currentGameId = game.id;
+      document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : "";
+      document.getElementById("gameCompetition").value = game.meta && game.meta.competition ? game.meta.competition : "";
+      document.getElementById("gameNotes").value = game.meta && game.meta.notes ? game.meta.notes : "";
+      document.getElementById("localName").value = game.teams && game.teams.team ? game.teams.team.name || "" : "";
+      document.getElementById("visitorName").value = game.teams && game.teams.opp ? game.teams.opp.name || "" : "";
+      setCounters("team", game.teams && game.teams.team ? game.teams.team.counters : {});
+      setCounters("opp", game.teams && game.teams.opp ? game.teams.opp.counters : {});
+      render();
+      renderSavedGames();
+      setSaveStatus("Partit carregat.");
+    }
+    function deleteGame(id){
+      const ok = window.confirm("Segur que vols eliminar aquest partit guardat?");
+      if(!ok) return;
+      const games = readSavedGames().filter(game => game.id !== id);
+      writeSavedGames(games);
+      if(currentGameId === id) currentGameId = null;
+      renderSavedGames();
+      setSaveStatus("Partit eliminat.");
+    }
+    function formatSavedDate(game){
+      if(game.meta && game.meta.date) return game.meta.date;
+      if(game.updatedAt) return game.updatedAt.slice(0, 10);
+      return "Sense data";
+    }
+    function formatSavedTitle(game){
+      const local = game.teams && game.teams.team && game.teams.team.name ? game.teams.team.name : "Equip local";
+      const visitor = game.teams && game.teams.opp && game.teams.opp.name ? game.teams.opp.name : "Equip visitant";
+      const localScore = game.teams && game.teams.team ? game.teams.team.score : 0;
+      const visitorScore = game.teams && game.teams.opp ? game.teams.opp.score : 0;
+      return local + " " + localScore + " - " + visitorScore + " " + visitor;
+    }
+    function formatSavedMeta(game){
+      const parts = [formatSavedDate(game)];
+      if(game.meta && game.meta.competition) parts.push(game.meta.competition);
+      if(game.summary && Number.isFinite(game.summary.winRate)) parts.push("Win Rate " + wholePct(game.summary.winRate));
+      return parts.join(" · ");
+    }
+    function renderSavedGames(){
+      const list = document.getElementById("savedGamesList");
+      const count = document.getElementById("savedGamesCount");
+      const games = readSavedGames().sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
+      count.textContent = games.length === 1 ? "1 partit" : games.length + " partits";
+      list.innerHTML = "";
+      if(!games.length) {
+        const empty = document.createElement("p");
+        empty.className = "saved-empty";
+        empty.textContent = "Encara no hi ha cap partit guardat en aquest navegador.";
+        list.appendChild(empty);
+        return;
+      }
+      games.forEach(game => {
+        const item = document.createElement("article");
+        item.className = "saved-game";
+        if(game.id === currentGameId) item.style.borderColor = "var(--brand)";
+        const text = document.createElement("div");
+        const title = document.createElement("div");
+        title.className = "saved-game-title";
+        title.textContent = formatSavedTitle(game);
+        const meta = document.createElement("div");
+        meta.className = "saved-game-meta";
+        meta.textContent = formatSavedMeta(game);
+        text.append(title, meta);
+        const load = document.createElement("button");
+        load.className = "btn";
+        load.type = "button";
+        load.textContent = "Carrega";
+        load.addEventListener("click", () => loadGame(game.id));
+        const remove = document.createElement("button");
+        remove.className = "btn danger";
+        remove.type = "button";
+        remove.textContent = "Elimina";
+        remove.addEventListener("click", () => deleteGame(game.id));
+        item.append(text, load, remove);
+        list.appendChild(item);
+      });
+    }
+    function setSaveStatus(message){
+      const status = document.getElementById("saveStatus");
+      if(status) status.textContent = message;
+    }
     document.getElementById("sampleBtn").onclick = () => setValues({
       "localName": "IAM", "visitorName": "SESE",
       "team-fg": 7, "team-fga": 23, "team-tp": 0, "team-fta": 11,
@@ -380,20 +597,31 @@
       "opp-fg": 16, "opp-fga": 39, "opp-tp": 2, "opp-fta": 13,
       "opp-ft": 5, "opp-orb": 8, "opp-drb": 11, "opp-tov": 8
     });
+    document.getElementById("saveGameBtn").onclick = saveGame;
     document.getElementById("clearBtn").onclick = () => {
+      currentGameId = null;
       document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
       render();
+      renderSavedGames();
+      setSaveStatus("");
     };
     document.getElementById("resetBtn").onclick = () => {
       const ok = window.confirm("Segur que vols reiniciar la calculadora?");
       if(!ok) return;
+      currentGameId = null;
+      document.getElementById("gameDate").value = "";
+      document.getElementById("gameCompetition").value = "";
+      document.getElementById("gameNotes").value = "";
       document.getElementById("localName").value = "";
       document.getElementById("visitorName").value = "";
       document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
       render();
+      renderSavedGames();
+      setSaveStatus("");
     };
     buildInputs();
     render();
+    renderSavedGames();
   </script>
 </body>
 </html>
