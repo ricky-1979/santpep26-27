@@ -32,7 +32,7 @@
       cursor:pointer; }
     .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
     .btn.danger { color:var(--bad); }
-    .match-panel { display:grid; grid-template-columns:minmax(150px,220px);
+    .match-panel { display:grid; grid-template-columns:minmax(150px,220px) minmax(170px,1fr) minmax(130px,180px);
       gap:10px; margin:0 0 16px; padding:12px; border:1px solid var(--line);
       border-radius:12px; background:#fff; box-shadow:var(--shadow); }
     .match-panel label { text-align:left; }
@@ -131,7 +131,7 @@
       main { padding:11px 7px 34px; }
       .toolbar { gap:8px; margin-bottom:10px; }
       .btn { padding:8px 10px; font-size:0.8rem; border-radius:8px; }
-      .match-panel { grid-template-columns:minmax(0,180px); margin-bottom:11px; padding:9px;
+      .match-panel { grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,0.9fr); margin-bottom:11px; padding:9px;
         border-radius:10px; box-shadow:none; }
       .match-panel label { font-size:0.66rem; }
       input { padding:6px 7px; font-size:0.98rem; }
@@ -184,6 +184,12 @@
     <section class="match-panel" aria-label="Dades del partit">
       <label for="gameDate">Data
         <input id="gameDate" type="date" />
+      </label>
+      <label for="matchTeamName">Nom de l'equip
+        <input id="matchTeamName" type="text" placeholder="Equip" />
+      </label>
+      <label for="matchCategory">Categoria
+        <input id="matchCategory" type="text" placeholder="Categoria" />
       </label>
     </section>
 
@@ -511,7 +517,9 @@
         savedAt: existing ? existing.savedAt : now,
         updatedAt: now,
         meta: {
-          date: document.getElementById("gameDate").value
+          date: document.getElementById("gameDate").value,
+          teamName: document.getElementById("matchTeamName").value.trim(),
+          category: document.getElementById("matchCategory").value.trim()
         },
         teams: {
           team: {
@@ -565,6 +573,8 @@
       if(!ok) return;
       currentGameId = game.id;
       document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : "";
+      document.getElementById("matchTeamName").value = game.meta && game.meta.teamName ? game.meta.teamName : "";
+      document.getElementById("matchCategory").value = game.meta && game.meta.category ? game.meta.category : "";
       document.getElementById("localName").value = game.teams && game.teams.team ? game.teams.team.name || "" : "";
       document.getElementById("visitorName").value = game.teams && game.teams.opp ? game.teams.opp.name || "" : "";
       setCounters("team", game.teams && game.teams.team ? game.teams.team.counters : {});
@@ -715,6 +725,8 @@
       if(!ok) return;
       currentGameId = null;
       document.getElementById("gameDate").value = "";
+      document.getElementById("matchTeamName").value = "";
+      document.getElementById("matchCategory").value = "";
       document.getElementById("localName").value = "";
       document.getElementById("visitorName").value = "";
       document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
