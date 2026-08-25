@@ -90,7 +90,9 @@
     .stepper.plus:hover { background:#ffe75a; }
     input { width:100%; border:1px solid #d7d7d7; border-radius:8px; padding:7px 8px;
       font:inherit; font-size:1rem; color:var(--ink); background:#fff; }
-    .counter input { text-align:center; font-weight:900; border-radius:8px; cursor:default; }
+    .counter-value { display:grid; place-items:center; min-width:0; border:1px solid #d7d7d7;
+      border-radius:8px; padding:7px 8px; background:#fff; color:var(--ink); font-size:1rem;
+      font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
     input:focus { outline:2px solid rgba(113,63,151,0.18); border-color:var(--brand); }
     .formula { margin:14px 0 0; color:var(--muted); font-size:0.82rem; }
     .formula code { color:var(--ink); background:#fff; border:1px solid var(--line);
@@ -158,7 +160,7 @@
       label { gap:3px; font-size:0.66rem; line-height:1.18; }
       .counter { grid-template-columns:31px minmax(0,1fr) 31px; }
       .stepper { width:31px; height:31px; border-radius:8px; font-size:1.12rem; }
-      .counter input { min-height:31px; padding:3px 4px; font-size:1rem; border-radius:8px; }
+      .counter-value { min-height:31px; padding:3px 4px; font-size:1rem; border-radius:8px; }
       .factor-results { gap:4px; }
       .factor-result { gap:1px; }
       .factor-result span { font-size:0.9rem; }
@@ -296,7 +298,8 @@
 
     function inputId(side, key){ return side + "-" + key; }
     function n(side, key){
-      const value = Number(document.getElementById(inputId(side, key)).value);
+      const el = document.getElementById(inputId(side, key));
+      const value = Number(el && el.dataset ? el.dataset.value : 0);
       return Number.isFinite(value) ? value : 0;
     }
     function pct(value){ return Number.isFinite(value) ? (value * 100).toFixed(1) + "%" : "-"; }
@@ -428,7 +431,7 @@
       return '<label for="' + inputId(side, key) + '">' + label + '<span class="counter">' +
           '<button class="stepper minus" type="button" data-target="' + inputId(side, key) +
           '" data-delta="-1" aria-label="Decrementa ' + label + '">−</button>' +
-          '<input id="' + inputId(side, key) + '" inputmode="decimal" type="number" min="0" step="1" value="0" readonly />' +
+          '<span class="counter-value" id="' + inputId(side, key) + '" data-value="0">0</span>' +
           '<button class="stepper plus" type="button" data-target="' + inputId(side, key) +
           '" data-delta="1" aria-label="Incrementa ' + label + '">+</button></span></label>';
     }
@@ -470,20 +473,23 @@
       });
     }
     function setCounterValue(id, value){
-      const input = document.getElementById(id);
-      if(input) input.value = Math.max(0, value);
+      const el = document.getElementById(id);
+      if(!el) return;
+      const next = Math.max(0, value);
+      el.dataset.value = String(next);
+      el.textContent = String(next);
     }
     function enforceAttemptMinimums(side){
       setCounterValue(inputId(side, "fga"), Math.max(n(side, "fga"), n(side, "fg") + n(side, "tp")));
       setCounterValue(inputId(side, "fta"), Math.max(n(side, "fta"), n(side, "ft")));
     }
     function adjustInput(id, delta){
-      const input = document.getElementById(id);
-      if(!input) return;
+      const el = document.getElementById(id);
+      if(!el) return;
       const [side, key] = id.split("-");
-      const current = Number(input.value) || 0;
+      const current = Number(el.dataset.value) || 0;
       const next = Math.max(0, current + delta);
-      input.value = next;
+      setCounterValue(id, next);
       if((key === "fg" || key === "tp") && delta !== 0) {
         setCounterValue(inputId(side, "fga"), n(side, "fga") + (next - current));
       }
@@ -491,13 +497,15 @@
         setCounterValue(inputId(side, "fta"), n(side, "fta") + (next - current));
       }
       enforceAttemptMinimums(side);
-      input.dispatchEvent(new Event("input", { bubbles:true }));
+      render();
     }
     function setValues(values){
       Object.entries(values).forEach(([id, value]) => {
         const el = document.getElementById(id);
         if(!el) return;
-        if(el.value !== undefined) {
+        if(el.dataset && el.dataset.value !== undefined) {
+          setCounterValue(id, value);
+        } else if(el.value !== undefined) {
           el.value = value;
         } else {
           el.textContent = value;
@@ -622,8 +630,7 @@
     }
     function setCounters(side, counters){
       fields.forEach(([key]) => {
-        const input = document.getElementById(inputId(side, key));
-        if(input) input.value = counters && counters[key] !== undefined ? counters[key] : 0;
+        setCounterValue(inputId(side, key), counters && counters[key] !== undefined ? counters[key] : 0);
       });
     }
     function loadGame(id){
@@ -791,7 +798,10 @@
       resetMatchDefaults();
       document.getElementById("localName").textContent = "Local";
       document.getElementById("visitorName").textContent = "Visitant";
-      document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
+      document.querySelectorAll(".counter-value").forEach(value => {
+        value.dataset.value = "0";
+        value.textContent = "0";
+      });
       render();
       renderSavedGames();
       setSaveStatus("");
