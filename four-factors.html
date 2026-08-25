@@ -105,6 +105,10 @@
     .saved-count { color:var(--muted); font-size:0.78rem; font-weight:800; }
     .saved-list { display:grid; gap:8px; margin-top:10px; }
     .saved-empty { color:var(--muted); font-size:0.85rem; margin:8px 0 0; }
+    .saved-nav { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:8px; align-items:center; }
+    .saved-nav .btn { padding:7px 9px; font-size:0.76rem; }
+    .saved-nav .btn:disabled { opacity:0.42; cursor:not-allowed; }
+    .saved-position { color:var(--muted); font-size:0.72rem; font-weight:800; text-align:center; }
     .saved-game { padding:9px; border:1px solid var(--line); border-radius:8px; }
     .saved-game-heading { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px;
       align-items:start; }
@@ -174,6 +178,7 @@
       .summary-item span { font-size:0.66rem; }
       .summary-item strong { font-size:1.04rem; }
       .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .saved-nav .btn { padding:6px 8px; font-size:0.72rem; }
     }
   </style>
 </head>
@@ -289,6 +294,7 @@
     const DEFAULT_MATCH_TEAM_NAME = "JBF";
     const DEFAULT_MATCH_CATEGORY = "1er Any Pref.";
     let currentGameId = null;
+    let savedGamesViewIndex = 0;
 
     function inputId(side, key){ return side + "-" + key; }
     function n(side, key){
@@ -667,6 +673,7 @@
           games.unshift(payload);
           currentGameId = payload.id;
         }
+        savedGamesViewIndex = 0;
         writeSavedGames(games);
         await renderSavedGames(games);
         try {
@@ -764,6 +771,22 @@
       ];
       return '<div class="saved-summary">' + summaryItemsHtml(items, "saved-summary-item") + '</div>';
     }
+    function clampSavedGamesViewIndex(total){
+      savedGamesViewIndex = Math.max(0, Math.min(savedGamesViewIndex, Math.max(0, total - 1)));
+    }
+    function savedNavButton(label, disabled, onClick){
+      const button = document.createElement("button");
+      button.className = "btn";
+      button.type = "button";
+      button.textContent = label;
+      button.disabled = disabled;
+      button.addEventListener("click", onClick);
+      return button;
+    }
+    async function moveSavedGamesView(delta, games){
+      savedGamesViewIndex += delta;
+      await renderSavedGames(games);
+    }
     function efficiencySummaryItems(possessionsValue, oer, der){
       if(Number.isFinite(possessionsValue) && possessionsValue < EFFICIENCY_POSSESSION_THRESHOLD) {
         return [
@@ -786,6 +809,7 @@
       const count = document.getElementById("savedGamesCount");
       const sourceGames = gamesOverride || await readSyncedSavedGames();
       const games = sourceGames.sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
+      clampSavedGamesViewIndex(games.length);
       updateMatchNumber(games);
       count.textContent = games.length === 1 ? "1 partit" : games.length + " partits";
       list.innerHTML = "";
@@ -796,46 +820,53 @@
         list.appendChild(empty);
         return;
       }
-      games.forEach(game => {
-        const item = document.createElement("article");
-        item.className = "saved-game";
-        if(game.id === currentGameId) item.style.borderColor = "var(--brand)";
-        const text = document.createElement("div");
-        const title = document.createElement("div");
-        title.className = "saved-game-title";
-        title.innerHTML = formatSavedTitle(game);
-        const date = document.createElement("div");
-        date.className = "saved-game-date";
-        date.textContent = formatSavedDate(game);
-        const heading = document.createElement("div");
-        heading.className = "saved-game-heading";
-        heading.append(title, date);
-        const summary = document.createElement("div");
-        summary.innerHTML = savedSummaryHtml(game);
-        const load = document.createElement("button");
-        load.className = "btn";
-        load.type = "button";
-        load.title = "Carrega";
-        load.setAttribute("aria-label", "Carrega partit");
-        load.innerHTML = iconHtml("load");
-        load.addEventListener("click", () => loadGame(game.id));
-        const remove = document.createElement("button");
-        remove.className = "btn danger";
-        remove.type = "button";
-        remove.title = "Elimina";
-        remove.setAttribute("aria-label", "Elimina partit");
-        remove.innerHTML = iconHtml("delete");
-        remove.addEventListener("click", () => deleteGame(game.id));
-        const actions = document.createElement("div");
-        actions.className = "saved-actions";
-        actions.append(load, remove);
-        const body = document.createElement("div");
-        body.className = "saved-game-body";
-        body.append(summary.firstChild, actions);
-        text.append(heading, body);
-        item.append(text);
-        list.appendChild(item);
-      });
+      const game = games[savedGamesViewIndex];
+      const nav = document.createElement("div");
+      nav.className = "saved-nav";
+      const newer = savedNavButton("Endarrere", savedGamesViewIndex === games.length - 1, () => moveSavedGamesView(1, games));
+      const older = savedNavButton("Endavant", savedGamesViewIndex === 0, () => moveSavedGamesView(-1, games));
+      const position = document.createElement("div");
+      position.className = "saved-position";
+      position.textContent = "Partit " + (games.length - savedGamesViewIndex) + " de " + games.length;
+      nav.append(newer, position, older);
+      const item = document.createElement("article");
+      item.className = "saved-game";
+      if(game.id === currentGameId) item.style.borderColor = "var(--brand)";
+      const text = document.createElement("div");
+      const title = document.createElement("div");
+      title.className = "saved-game-title";
+      title.innerHTML = formatSavedTitle(game);
+      const date = document.createElement("div");
+      date.className = "saved-game-date";
+      date.textContent = formatSavedDate(game);
+      const heading = document.createElement("div");
+      heading.className = "saved-game-heading";
+      heading.append(title, date);
+      const summary = document.createElement("div");
+      summary.innerHTML = savedSummaryHtml(game);
+      const load = document.createElement("button");
+      load.className = "btn";
+      load.type = "button";
+      load.title = "Carrega";
+      load.setAttribute("aria-label", "Carrega partit");
+      load.innerHTML = iconHtml("load");
+      load.addEventListener("click", () => loadGame(game.id));
+      const remove = document.createElement("button");
+      remove.className = "btn danger";
+      remove.type = "button";
+      remove.title = "Elimina";
+      remove.setAttribute("aria-label", "Elimina partit");
+      remove.innerHTML = iconHtml("delete");
+      remove.addEventListener("click", () => deleteGame(game.id));
+      const actions = document.createElement("div");
+      actions.className = "saved-actions";
+      actions.append(load, remove);
+      const body = document.createElement("div");
+      body.className = "saved-game-body";
+      body.append(summary.firstChild, actions);
+      text.append(heading, body);
+      item.append(text);
+      list.append(nav, item);
     }
     function setSaveStatus(message){
       const status = document.getElementById("saveStatus");
