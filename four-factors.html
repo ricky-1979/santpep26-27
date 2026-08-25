@@ -99,6 +99,13 @@
       align-items:center; padding:9px; border:1px solid var(--line); border-radius:8px; }
     .saved-game-title { font-weight:900; color:var(--ink); overflow-wrap:anywhere; }
     .saved-game-meta { color:var(--muted); font-size:0.75rem; overflow-wrap:anywhere; }
+    .saved-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:7px; }
+    .saved-summary-item { border:1px solid var(--line); border-radius:8px; padding:5px 6px;
+      background:#faf9fc; text-align:center; min-width:0; }
+    .saved-summary-item span { display:block; color:var(--muted); font-size:0.62rem;
+      font-weight:800; text-transform:uppercase; letter-spacing:0.02em; }
+    .saved-summary-item strong { display:block; margin-top:1px; color:var(--ink); font-size:0.82rem;
+      font-weight:900; font-variant-numeric:tabular-nums; }
     .status-line { color:var(--muted); font-size:0.78rem; margin-top:8px; min-height:1.1em; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
     @media (max-width:780px) {
@@ -123,6 +130,7 @@
       .match-panel { grid-template-columns:1fr; }
       .saved-game { grid-template-columns:1fr; }
       .saved-game .btn { width:100%; }
+      .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
   </style>
 </head>
@@ -529,9 +537,19 @@
       return local + " " + localScore + " - " + visitorScore + " " + visitor;
     }
     function formatSavedMeta(game){
-      const parts = [formatSavedDate(game)];
-      if(game.summary && Number.isFinite(game.summary.winRate)) parts.push("Win Rate " + wholePct(game.summary.winRate));
-      return parts.join(" · ");
+      return formatSavedDate(game);
+    }
+    function savedSummaryHtml(game){
+      const summary = game.summary || {};
+      const items = [
+        ["Win Rate", wholePct(summary.winRate)],
+        ["Possessions", whole(summary.possessions)],
+        ["OER", decimal(summary.oer)],
+        ["DER", decimal(summary.der)]
+      ];
+      return '<div class="saved-summary">' + items.map(([label, value]) =>
+        '<div class="saved-summary-item"><span>' + label + '</span><strong>' + value + '</strong></div>'
+      ).join("") + '</div>';
     }
     function renderSavedGames(){
       const list = document.getElementById("savedGamesList");
@@ -557,7 +575,9 @@
         const meta = document.createElement("div");
         meta.className = "saved-game-meta";
         meta.textContent = formatSavedMeta(game);
-        text.append(title, meta);
+        const summary = document.createElement("div");
+        summary.innerHTML = savedSummaryHtml(game);
+        text.append(title, meta, summary.firstChild);
         const load = document.createElement("button");
         load.className = "btn";
         load.type = "button";
