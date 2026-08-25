@@ -41,9 +41,6 @@
       appearance:none; -webkit-appearance:none; }
     .match-panel input[type="date"]:disabled { color:var(--brand-dark); background:#f4edf8;
       border-color:rgba(113,63,151,0.38); opacity:1; cursor:not-allowed; }
-    .date-lock { display:none; margin-top:2px; color:var(--brand-dark); font-size:0.62rem;
-      font-weight:900; text-transform:uppercase; letter-spacing:0.03em; }
-    .date-field.locked .date-lock { display:block; }
     .match-value { color:var(--brand-dark); font-size:1rem; font-weight:900; line-height:1.2;
       text-transform:none; overflow-wrap:anywhere; }
     .scoreboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
@@ -198,7 +195,6 @@
       <div class="match-column">
         <label class="date-field">Data
           <input id="gameDate" type="date" />
-          <span class="date-lock">Bloquejada</span>
         </label>
         <label>Nom de l'equip
           <span class="match-value" id="matchTeamName">JBF</span>
