@@ -39,6 +39,11 @@
     .match-panel label { text-align:left; min-width:0; overflow:hidden; }
     .match-panel input[type="date"] { display:block; width:100%; max-width:100%; min-width:0;
       appearance:none; -webkit-appearance:none; }
+    .match-panel input[type="date"]:disabled { color:var(--brand-dark); background:#f4edf8;
+      border-color:rgba(113,63,151,0.38); opacity:1; cursor:not-allowed; }
+    .date-lock { display:none; margin-top:2px; color:var(--brand-dark); font-size:0.62rem;
+      font-weight:900; text-transform:uppercase; letter-spacing:0.03em; }
+    .date-field.locked .date-lock { display:block; }
     .match-value { color:var(--brand-dark); font-size:1rem; font-weight:900; line-height:1.2;
       text-transform:none; overflow-wrap:anywhere; }
     .scoreboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
@@ -191,8 +196,9 @@
 
     <section class="match-panel" aria-label="Dades del partit">
       <div class="match-column">
-        <label>Data
+        <label class="date-field">Data
           <input id="gameDate" type="date" />
+          <span class="date-lock">Bloquejada</span>
         </label>
         <label>Nom de l'equip
           <span class="match-value" id="matchTeamName">JBF</span>
@@ -538,7 +544,10 @@
     }
     function updateDateEditability(){
       const date = document.getElementById("gameDate");
-      if(date) date.disabled = statsStarted();
+      const locked = statsStarted();
+      if(date) date.disabled = locked;
+      const field = document.querySelector(".date-field");
+      if(field) field.classList.toggle("locked", locked);
     }
     function todayIsoDate(){
       return new Date().toISOString().slice(0, 10);
