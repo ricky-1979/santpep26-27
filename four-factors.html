@@ -52,6 +52,7 @@
     .factor-stack { display:grid; gap:0; }
     .factor-section { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(88px,0.85fr);
       gap:14px; align-items:center; padding:22px 0; border-bottom:1px dashed var(--line); }
+    .factor-section:first-child { padding-top:10px; }
     .factor-section:last-child { border-bottom:0; padding-bottom:0; }
     .team-card.visitor .factor-section { grid-template-columns:minmax(88px,0.85fr) minmax(0,1.15fr); }
     .control-stack { display:grid; gap:12px; }
@@ -121,6 +122,7 @@
       .team-field input { font-size:1rem; }
       .score-field input { font-size:1.2rem; }
       .factor-section { grid-template-columns:minmax(0,1fr) 58px; gap:8px; padding:16px 0; }
+      .factor-section:first-child { padding-top:8px; }
       .team-card.visitor .factor-section { grid-template-columns:58px minmax(0,1fr); }
       .team-card.visitor .factor-result { align-items:flex-start; }
       .control-stack { gap:8px; }
