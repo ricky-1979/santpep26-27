@@ -51,11 +51,10 @@
     .team-header { display:grid; grid-template-columns:minmax(0,1fr) 76px; gap:10px; align-items:end;
       border-bottom:4px solid var(--team-color); padding-bottom:12px; margin-bottom:18px; }
     .team-field { color:var(--team-color); }
-    .team-field input { color:var(--team-color); font-size:1.35rem; font-weight:900; border:0;
-      border-radius:8px; padding:6px 0; background:transparent; text-transform:uppercase; }
-    .team-field input::placeholder { color:var(--team-color); opacity:0.65; }
-    .score-field input { color:var(--team-color); font-size:1.55rem; font-weight:900; text-align:right;
-      border:0; border-radius:8px; padding:6px 0; background:transparent; }
+    .team-name { color:var(--team-color); font-size:1.35rem; font-weight:900; line-height:1.15;
+      text-transform:uppercase; overflow-wrap:anywhere; }
+    .score-value { color:var(--team-color); font-size:1.55rem; font-weight:900; line-height:1.1;
+      text-align:right; font-variant-numeric:tabular-nums; }
     .factor-stack { display:grid; gap:0; }
     .factor-section { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(88px,0.85fr);
       gap:14px; align-items:center; padding:22px 0; border-bottom:1px dashed var(--line); }
@@ -149,8 +148,8 @@
       .team-card { padding:12px 8px 13px; border-radius:12px; }
       .team-header { grid-template-columns:minmax(0,1fr) 56px; gap:6px;
         border-bottom-width:4px; padding-bottom:8px; margin-bottom:8px; }
-      .team-field input { font-size:1rem; padding:3px 0; }
-      .score-field input { font-size:1.28rem; padding:3px 0; }
+      .team-name { font-size:1rem; }
+      .score-value { font-size:1.28rem; }
       .factor-section { grid-template-columns:minmax(0,1fr) 60px; gap:7px; padding:11px 0; }
       .factor-section:first-child { padding-top:7px; }
       .team-card.visitor .factor-section { grid-template-columns:60px minmax(0,1fr); }
@@ -213,22 +212,22 @@
     <section class="scoreboard-grid">
       <article class="team-card local" data-side="team">
         <div class="team-header">
-          <label for="localName" class="team-field">Equip local
-            <input id="localName" type="text" placeholder="Local" />
+          <label class="team-field">Equip local
+            <span class="team-name" id="localName">Local</span>
           </label>
-          <label for="localScore" class="score-field">Punts
-            <input id="localScore" type="number" min="0" step="1" value="0" readonly />
+          <label class="score-field">Punts
+            <span class="score-value" id="localScore">0</span>
           </label>
         </div>
         <div class="factor-stack" data-side="team"></div>
       </article>
       <article class="team-card visitor" data-side="opp">
         <div class="team-header">
-          <label for="visitorName" class="team-field">Equip visitant
-            <input id="visitorName" type="text" placeholder="Visitant" />
+          <label class="team-field">Equip visitant
+            <span class="team-name" id="visitorName">Visitant</span>
           </label>
-          <label for="visitorScore" class="score-field">Punts
-            <input id="visitorScore" type="number" min="0" step="1" value="0" readonly />
+          <label class="score-field">Punts
+            <span class="score-value" id="visitorScore">0</span>
           </label>
         </div>
         <div class="factor-stack" data-side="opp"></div>
@@ -408,7 +407,7 @@
       return scoreRate * scoreWeight + factorRate * (1 - scoreWeight);
     }
     function updateScore(side, scoreId){
-      document.getElementById(scoreId).value = points(side);
+      document.getElementById(scoreId).textContent = points(side);
     }
     function updateSummary(side, other, summaryId){
       const poss = possessions(side);
@@ -496,8 +495,13 @@
     }
     function setValues(values){
       Object.entries(values).forEach(([id, value]) => {
-        const input = document.getElementById(id);
-        if(input) input.value = value;
+        const el = document.getElementById(id);
+        if(!el) return;
+        if(el.value !== undefined) {
+          el.value = value;
+        } else {
+          el.textContent = value;
+        }
       });
       render();
     }
@@ -583,13 +587,13 @@
         },
         teams: {
           team: {
-            name: document.getElementById("localName").value.trim(),
+            name: matchText("localName"),
             score: points("team"),
             counters: collectCounters("team"),
             factors: teamFactors
           },
           opp: {
-            name: document.getElementById("visitorName").value.trim(),
+            name: matchText("visitorName"),
             score: points("opp"),
             counters: collectCounters("opp"),
             factors: oppFactors
@@ -634,8 +638,8 @@
       currentGameId = game.id;
       resetMatchDefaults();
       document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : todayIsoDate();
-      document.getElementById("localName").value = game.teams && game.teams.team ? game.teams.team.name || "" : "";
-      document.getElementById("visitorName").value = game.teams && game.teams.opp ? game.teams.opp.name || "" : "";
+      document.getElementById("localName").textContent = game.teams && game.teams.team && game.teams.team.name ? game.teams.team.name : "Local";
+      document.getElementById("visitorName").textContent = game.teams && game.teams.opp && game.teams.opp.name ? game.teams.opp.name : "Visitant";
       setCounters("team", game.teams && game.teams.team ? game.teams.team.counters : {});
       setCounters("opp", game.teams && game.teams.opp ? game.teams.opp.counters : {});
       render();
@@ -785,8 +789,8 @@
       if(!ok) return;
       currentGameId = null;
       resetMatchDefaults();
-      document.getElementById("localName").value = "";
-      document.getElementById("visitorName").value = "";
+      document.getElementById("localName").textContent = "Local";
+      document.getElementById("visitorName").textContent = "Visitant";
       document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
       render();
       renderSavedGames();
