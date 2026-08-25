@@ -185,7 +185,7 @@
 
     <section class="match-panel" aria-label="Dades del partit">
       <label>Data
-        <span class="match-value" id="gameDate"></span>
+        <input id="gameDate" type="date" />
       </label>
       <label>Partit
         <span class="match-value" id="matchNumber">1</span>
@@ -335,6 +335,7 @@
       updateFactors("team", team, opp);
       updateFactors("opp", opp, team);
       updateSummary("team", "opp", "teamSummary");
+      updateDateEditability();
     }
     function points(side){
       return n(side, "fg") * 2 + n(side, "tp") * 3 + n(side, "ft");
@@ -518,16 +519,24 @@
       if(value) value.textContent = String(matchNumberForGames(games || readSavedGames(), currentGameId));
     }
     function resetMatchDefaults(){
-      document.getElementById("gameDate").textContent = todayIsoDate();
+      document.getElementById("gameDate").value = todayIsoDate();
       document.getElementById("matchTeamName").textContent = DEFAULT_MATCH_TEAM_NAME;
       document.getElementById("matchCategory").textContent = DEFAULT_MATCH_CATEGORY;
+    }
+    function statsStarted(){
+      return ["team", "opp"].some(side => fields.some(([key]) => n(side, key) > 0));
+    }
+    function updateDateEditability(){
+      const date = document.getElementById("gameDate");
+      if(date) date.disabled = statsStarted();
     }
     function todayIsoDate(){
       return new Date().toISOString().slice(0, 10);
     }
     function matchText(id){
       const value = document.getElementById(id);
-      return value ? value.textContent.trim() : "";
+      if(!value) return "";
+      return value.value !== undefined ? value.value.trim() : value.textContent.trim();
     }
     function writeSavedGames(games){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
@@ -609,7 +618,7 @@
       if(!ok) return;
       currentGameId = game.id;
       resetMatchDefaults();
-      document.getElementById("gameDate").textContent = game.meta && game.meta.date ? game.meta.date : todayIsoDate();
+      document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : todayIsoDate();
       document.getElementById("localName").value = game.teams && game.teams.team ? game.teams.team.name || "" : "";
       document.getElementById("visitorName").value = game.teams && game.teams.opp ? game.teams.opp.name || "" : "";
       setCounters("team", game.teams && game.teams.team ? game.teams.team.counters : {});
