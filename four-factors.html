@@ -32,10 +32,11 @@
       cursor:pointer; }
     .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
     .btn.danger { color:var(--bad); }
-    .match-panel { display:grid; grid-template-columns:minmax(150px,220px) minmax(170px,1fr) minmax(130px,180px);
+    .match-panel { display:grid; grid-template-columns:minmax(150px,220px) minmax(72px,90px) minmax(170px,1fr) minmax(130px,180px);
       gap:10px; margin:0 0 16px; padding:12px; border:1px solid var(--line);
       border-radius:12px; background:#fff; box-shadow:var(--shadow); }
     .match-panel label { text-align:left; }
+    .match-panel input[readonly] { color:var(--brand-dark); font-weight:900; cursor:default; background:#faf9fc; }
     .scoreboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
     .team-card { background:var(--card); border:1px solid var(--line); border-radius:18px;
       box-shadow:var(--shadow); padding:18px 18px 20px; }
@@ -131,7 +132,7 @@
       main { padding:11px 7px 34px; }
       .toolbar { gap:8px; margin-bottom:10px; }
       .btn { padding:8px 10px; font-size:0.8rem; border-radius:8px; }
-      .match-panel { grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,0.9fr); margin-bottom:11px; padding:9px;
+      .match-panel { grid-template-columns:minmax(0,0.9fr) minmax(58px,0.5fr) minmax(0,1.1fr) minmax(0,0.85fr); margin-bottom:11px; padding:9px;
         border-radius:10px; box-shadow:none; }
       .match-panel label { font-size:0.66rem; }
       input { padding:6px 7px; font-size:0.98rem; }
@@ -184,6 +185,9 @@
     <section class="match-panel" aria-label="Dades del partit">
       <label for="gameDate">Data
         <input id="gameDate" type="date" />
+      </label>
+      <label for="matchNumber">Partit
+        <input id="matchNumber" type="text" value="1" readonly />
       </label>
       <label for="matchTeamName">Nom de l'equip
         <input id="matchTeamName" type="text" placeholder="Equip" />
@@ -494,6 +498,22 @@
         return [];
       }
     }
+    function orderedSavedGames(games){
+      return [...games].sort((a, b) =>
+        String(a.savedAt || a.updatedAt || "").localeCompare(String(b.savedAt || b.updatedAt || ""))
+      );
+    }
+    function matchNumberForGames(games, gameIdValue){
+      if(gameIdValue) {
+        const index = orderedSavedGames(games).findIndex(game => game.id === gameIdValue);
+        if(index >= 0) return index + 1;
+      }
+      return games.length + 1;
+    }
+    function updateMatchNumber(games){
+      const input = document.getElementById("matchNumber");
+      if(input) input.value = String(matchNumberForGames(games || readSavedGames(), currentGameId));
+    }
     function writeSavedGames(games){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
     }
@@ -508,7 +528,7 @@
         der: defensiveEfficiency(other)
       };
     }
-    function buildGamePayload(existing){
+    function buildGamePayload(existing, games){
       const teamFactors = calc("team", "opp");
       const oppFactors = calc("opp", "team");
       const now = new Date().toISOString();
@@ -518,6 +538,7 @@
         updatedAt: now,
         meta: {
           date: document.getElementById("gameDate").value,
+          gameNumber: matchNumberForGames(games || readSavedGames(), existing ? existing.id : null),
           teamName: document.getElementById("matchTeamName").value.trim(),
           category: document.getElementById("matchCategory").value.trim()
         },
@@ -542,7 +563,7 @@
       try {
         const games = readSavedGames();
         const existingIndex = currentGameId ? games.findIndex(game => game.id === currentGameId) : -1;
-        const payload = buildGamePayload(existingIndex >= 0 ? games[existingIndex] : null);
+        const payload = buildGamePayload(existingIndex >= 0 ? games[existingIndex] : null, games);
         if(existingIndex >= 0) {
           games[existingIndex] = payload;
         } else {
@@ -658,6 +679,7 @@
       const list = document.getElementById("savedGamesList");
       const count = document.getElementById("savedGamesCount");
       const games = readSavedGames().sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
+      updateMatchNumber(games);
       count.textContent = games.length === 1 ? "1 partit" : games.length + " partits";
       list.innerHTML = "";
       if(!games.length) {
