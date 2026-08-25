@@ -98,9 +98,6 @@
       border-radius:8px; padding:7px 8px; background:#fff; color:var(--ink); font-size:1rem;
       font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
     input:focus { outline:2px solid rgba(113,63,151,0.18); border-color:var(--brand); }
-    .formula { margin:14px 0 0; color:var(--muted); font-size:0.82rem; }
-    .formula code { color:var(--ink); background:#fff; border:1px solid var(--line);
-      border-radius:6px; padding:1px 5px; }
     .saved-games { margin-top:18px; padding:12px; border:1px solid var(--line);
       border-radius:12px; background:#fff; box-shadow:var(--shadow); }
     .saved-games-header { display:flex; justify-content:space-between; gap:10px; align-items:center; }
@@ -176,7 +173,6 @@
       .summary-item { gap:2px; }
       .summary-item span { font-size:0.66rem; }
       .summary-item strong { font-size:1.04rem; }
-      .formula { margin-top:8px; font-size:0.68rem; }
       .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
   </style>
@@ -251,14 +247,6 @@
       <div class="status-line" id="saveStatus" role="status" aria-live="polite"></div>
     </section>
 
-    <p class="formula">
-      Fórmules: <code>eFG% = (FGM + 0.5 * 3PM) / FGA</code>,
-      <code>TOV% = TO / (FGA + 0.44 * FTA + TO)</code>,
-      <code>REB% = (OREB + DREB) / rebots totals del partit</code>,
-      <code>ORB% = 100 * OREB / (OREB + DREB rival)</code>,
-      <code>DRB% = 100 * DREB / (DREB + OREB rival)</code>,
-      <code>FT/FGA = FTA / FGA</code>.
-    </p>
   </main>
   <footer>CB Sant Josep de Badalona · 4 Factors</footer>
 
