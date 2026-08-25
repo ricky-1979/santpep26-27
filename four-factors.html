@@ -266,6 +266,7 @@
       reb: 0.20,
       ftfga: 0.15
     };
+    const EFFICIENCY_POSSESSION_THRESHOLD = 10;
     const STORAGE_KEY = "santpep.fourFactors.games.v1";
     let currentGameId = null;
 
@@ -277,6 +278,7 @@
     function pct(value){ return Number.isFinite(value) ? (value * 100).toFixed(1) + "%" : "-"; }
     function wholePct(value){ return Number.isFinite(value) ? Math.round(value * 100) + "%" : "-"; }
     function ratio(value){ return Number.isFinite(value) ? value.toFixed(3) : "-"; }
+    function ppp(value){ return Number.isFinite(value) ? value.toFixed(2) : "-"; }
     function decimal(value){ return Number.isFinite(value) ? value.toFixed(1) : "-"; }
     function whole(value){ return Number.isFinite(value) ? Math.round(value) : "-"; }
     function safeDiv(a, b){ return b > 0 ? a / b : NaN; }
@@ -333,8 +335,11 @@
     function possessions(side){
       return n(side, "fga") - n(side, "orb") + n(side, "tov") + 0.44 * n(side, "fta");
     }
+    function pointsPerPossession(side){
+      return safeDiv(points(side), possessions(side));
+    }
     function offensiveEfficiency(side){
-      return safeDiv(points(side), possessions(side)) * 100;
+      return pointsPerPossession(side) * 100;
     }
     function defensiveEfficiency(other){
       return offensiveEfficiency(other);
@@ -386,11 +391,12 @@
       const ownFactors = calc(side, other);
       const otherFactors = calc(other, side);
       const win = winRate(side, other, ownFactors, otherFactors);
-      document.getElementById(summaryId).innerHTML =
-        '<div class="summary-item"><span>Win Rate</span><strong>' + wholePct(win) + '</strong></div>' +
-        '<div class="summary-item"><span>Possessions</span><strong>' + whole(poss) + '</strong></div>' +
-        '<div class="summary-item"><span>OER</span><strong>' + decimal(oer) + '</strong></div>' +
-        '<div class="summary-item"><span>DER</span><strong>' + decimal(der) + '</strong></div>';
+      const items = [
+        ["Win Rate", wholePct(win)],
+        ["Possessions", whole(poss)],
+        ...efficiencySummaryItems(poss, oer, der)
+      ];
+      document.getElementById(summaryId).innerHTML = summaryItemsHtml(items, "summary-item");
     }
     function controlHtml(side, key){
       const label = fieldLabels[key];
@@ -617,12 +623,26 @@
       const items = [
         ["Win Rate", wholePct(summary.winRate)],
         ["Possessions", whole(summary.possessions)],
-        ["OER", decimal(summary.oer)],
-        ["DER", decimal(summary.der)]
+        ...efficiencySummaryItems(summary.possessions, summary.oer, summary.der)
       ];
-      return '<div class="saved-summary">' + items.map(([label, value]) =>
-        '<div class="saved-summary-item"><span>' + label + '</span><strong>' + value + '</strong></div>'
-      ).join("") + '</div>';
+      return '<div class="saved-summary">' + summaryItemsHtml(items, "saved-summary-item") + '</div>';
+    }
+    function efficiencySummaryItems(possessionsValue, oer, der){
+      if(Number.isFinite(possessionsValue) && possessionsValue < EFFICIENCY_POSSESSION_THRESHOLD) {
+        return [
+          ["PPP", ppp(oer / 100)],
+          ["DPP", ppp(der / 100)]
+        ];
+      }
+      return [
+        ["OER", decimal(oer)],
+        ["DER", decimal(der)]
+      ];
+    }
+    function summaryItemsHtml(items, className){
+      return items.map(([label, value]) =>
+        '<div class="' + className + '"><span>' + label + '</span><strong>' + value + '</strong></div>'
+      ).join("");
     }
     function renderSavedGames(){
       const list = document.getElementById("savedGamesList");
