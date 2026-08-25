@@ -100,11 +100,17 @@
     .saved-game-heading { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px;
       align-items:start; }
     .saved-game-title { font-weight:900; color:var(--ink); overflow-wrap:anywhere; }
+    .saved-team-local { color:#3498db; }
+    .saved-team-visitor { color:#ef4438; }
+    .saved-score { color:var(--ink); padding:0 3px; }
     .saved-game-date { color:var(--muted); font-size:0.75rem; font-weight:800; white-space:nowrap; }
     .saved-game-body { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:start;
       margin-top:7px; }
     .saved-actions { display:grid; gap:6px; align-self:start; }
-    .saved-actions .btn { padding:6px 8px; font-size:0.72rem; min-width:68px; }
+    .saved-actions .btn { display:inline-grid; place-items:center; width:32px; height:32px; min-width:0;
+      padding:0; color:var(--brand-dark); }
+    .saved-actions .btn svg { width:16px; height:16px; stroke:currentColor; }
+    .saved-actions .btn.danger { color:var(--bad); }
     .saved-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
     .saved-summary-item { border:1px solid var(--line); border-radius:8px; padding:5px 6px;
       background:#faf9fc; text-align:center; min-width:0; }
@@ -135,7 +141,6 @@
       .team-summary { grid-template-columns:repeat(4,minmax(0,1fr)); padding:10px 8px; }
       .summary-item strong { font-size:0.95rem; }
       .match-panel { grid-template-columns:1fr; }
-      .saved-actions .btn { width:68px; }
       .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
   </style>
@@ -540,7 +545,29 @@
       const visitor = game.teams && game.teams.opp && game.teams.opp.name ? game.teams.opp.name : "Equip visitant";
       const localScore = game.teams && game.teams.team ? game.teams.team.score : 0;
       const visitorScore = game.teams && game.teams.opp ? game.teams.opp.score : 0;
-      return local + " " + localScore + " - " + visitorScore + " " + visitor;
+      return '<span class="saved-team-local">' + escapeHtml(local) + '</span>' +
+        '<span class="saved-score"> ' + localScore + ' - ' + visitorScore + ' </span>' +
+        '<span class="saved-team-visitor">' + escapeHtml(visitor) + '</span>';
+    }
+    function escapeHtml(value){
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+    function iconHtml(name){
+      if(name === "load") {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>' +
+          '<path d="M7 10l5 5 5-5"></path>' +
+          '<path d="M12 15V3"></path></svg>';
+      }
+      return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path>' +
+        '<path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>';
     }
     function savedSummaryHtml(game){
       const summary = game.summary || {};
@@ -574,7 +601,7 @@
         const text = document.createElement("div");
         const title = document.createElement("div");
         title.className = "saved-game-title";
-        title.textContent = formatSavedTitle(game);
+        title.innerHTML = formatSavedTitle(game);
         const date = document.createElement("div");
         date.className = "saved-game-date";
         date.textContent = formatSavedDate(game);
@@ -586,12 +613,16 @@
         const load = document.createElement("button");
         load.className = "btn";
         load.type = "button";
-        load.textContent = "Carrega";
+        load.title = "Carrega";
+        load.setAttribute("aria-label", "Carrega partit");
+        load.innerHTML = iconHtml("load");
         load.addEventListener("click", () => loadGame(game.id));
         const remove = document.createElement("button");
         remove.className = "btn danger";
         remove.type = "button";
-        remove.textContent = "Elimina";
+        remove.title = "Elimina";
+        remove.setAttribute("aria-label", "Elimina partit");
+        remove.innerHTML = iconHtml("delete");
         remove.addEventListener("click", () => deleteGame(game.id));
         const actions = document.createElement("div");
         actions.className = "saved-actions";
