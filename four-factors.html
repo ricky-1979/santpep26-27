@@ -52,7 +52,9 @@
       border-bottom:4px solid var(--team-color); padding-bottom:12px; margin-bottom:18px; }
     .team-field { color:var(--team-color); }
     .team-name { color:var(--team-color); font-size:1.35rem; font-weight:900; line-height:1.15;
-      text-transform:uppercase; overflow-wrap:anywhere; }
+      text-transform:uppercase; overflow-wrap:anywhere; border:0; border-radius:8px; padding:6px 0;
+      background:transparent; }
+    .team-name::placeholder { color:var(--team-color); opacity:0.65; }
     .score-value { color:var(--team-color); font-size:1.55rem; font-weight:900; line-height:1.1;
       text-align:right; font-variant-numeric:tabular-nums; }
     .factor-stack { display:grid; gap:0; }
@@ -150,7 +152,7 @@
       .team-card { padding:12px 8px 13px; border-radius:12px; }
       .team-header { grid-template-columns:minmax(0,1fr) 56px; gap:6px;
         border-bottom-width:4px; padding-bottom:8px; margin-bottom:8px; }
-      .team-name { font-size:1rem; }
+      .team-name { font-size:1rem; padding:3px 0; }
       .score-value { font-size:1.28rem; }
       .factor-section { grid-template-columns:minmax(0,1fr) 60px; gap:7px; padding:11px 0; }
       .factor-section:first-child { padding-top:7px; }
@@ -215,7 +217,7 @@
       <article class="team-card local" data-side="team">
         <div class="team-header">
           <label class="team-field">Equip local
-            <span class="team-name" id="localName">Local</span>
+            <input class="team-name" id="localName" type="text" placeholder="Local" />
           </label>
           <label class="score-field">Punts
             <span class="score-value" id="localScore">0</span>
@@ -226,7 +228,7 @@
       <article class="team-card visitor" data-side="opp">
         <div class="team-header">
           <label class="team-field">Equip visitant
-            <span class="team-name" id="visitorName">Visitant</span>
+            <input class="team-name" id="visitorName" type="text" placeholder="Visitant" />
           </label>
           <label class="score-field">Punts
             <span class="score-value" id="visitorScore">0</span>
@@ -645,8 +647,8 @@
       currentGameId = game.id;
       resetMatchDefaults();
       document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : todayIsoDate();
-      document.getElementById("localName").textContent = game.teams && game.teams.team && game.teams.team.name ? game.teams.team.name : "Local";
-      document.getElementById("visitorName").textContent = game.teams && game.teams.opp && game.teams.opp.name ? game.teams.opp.name : "Visitant";
+      document.getElementById("localName").value = game.teams && game.teams.team && game.teams.team.name ? game.teams.team.name : "";
+      document.getElementById("visitorName").value = game.teams && game.teams.opp && game.teams.opp.name ? game.teams.opp.name : "";
       setCounters("team", game.teams && game.teams.team ? game.teams.team.counters : {});
       setCounters("opp", game.teams && game.teams.opp ? game.teams.opp.counters : {});
       render();
@@ -796,8 +798,8 @@
       if(!ok) return;
       currentGameId = null;
       resetMatchDefaults();
-      document.getElementById("localName").textContent = "Local";
-      document.getElementById("visitorName").textContent = "Visitant";
+      document.getElementById("localName").value = "";
+      document.getElementById("visitorName").value = "";
       document.querySelectorAll(".counter-value").forEach(value => {
         value.dataset.value = "0";
         value.textContent = "0";
