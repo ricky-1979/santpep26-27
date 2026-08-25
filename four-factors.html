@@ -227,7 +227,7 @@
       <code>REB% = (OREB + DREB) / rebots totals del partit</code>,
       <code>ORB% = 100 * OREB / (OREB + DREB rival)</code>,
       <code>DRB% = 100 * DREB / (DREB + OREB rival)</code>,
-      <code>FT/FGA = FTM / FGA</code>.
+      <code>FT/FGA = FTA / FGA</code>.
     </p>
   </main>
   <footer>CB Sant Josep de Badalona · 4 Factors</footer>
@@ -291,7 +291,6 @@
       const fga = n(side, "fga");
       const tp = n(side, "tp");
       const fta = n(side, "fta");
-      const ft = n(side, "ft");
       const orb = n(side, "orb");
       const drb = n(side, "drb");
       const tov = n(side, "tov");
@@ -306,7 +305,7 @@
         reb: reboundRate,
         orb: orbRate,
         drb: drbRate,
-        ftfga: safeDiv(ft, fga)
+        ftfga: safeDiv(fta, fga)
       };
     }
     function render(){
