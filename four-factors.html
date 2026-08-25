@@ -294,6 +294,8 @@
     };
     const EFFICIENCY_POSSESSION_THRESHOLD = 10;
     const STORAGE_KEY = "santpep.fourFactors.games.v1";
+    const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
+    const FIREBASE_GAMES_PATH = "fourFactorsGames/jbf-1er-any-pref";
     const DEFAULT_MATCH_TEAM_NAME = "JBF";
     const DEFAULT_MATCH_CATEGORY = "1er Any Pref.";
     let currentGameId = null;
@@ -570,6 +572,58 @@
     function writeSavedGames(games){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
     }
+    function firebaseGamesUrl(id){
+      const base = FIREBASE_DB_URL.replace(/\/$/, "");
+      const path = FIREBASE_GAMES_PATH.split("/").map(encodeURIComponent).join("/");
+      return base + "/" + path + (id ? "/" + encodeURIComponent(id) : "") + ".json";
+    }
+    function normalizeRemoteGames(data){
+      if(!data) return [];
+      if(Array.isArray(data)) return data.filter(Boolean);
+      return Object.entries(data).map(([id, game]) => Object.assign({ id }, game || {}));
+    }
+    function mergeSavedGames(...lists){
+      const byId = new Map();
+      lists.flat().forEach(game => {
+        if(!game || !game.id) return;
+        const current = byId.get(game.id);
+        const currentDate = current ? String(current.updatedAt || current.savedAt || "") : "";
+        const nextDate = String(game.updatedAt || game.savedAt || "");
+        if(!current || nextDate >= currentDate) byId.set(game.id, game);
+      });
+      return [...byId.values()];
+    }
+    async function fetchFirebaseGames(){
+      const response = await fetch(firebaseGamesUrl(), { cache:"no-store" });
+      if(!response.ok) throw new Error("Firebase read failed");
+      return normalizeRemoteGames(await response.json());
+    }
+    async function saveFirebaseGame(game){
+      const response = await fetch(firebaseGamesUrl(game.id), {
+        method:"PUT",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(game)
+      });
+      if(!response.ok) throw new Error("Firebase write failed");
+    }
+    async function deleteFirebaseGame(id){
+      const response = await fetch(firebaseGamesUrl(id), { method:"DELETE" });
+      if(!response.ok) throw new Error("Firebase delete failed");
+    }
+    async function readSyncedSavedGames(){
+      const local = readSavedGames();
+      try {
+        const remote = await fetchFirebaseGames();
+        const merged = mergeSavedGames(local, remote);
+        writeSavedGames(merged);
+        const remoteIds = new Set(remote.map(game => game.id));
+        await Promise.all(merged.filter(game => !remoteIds.has(game.id)).map(saveFirebaseGame));
+        return merged;
+      } catch(error) {
+        setSaveStatus("No s'ha pogut sincronitzar amb Firebase. Es mostren les dades locals.");
+        return local;
+      }
+    }
     function collectCounters(side){
       return Object.fromEntries(fields.map(([key]) => [key, n(side, key)]));
     }
@@ -612,9 +666,9 @@
         summary: summaryValues("team", "opp", teamFactors, oppFactors)
       };
     }
-    function saveGame(){
+    async function saveGame(){
       try {
-        const games = readSavedGames();
+        const games = await readSyncedSavedGames();
         const existingIndex = currentGameId ? games.findIndex(game => game.id === currentGameId) : -1;
         const payload = buildGamePayload(existingIndex >= 0 ? games[existingIndex] : null, games);
         if(existingIndex >= 0) {
@@ -624,8 +678,13 @@
           currentGameId = payload.id;
         }
         writeSavedGames(games);
-        renderSavedGames();
-        setSaveStatus("Partit guardat.");
+        await renderSavedGames(games);
+        try {
+          await saveFirebaseGame(payload);
+          setSaveStatus("Partit guardat i sincronitzat.");
+        } catch(error) {
+          setSaveStatus("Partit guardat en aquest navegador. Firebase no permet sincronitzar.");
+        }
       } catch(error) {
         setSaveStatus("No s'ha pogut guardar el partit en aquest navegador.");
       }
@@ -635,11 +694,12 @@
         setCounterValue(inputId(side, key), counters && counters[key] !== undefined ? counters[key] : 0);
       });
     }
-    function loadGame(id){
-      const game = readSavedGames().find(item => item.id === id);
+    async function loadGame(id){
+      const games = await readSyncedSavedGames();
+      const game = games.find(item => item.id === id);
       if(!game) {
         setSaveStatus("Aquest partit ja no existeix.");
-        renderSavedGames();
+        await renderSavedGames(games);
         return;
       }
       const ok = window.confirm("Carregar aquest partit substituirà les dades actuals de la calculadora. Vols continuar?");
@@ -652,17 +712,22 @@
       setCounters("team", game.teams && game.teams.team ? game.teams.team.counters : {});
       setCounters("opp", game.teams && game.teams.opp ? game.teams.opp.counters : {});
       render();
-      renderSavedGames();
+      await renderSavedGames(games);
       setSaveStatus("Partit carregat.");
     }
-    function deleteGame(id){
+    async function deleteGame(id){
       const ok = window.confirm("Segur que vols eliminar aquest partit guardat?");
       if(!ok) return;
-      const games = readSavedGames().filter(game => game.id !== id);
+      const games = (await readSyncedSavedGames()).filter(game => game.id !== id);
       writeSavedGames(games);
       if(currentGameId === id) currentGameId = null;
-      renderSavedGames();
-      setSaveStatus("Partit eliminat.");
+      await renderSavedGames(games);
+      try {
+        await deleteFirebaseGame(id);
+        setSaveStatus("Partit eliminat i sincronitzat.");
+      } catch(error) {
+        setSaveStatus("Partit eliminat localment. Firebase no permet sincronitzar.");
+      }
     }
     function formatSavedDate(game){
       if(game.meta && game.meta.date) return game.meta.date;
@@ -726,10 +791,11 @@
         '<div class="' + className + '"><span>' + label + '</span><strong>' + value + '</strong></div>'
       ).join("");
     }
-    function renderSavedGames(){
+    async function renderSavedGames(gamesOverride){
       const list = document.getElementById("savedGamesList");
       const count = document.getElementById("savedGamesCount");
-      const games = readSavedGames().sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
+      const sourceGames = gamesOverride || await readSyncedSavedGames();
+      const games = sourceGames.sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
       updateMatchNumber(games);
       count.textContent = games.length === 1 ? "1 partit" : games.length + " partits";
       list.innerHTML = "";
