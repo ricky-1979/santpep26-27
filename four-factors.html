@@ -95,10 +95,12 @@
     .saved-count { color:var(--muted); font-size:0.78rem; font-weight:800; }
     .saved-list { display:grid; gap:8px; margin-top:10px; }
     .saved-empty { color:var(--muted); font-size:0.85rem; margin:8px 0 0; }
-    .saved-game { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:8px;
+    .saved-game { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px;
       align-items:center; padding:9px; border:1px solid var(--line); border-radius:8px; }
     .saved-game-title { font-weight:900; color:var(--ink); overflow-wrap:anywhere; }
     .saved-game-meta { color:var(--muted); font-size:0.75rem; overflow-wrap:anywhere; }
+    .saved-actions { display:grid; gap:6px; align-self:start; }
+    .saved-actions .btn { padding:6px 8px; font-size:0.72rem; min-width:68px; }
     .saved-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:7px; }
     .saved-summary-item { border:1px solid var(--line); border-radius:8px; padding:5px 6px;
       background:#faf9fc; text-align:center; min-width:0; }
@@ -128,8 +130,8 @@
       .team-summary { grid-template-columns:repeat(4,minmax(0,1fr)); padding:10px 8px; }
       .summary-item strong { font-size:0.95rem; }
       .match-panel { grid-template-columns:1fr; }
-      .saved-game { grid-template-columns:1fr; }
-      .saved-game .btn { width:100%; }
+      .saved-game { grid-template-columns:minmax(0,1fr) auto; }
+      .saved-actions .btn { width:68px; }
       .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
   </style>
@@ -588,7 +590,10 @@
         remove.type = "button";
         remove.textContent = "Elimina";
         remove.addEventListener("click", () => deleteGame(game.id));
-        item.append(text, load, remove);
+        const actions = document.createElement("div");
+        actions.className = "saved-actions";
+        actions.append(load, remove);
+        item.append(text, actions);
         list.appendChild(item);
       });
     }
