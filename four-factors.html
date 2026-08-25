@@ -310,6 +310,8 @@
       };
     }
     function render(){
+      enforceAttemptMinimums("team");
+      enforceAttemptMinimums("opp");
       const team = calc("team", "opp");
       const opp = calc("opp", "team");
       updateScore("team", "localScore");
@@ -432,11 +434,28 @@
         });
       });
     }
+    function setCounterValue(id, value){
+      const input = document.getElementById(id);
+      if(input) input.value = Math.max(0, value);
+    }
+    function enforceAttemptMinimums(side){
+      setCounterValue(inputId(side, "fga"), Math.max(n(side, "fga"), n(side, "fg") + n(side, "tp")));
+      setCounterValue(inputId(side, "fta"), Math.max(n(side, "fta"), n(side, "ft")));
+    }
     function adjustInput(id, delta){
       const input = document.getElementById(id);
       if(!input) return;
+      const [side, key] = id.split("-");
       const current = Number(input.value) || 0;
-      input.value = Math.max(0, current + delta);
+      const next = Math.max(0, current + delta);
+      input.value = next;
+      if((key === "fg" || key === "tp") && delta !== 0) {
+        setCounterValue(inputId(side, "fga"), n(side, "fga") + (next - current));
+      }
+      if(key === "ft" && delta !== 0) {
+        setCounterValue(inputId(side, "fta"), n(side, "fta") + (next - current));
+      }
+      enforceAttemptMinimums(side);
       input.dispatchEvent(new Event("input", { bubbles:true }));
     }
     function setValues(values){
