@@ -495,6 +495,8 @@
         renderSavedGames();
         return;
       }
+      const ok = window.confirm("Carregar aquest partit substituirà les dades actuals de la calculadora. Vols continuar?");
+      if(!ok) return;
       currentGameId = game.id;
       document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : "";
       document.getElementById("localName").value = game.teams && game.teams.team ? game.teams.team.name || "" : "";
