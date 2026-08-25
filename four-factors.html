@@ -36,7 +36,8 @@
       gap:10px; margin:0 0 16px; padding:12px; border:1px solid var(--line);
       border-radius:12px; background:#fff; box-shadow:var(--shadow); }
     .match-panel label { text-align:left; }
-    .match-panel input[readonly] { color:var(--brand-dark); font-weight:900; cursor:default; background:#faf9fc; }
+    .match-value { color:var(--brand-dark); font-size:1rem; font-weight:900; line-height:1.2;
+      text-transform:none; overflow-wrap:anywhere; }
     .scoreboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
     .team-card { background:var(--card); border:1px solid var(--line); border-radius:18px;
       box-shadow:var(--shadow); padding:18px 18px 20px; }
@@ -183,17 +184,17 @@
     </div>
 
     <section class="match-panel" aria-label="Dades del partit">
-      <label for="gameDate">Data
-        <input id="gameDate" type="date" />
+      <label>Data
+        <span class="match-value" id="gameDate"></span>
       </label>
-      <label for="matchNumber">Partit
-        <input id="matchNumber" type="text" value="1" readonly />
+      <label>Partit
+        <span class="match-value" id="matchNumber">1</span>
       </label>
-      <label for="matchTeamName">Nom de l'equip
-        <input id="matchTeamName" type="text" value="JBF" readonly />
+      <label>Nom de l'equip
+        <span class="match-value" id="matchTeamName">JBF</span>
       </label>
-      <label for="matchCategory">Categoria
-        <input id="matchCategory" type="text" value="1er Any Pref." readonly />
+      <label>Categoria
+        <span class="match-value" id="matchCategory">1er Any Pref.</span>
       </label>
     </section>
 
@@ -513,12 +514,20 @@
       return games.length + 1;
     }
     function updateMatchNumber(games){
-      const input = document.getElementById("matchNumber");
-      if(input) input.value = String(matchNumberForGames(games || readSavedGames(), currentGameId));
+      const value = document.getElementById("matchNumber");
+      if(value) value.textContent = String(matchNumberForGames(games || readSavedGames(), currentGameId));
     }
     function resetMatchDefaults(){
-      document.getElementById("matchTeamName").value = DEFAULT_MATCH_TEAM_NAME;
-      document.getElementById("matchCategory").value = DEFAULT_MATCH_CATEGORY;
+      document.getElementById("gameDate").textContent = todayIsoDate();
+      document.getElementById("matchTeamName").textContent = DEFAULT_MATCH_TEAM_NAME;
+      document.getElementById("matchCategory").textContent = DEFAULT_MATCH_CATEGORY;
+    }
+    function todayIsoDate(){
+      return new Date().toISOString().slice(0, 10);
+    }
+    function matchText(id){
+      const value = document.getElementById(id);
+      return value ? value.textContent.trim() : "";
     }
     function writeSavedGames(games){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
@@ -543,10 +552,10 @@
         savedAt: existing ? existing.savedAt : now,
         updatedAt: now,
         meta: {
-          date: document.getElementById("gameDate").value,
+          date: matchText("gameDate"),
           gameNumber: matchNumberForGames(games || readSavedGames(), existing ? existing.id : null),
-          teamName: document.getElementById("matchTeamName").value.trim(),
-          category: document.getElementById("matchCategory").value.trim()
+          teamName: matchText("matchTeamName"),
+          category: matchText("matchCategory")
         },
         teams: {
           team: {
@@ -599,8 +608,8 @@
       const ok = window.confirm("Carregar aquest partit substituirà les dades actuals de la calculadora. Vols continuar?");
       if(!ok) return;
       currentGameId = game.id;
-      document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : "";
       resetMatchDefaults();
+      document.getElementById("gameDate").textContent = game.meta && game.meta.date ? game.meta.date : todayIsoDate();
       document.getElementById("localName").value = game.teams && game.teams.team ? game.teams.team.name || "" : "";
       document.getElementById("visitorName").value = game.teams && game.teams.opp ? game.teams.opp.name || "" : "";
       setCounters("team", game.teams && game.teams.team ? game.teams.team.counters : {});
@@ -751,7 +760,6 @@
       const ok = window.confirm("Segur que vols reiniciar la calculadora?");
       if(!ok) return;
       currentGameId = null;
-      document.getElementById("gameDate").value = "";
       resetMatchDefaults();
       document.getElementById("localName").value = "";
       document.getElementById("visitorName").value = "";
@@ -760,6 +768,7 @@
       renderSavedGames();
       setSaveStatus("");
     };
+    resetMatchDefaults();
     buildInputs();
     render();
     renderSavedGames();
