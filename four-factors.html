@@ -142,7 +142,6 @@
     <div class="toolbar">
       <button class="btn primary" type="button" id="sampleBtn">Exemple</button>
       <button class="btn primary" type="button" id="saveGameBtn">Guardar partit</button>
-      <button class="btn" type="button" id="clearBtn">Neteja</button>
       <button class="btn danger" type="button" id="resetBtn">Reinicia</button>
     </div>
 
@@ -598,13 +597,6 @@
       "opp-ft": 5, "opp-orb": 8, "opp-drb": 11, "opp-tov": 8
     });
     document.getElementById("saveGameBtn").onclick = saveGame;
-    document.getElementById("clearBtn").onclick = () => {
-      currentGameId = null;
-      document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
-      render();
-      renderSavedGames();
-      setSaveStatus("");
-    };
     document.getElementById("resetBtn").onclick = () => {
       const ok = window.confirm("Segur que vols reiniciar la calculadora?");
       if(!ok) return;
