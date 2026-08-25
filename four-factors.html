@@ -190,10 +190,10 @@
         <input id="matchNumber" type="text" value="1" readonly />
       </label>
       <label for="matchTeamName">Nom de l'equip
-        <input id="matchTeamName" type="text" placeholder="Equip" />
+        <input id="matchTeamName" type="text" value="JBF" readonly />
       </label>
       <label for="matchCategory">Categoria
-        <input id="matchCategory" type="text" placeholder="Categoria" />
+        <input id="matchCategory" type="text" value="1er Any Pref." readonly />
       </label>
     </section>
 
@@ -278,6 +278,8 @@
     };
     const EFFICIENCY_POSSESSION_THRESHOLD = 10;
     const STORAGE_KEY = "santpep.fourFactors.games.v1";
+    const DEFAULT_MATCH_TEAM_NAME = "JBF";
+    const DEFAULT_MATCH_CATEGORY = "1er Any Pref.";
     let currentGameId = null;
 
     function inputId(side, key){ return side + "-" + key; }
@@ -514,6 +516,10 @@
       const input = document.getElementById("matchNumber");
       if(input) input.value = String(matchNumberForGames(games || readSavedGames(), currentGameId));
     }
+    function resetMatchDefaults(){
+      document.getElementById("matchTeamName").value = DEFAULT_MATCH_TEAM_NAME;
+      document.getElementById("matchCategory").value = DEFAULT_MATCH_CATEGORY;
+    }
     function writeSavedGames(games){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
     }
@@ -594,8 +600,7 @@
       if(!ok) return;
       currentGameId = game.id;
       document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : "";
-      document.getElementById("matchTeamName").value = game.meta && game.meta.teamName ? game.meta.teamName : "";
-      document.getElementById("matchCategory").value = game.meta && game.meta.category ? game.meta.category : "";
+      resetMatchDefaults();
       document.getElementById("localName").value = game.teams && game.teams.team ? game.teams.team.name || "" : "";
       document.getElementById("visitorName").value = game.teams && game.teams.opp ? game.teams.opp.name || "" : "";
       setCounters("team", game.teams && game.teams.team ? game.teams.team.counters : {});
@@ -747,8 +752,7 @@
       if(!ok) return;
       currentGameId = null;
       document.getElementById("gameDate").value = "";
-      document.getElementById("matchTeamName").value = "";
-      document.getElementById("matchCategory").value = "";
+      resetMatchDefaults();
       document.getElementById("localName").value = "";
       document.getElementById("visitorName").value = "";
       document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
