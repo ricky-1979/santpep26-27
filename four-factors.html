@@ -565,6 +565,9 @@
       if(!value) return "";
       return value.value !== undefined ? value.value.trim() : value.textContent.trim();
     }
+    function teamNameText(id, fallback){
+      return (matchText(id) || fallback).toLocaleUpperCase("ca-ES");
+    }
     function writeSavedGames(games){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
     }
@@ -647,13 +650,13 @@
         },
         teams: {
           team: {
-            name: matchText("localName"),
+            name: teamNameText("localName", "Local"),
             score: points("team"),
             counters: collectCounters("team"),
             factors: teamFactors
           },
           opp: {
-            name: matchText("visitorName"),
+            name: teamNameText("visitorName", "Visitant"),
             score: points("opp"),
             counters: collectCounters("opp"),
             factors: oppFactors
@@ -732,8 +735,8 @@
       return "Sense data";
     }
     function formatSavedTitle(game){
-      const local = game.teams && game.teams.team && game.teams.team.name ? game.teams.team.name : "Equip local";
-      const visitor = game.teams && game.teams.opp && game.teams.opp.name ? game.teams.opp.name : "Equip visitant";
+      const local = (game.teams && game.teams.team && game.teams.team.name ? game.teams.team.name : "Equip local").toLocaleUpperCase("ca-ES");
+      const visitor = (game.teams && game.teams.opp && game.teams.opp.name ? game.teams.opp.name : "Equip visitant").toLocaleUpperCase("ca-ES");
       const localScore = game.teams && game.teams.team ? game.teams.team.score : 0;
       const visitorScore = game.teams && game.teams.opp ? game.teams.opp.score : 0;
       return '<span class="saved-team-local">' + escapeHtml(local) + '</span>' +
