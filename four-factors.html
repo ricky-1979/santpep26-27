@@ -48,9 +48,11 @@
       box-shadow:var(--shadow); padding:18px 18px 20px; }
     .team-card.local { --team-color:#3498db; }
     .team-card.visitor { --team-color:#ef4438; }
-    .team-header { display:grid; grid-template-columns:minmax(0,1fr) 76px; gap:10px; align-items:end;
+    .team-header { display:grid; grid-template-columns:minmax(0,1fr) 76px; gap:10px; align-items:start;
       border-bottom:4px solid var(--team-color); padding-bottom:12px; margin-bottom:18px; }
     .team-field { color:var(--team-color); }
+    .team-field, .score-field { min-width:0; justify-content:start; }
+    .score-field { align-items:flex-end; text-align:right; }
     .team-name { color:var(--team-color); font-size:1.35rem; font-weight:900; line-height:1.15;
       text-transform:uppercase; overflow-wrap:anywhere; border:0; border-radius:8px; padding:6px 0;
       background:transparent; }
