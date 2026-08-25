@@ -102,7 +102,9 @@
     .saved-game-title { font-weight:900; color:var(--ink); overflow-wrap:anywhere; }
     .saved-team-local { color:#3498db; }
     .saved-team-visitor { color:#ef4438; }
-    .saved-score { color:var(--ink); padding:0 3px; }
+    .saved-score-local { color:#3498db; padding-left:3px; }
+    .saved-score-separator { color:var(--ink); padding:0 3px; }
+    .saved-score-visitor { color:#ef4438; padding-right:3px; }
     .saved-game-date { color:var(--muted); font-size:0.75rem; font-weight:800; white-space:nowrap; }
     .saved-game-body { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:start;
       margin-top:7px; }
@@ -585,7 +587,9 @@
       const localScore = game.teams && game.teams.team ? game.teams.team.score : 0;
       const visitorScore = game.teams && game.teams.opp ? game.teams.opp.score : 0;
       return '<span class="saved-team-local">' + escapeHtml(local) + '</span>' +
-        '<span class="saved-score"> ' + localScore + ' - ' + visitorScore + ' </span>' +
+        '<span class="saved-score-local"> ' + localScore + '</span>' +
+        '<span class="saved-score-separator">-</span>' +
+        '<span class="saved-score-visitor">' + visitorScore + ' </span>' +
         '<span class="saved-team-visitor">' + escapeHtml(visitor) + '</span>';
     }
     function escapeHtml(value){
