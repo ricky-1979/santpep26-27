@@ -36,6 +36,7 @@
       gap:10px; margin:0 0 16px; padding:12px; border:1px solid var(--line);
       border-radius:12px; background:#fff; box-shadow:var(--shadow); }
     .match-panel label { text-align:left; }
+    .match-panel input[type="date"] { min-width:0; }
     .match-value { color:var(--brand-dark); font-size:1rem; font-weight:900; line-height:1.2;
       text-transform:none; overflow-wrap:anywhere; }
     .scoreboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
@@ -133,9 +134,11 @@
       main { padding:11px 7px 34px; }
       .toolbar { gap:8px; margin-bottom:10px; }
       .btn { padding:8px 10px; font-size:0.8rem; border-radius:8px; }
-      .match-panel { grid-template-columns:minmax(0,0.9fr) minmax(58px,0.5fr) minmax(0,1.1fr) minmax(0,0.85fr); margin-bottom:11px; padding:9px;
+      .match-panel { grid-template-columns:minmax(0,1.45fr) minmax(52px,0.55fr); margin-bottom:11px; padding:9px;
         border-radius:10px; box-shadow:none; }
       .match-panel label { font-size:0.66rem; }
+      .match-panel input[type="date"] { font-size:0.82rem; }
+      .match-value { font-size:0.9rem; }
       input { padding:6px 7px; font-size:0.98rem; }
       .scoreboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
       .team-card { padding:12px 8px 13px; border-radius:12px; }
