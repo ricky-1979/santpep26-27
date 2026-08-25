@@ -121,26 +121,45 @@
     .status-line { color:var(--muted); font-size:0.78rem; margin-top:8px; min-height:1.1em; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
     @media (max-width:780px) {
-      main { padding-inline:8px; }
-      .scoreboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-      .team-card { padding:12px 10px 16px; border-radius:14px; }
-      .team-header { grid-template-columns:minmax(0,1fr) 52px; gap:6px; }
-      .team-field input { font-size:1rem; }
-      .score-field input { font-size:1.2rem; }
-      .factor-section { grid-template-columns:minmax(0,1fr) 58px; gap:8px; padding:16px 0; }
+      header { gap:8px; padding:8px 10px; }
+      .logo { width:34px; height:34px; border-radius:8px; padding:2px; }
+      .htext h1 { font-size:0.86rem; }
+      .htext h1 .club { font-size:0.58rem; }
+      .htext p { display:none; }
+      main { padding:8px 6px 28px; }
+      .toolbar { gap:6px; margin-bottom:8px; }
+      .btn { padding:6px 8px; font-size:0.72rem; border-radius:7px; }
+      .match-panel { grid-template-columns:minmax(0,150px); margin-bottom:8px; padding:7px;
+        border-radius:10px; box-shadow:none; }
+      .match-panel label { font-size:0.56rem; }
+      input { padding:4px 5px; font-size:0.82rem; }
+      .scoreboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+      .team-card { padding:7px 5px 8px; border-radius:10px; }
+      .team-header { grid-template-columns:minmax(0,1fr) 42px; gap:4px;
+        border-bottom-width:3px; padding-bottom:5px; margin-bottom:5px; }
+      .team-field input { font-size:0.78rem; padding:1px 0; }
+      .score-field input { font-size:0.98rem; padding:1px 0; }
+      .factor-section { grid-template-columns:minmax(0,1fr) 46px; gap:4px; padding:5px 0; }
       .factor-section:first-child { padding-top:3px; }
-      .team-card.visitor .factor-section { grid-template-columns:58px minmax(0,1fr); }
+      .team-card.visitor .factor-section { grid-template-columns:46px minmax(0,1fr); }
       .team-card.visitor .factor-result { align-items:flex-start; }
-      .control-stack { gap:8px; }
-      label { font-size:0.66rem; }
-      .counter { grid-template-columns:30px minmax(0,1fr) 30px; }
-      .stepper { width:30px; height:30px; font-size:1rem; }
-      .counter input { padding:5px 4px; }
-      .factor-result span { font-size:0.95rem; }
-      .factor-result strong { font-size:1.15rem; }
-      .team-summary { grid-template-columns:repeat(4,minmax(0,1fr)); padding:10px 8px; }
-      .summary-item strong { font-size:0.95rem; }
-      .match-panel { grid-template-columns:1fr; }
+      .control-stack { gap:2px; }
+      label { gap:1px; font-size:0.52rem; line-height:1.15; }
+      .counter { grid-template-columns:22px minmax(0,1fr) 22px; }
+      .stepper { width:22px; height:22px; border-radius:7px; font-size:0.82rem; }
+      .counter input { min-height:22px; padding:1px 2px; font-size:0.78rem; border-radius:6px; }
+      .factor-results { gap:2px; }
+      .factor-result { gap:0; }
+      .factor-result span { font-size:0.72rem; }
+      .factor-result strong { font-size:0.9rem; }
+      .factor-result.sub-factor span { font-size:0.52rem; }
+      .factor-result.sub-factor strong { font-size:0.68rem; }
+      .team-summary { grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px;
+        margin-top:8px; padding:7px 5px; border-radius:9px; }
+      .summary-item { gap:0; }
+      .summary-item span { font-size:0.52rem; }
+      .summary-item strong { font-size:0.78rem; }
+      .formula { margin-top:8px; font-size:0.68rem; }
       .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
   </style>
