@@ -32,14 +32,10 @@
       cursor:pointer; }
     .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
     .btn.danger { color:var(--bad); }
-    .match-panel { display:grid; grid-template-columns:150px minmax(0,1fr) minmax(0,1.4fr);
+    .match-panel { display:grid; grid-template-columns:minmax(150px,220px);
       gap:10px; margin:0 0 16px; padding:12px; border:1px solid var(--line);
       border-radius:12px; background:#fff; box-shadow:var(--shadow); }
     .match-panel label { text-align:left; }
-    textarea { width:100%; min-height:39px; border:1px solid #d7d7d7; border-radius:8px;
-      padding:7px 8px; font:inherit; font-size:0.92rem; color:var(--ink); background:#fff;
-      resize:vertical; }
-    textarea:focus { outline:2px solid rgba(113,63,151,0.18); border-color:var(--brand); }
     .scoreboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
     .team-card { background:var(--card); border:1px solid var(--line); border-radius:18px;
       box-shadow:var(--shadow); padding:18px 18px 20px; }
@@ -148,12 +144,6 @@
     <section class="match-panel" aria-label="Dades del partit">
       <label for="gameDate">Data
         <input id="gameDate" type="date" />
-      </label>
-      <label for="gameCompetition">Competició
-        <input id="gameCompetition" type="text" placeholder="Lliga, amistós..." />
-      </label>
-      <label for="gameNotes">Notes
-        <textarea id="gameNotes" placeholder="Pavelló, categoria, jornada..."></textarea>
       </label>
     </section>
 
@@ -455,9 +445,7 @@
         savedAt: existing ? existing.savedAt : now,
         updatedAt: now,
         meta: {
-          date: document.getElementById("gameDate").value,
-          competition: document.getElementById("gameCompetition").value.trim(),
-          notes: document.getElementById("gameNotes").value.trim()
+          date: document.getElementById("gameDate").value
         },
         teams: {
           team: {
@@ -509,8 +497,6 @@
       }
       currentGameId = game.id;
       document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : "";
-      document.getElementById("gameCompetition").value = game.meta && game.meta.competition ? game.meta.competition : "";
-      document.getElementById("gameNotes").value = game.meta && game.meta.notes ? game.meta.notes : "";
       document.getElementById("localName").value = game.teams && game.teams.team ? game.teams.team.name || "" : "";
       document.getElementById("visitorName").value = game.teams && game.teams.opp ? game.teams.opp.name || "" : "";
       setCounters("team", game.teams && game.teams.team ? game.teams.team.counters : {});
@@ -542,7 +528,6 @@
     }
     function formatSavedMeta(game){
       const parts = [formatSavedDate(game)];
-      if(game.meta && game.meta.competition) parts.push(game.meta.competition);
       if(game.summary && Number.isFinite(game.summary.winRate)) parts.push("Win Rate " + wholePct(game.summary.winRate));
       return parts.join(" · ");
     }
@@ -602,8 +587,6 @@
       if(!ok) return;
       currentGameId = null;
       document.getElementById("gameDate").value = "";
-      document.getElementById("gameCompetition").value = "";
-      document.getElementById("gameNotes").value = "";
       document.getElementById("localName").value = "";
       document.getElementById("visitorName").value = "";
       document.querySelectorAll(".counter input").forEach(input => { input.value = "0"; });
