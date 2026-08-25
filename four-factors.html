@@ -106,7 +106,8 @@
     .saved-list { display:grid; gap:8px; margin-top:10px; }
     .saved-empty { color:var(--muted); font-size:0.85rem; margin:8px 0 0; }
     .saved-nav { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:8px; align-items:center; }
-    .saved-nav .btn { padding:7px 9px; font-size:0.76rem; }
+    .saved-nav .btn { display:inline-grid; place-items:center; width:32px; height:32px; min-width:0; padding:0; }
+    .saved-nav .btn svg { width:17px; height:17px; stroke:currentColor; }
     .saved-nav .btn:disabled { opacity:0.42; cursor:not-allowed; }
     .saved-position { color:var(--muted); font-size:0.72rem; font-weight:800; text-align:center; }
     .saved-game { padding:9px; border:1px solid var(--line); border-radius:8px; }
@@ -178,7 +179,7 @@
       .summary-item span { font-size:0.66rem; }
       .summary-item strong { font-size:1.04rem; }
       .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
-      .saved-nav .btn { padding:6px 8px; font-size:0.72rem; }
+      .saved-nav .btn { width:30px; height:30px; }
     }
   </style>
 </head>
@@ -761,6 +762,14 @@
           '<path d="M7 10l5 5 5-5"></path>' +
           '<path d="M12 15V3"></path></svg>';
       }
+      if(name === "prev") {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M15 18l-6-6 6-6"></path></svg>';
+      }
+      if(name === "next") {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M9 18l6-6-6-6"></path></svg>';
+      }
       return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
         '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path>' +
         '<path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>';
@@ -777,11 +786,13 @@
     function clampSavedGamesViewIndex(total){
       savedGamesViewIndex = Math.max(0, Math.min(savedGamesViewIndex, Math.max(0, total - 1)));
     }
-    function savedNavButton(label, disabled, onClick){
+    function savedNavButton(label, icon, disabled, onClick){
       const button = document.createElement("button");
       button.className = "btn";
       button.type = "button";
-      button.textContent = label;
+      button.title = label;
+      button.setAttribute("aria-label", label);
+      button.innerHTML = iconHtml(icon);
       button.disabled = disabled;
       button.addEventListener("click", onClick);
       return button;
@@ -826,8 +837,8 @@
       const game = games[savedGamesViewIndex];
       const nav = document.createElement("div");
       nav.className = "saved-nav";
-      const newer = savedNavButton("Endarrere", savedGamesViewIndex === games.length - 1, () => moveSavedGamesView(1, games));
-      const older = savedNavButton("Endavant", savedGamesViewIndex === 0, () => moveSavedGamesView(-1, games));
+      const newer = savedNavButton("Endarrere", "prev", savedGamesViewIndex === games.length - 1, () => moveSavedGamesView(1, games));
+      const older = savedNavButton("Endavant", "next", savedGamesViewIndex === 0, () => moveSavedGamesView(-1, games));
       const position = document.createElement("div");
       position.className = "saved-position";
       position.textContent = "Partit " + (games.length - savedGamesViewIndex) + " de " + games.length;
