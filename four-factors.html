@@ -95,13 +95,16 @@
     .saved-count { color:var(--muted); font-size:0.78rem; font-weight:800; }
     .saved-list { display:grid; gap:8px; margin-top:10px; }
     .saved-empty { color:var(--muted); font-size:0.85rem; margin:8px 0 0; }
-    .saved-game { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px;
-      align-items:center; padding:9px; border:1px solid var(--line); border-radius:8px; }
+    .saved-game { padding:9px; border:1px solid var(--line); border-radius:8px; }
+    .saved-game-heading { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px;
+      align-items:start; }
     .saved-game-title { font-weight:900; color:var(--ink); overflow-wrap:anywhere; }
-    .saved-game-meta { color:var(--muted); font-size:0.75rem; overflow-wrap:anywhere; }
+    .saved-game-date { color:var(--muted); font-size:0.75rem; font-weight:800; white-space:nowrap; }
+    .saved-game-body { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:start;
+      margin-top:7px; }
     .saved-actions { display:grid; gap:6px; align-self:start; }
     .saved-actions .btn { padding:6px 8px; font-size:0.72rem; min-width:68px; }
-    .saved-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:7px; }
+    .saved-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
     .saved-summary-item { border:1px solid var(--line); border-radius:8px; padding:5px 6px;
       background:#faf9fc; text-align:center; min-width:0; }
     .saved-summary-item span { display:block; color:var(--muted); font-size:0.62rem;
@@ -130,7 +133,6 @@
       .team-summary { grid-template-columns:repeat(4,minmax(0,1fr)); padding:10px 8px; }
       .summary-item strong { font-size:0.95rem; }
       .match-panel { grid-template-columns:1fr; }
-      .saved-game { grid-template-columns:minmax(0,1fr) auto; }
       .saved-actions .btn { width:68px; }
       .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
@@ -538,9 +540,6 @@
       const visitorScore = game.teams && game.teams.opp ? game.teams.opp.score : 0;
       return local + " " + localScore + " - " + visitorScore + " " + visitor;
     }
-    function formatSavedMeta(game){
-      return formatSavedDate(game);
-    }
     function savedSummaryHtml(game){
       const summary = game.summary || {};
       const items = [
@@ -574,12 +573,14 @@
         const title = document.createElement("div");
         title.className = "saved-game-title";
         title.textContent = formatSavedTitle(game);
-        const meta = document.createElement("div");
-        meta.className = "saved-game-meta";
-        meta.textContent = formatSavedMeta(game);
+        const date = document.createElement("div");
+        date.className = "saved-game-date";
+        date.textContent = formatSavedDate(game);
+        const heading = document.createElement("div");
+        heading.className = "saved-game-heading";
+        heading.append(title, date);
         const summary = document.createElement("div");
         summary.innerHTML = savedSummaryHtml(game);
-        text.append(title, meta, summary.firstChild);
         const load = document.createElement("button");
         load.className = "btn";
         load.type = "button";
@@ -593,7 +594,11 @@
         const actions = document.createElement("div");
         actions.className = "saved-actions";
         actions.append(load, remove);
-        item.append(text, actions);
+        const body = document.createElement("div");
+        body.className = "saved-game-body";
+        body.append(summary.firstChild, actions);
+        text.append(heading, body);
+        item.append(text);
         list.appendChild(item);
       });
     }
