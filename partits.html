@@ -149,9 +149,7 @@
       const vs = g.home
         ? '<div class="game-vs"><span class="lbl">vs</span> ' + g.rival + '</div>'
         : '<div class="game-vs"><span class="lbl">l\'equip rival és</span> ' + g.rival + '</div>';
-      // A casa normalment és La Colina (no cal repetir-lo); si és una altra
-      // pista pròpia (p. ex. Montigalà) sí que es mostra.
-      const showLoc = g.loc && (!g.home || !/LA COLINA/i.test(g.loc));
+      const showLoc = !!g.loc;
       const loc = showLoc ? '<div class="game-loc">📍 ' + g.loc + '</div>' : '';
       // Partit amistós: icona 🤝 amb tooltip.
       const fr = g.friendly ? ' <span class="friendly" title="Partit amistós">🤝</span>' : '';
@@ -171,8 +169,7 @@
     // Targeta compacta per a les cel·les de la graella de casa.
     function gameChip(g){
       const sexCls = g.sex==='F' ? 'fem' : 'masc';
-      // Pavelló només si no és La Colina (implícit a casa).
-      const showLoc = g.loc && !/LA COLINA/i.test(g.loc);
+      const showLoc = !!g.loc;
       const loc = showLoc ? '<div class="gchip-loc">📍 ' + venueName(g.loc) + '</div>' : '';
       // Partit amistós: icona 🤝 amb tooltip.
       const fr = g.friendly ? ' <span class="friendly" title="Partit amistós">🤝</span>' : '';
