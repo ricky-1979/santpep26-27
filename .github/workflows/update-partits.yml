@@ -72,6 +72,15 @@ jobs:
       - name: Actualitza les dades de partits
         run: node scripts/update-partits.js
 
+      - name: Avisa canvis per WhatsApp
+        if: ${{ !cancelled() }}
+        env:
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_WHATSAPP_FROM: ${{ secrets.TWILIO_WHATSAPP_FROM }}
+          WHATSAPP_RECIPIENTS: ${{ secrets.WHATSAPP_RECIPIENTS }}
+        run: node scripts/notify-partits-whatsapp.js
+
       - name: Commit si hi ha canvis
         run: |
           if git diff --quiet -- partits.html; then
