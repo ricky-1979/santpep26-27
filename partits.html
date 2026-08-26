@@ -77,6 +77,8 @@
     .chip.sex-fem.active { background:#c2185b; color:#fff; border-color:#c2185b; }
     .chip.sex-masc { border-color:#1565c0; color:#1565c0; }
     .chip.sex-fem { border-color:#c2185b; color:#c2185b; }
+    .chip.friendly-filter { border-color:var(--brand); color:var(--brand); }
+    .chip.friendly-filter.active { background:var(--brand); color:#fff; border-color:var(--brand); }
     /* Graella de casa: 3 columnes iguals (les 3 hores de la franja) */
     .hgrid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
       align-items:start; margin:0 0 14px; }
@@ -134,10 +136,12 @@
     const SEX_ORDER=[['M','Masculí'],['F','Femení']];
     const activeFilters=new Set(); // categories
     const activeSex=new Set();     // gèneres
+    let activeFriendly=false;      // només amistosos
     function passes(g){
       const okFam = activeFilters.size===0 || activeFilters.has(g.fam);
       const okSex = activeSex.size===0 || activeSex.has(g.sex);
-      return okFam && okSex;
+      const okFriendly = !activeFriendly || !!g.friendly;
+      return okFam && okSex && okFriendly;
     }
 
     function gameCard(g){
@@ -340,6 +344,11 @@
           b.onclick=function(){ if(activeSex.has(s[0])) activeSex.delete(s[0]); else activeSex.add(s[0]); sync(); renderContent(); };
           el.appendChild(b);
         });
+        const friendly=document.createElement('button');
+        friendly.className='chip friendly-filter';
+        friendly.textContent='Amistosos';
+        friendly.onclick=function(){ activeFriendly=!activeFriendly; sync(); renderContent(); };
+        el.appendChild(friendly);
       }
 
       // Grup 2: categoria
@@ -357,6 +366,8 @@
         if(sexAll) sexAll.classList.toggle('active',activeSex.size===0);
         el.querySelector('.fam-all').classList.toggle('active',activeFilters.size===0);
         Array.prototype.forEach.call(el.querySelectorAll('.chip[data-sex]'), function(c){ c.classList.toggle('active',activeSex.has(c.dataset.sex)); });
+        const friendly=el.querySelector('.friendly-filter');
+        if(friendly) friendly.classList.toggle('active',activeFriendly);
         Array.prototype.forEach.call(el.querySelectorAll('.chip[data-fam]'), function(c){ c.classList.toggle('active',activeFilters.has(c.dataset.fam)); });
       }
     }
