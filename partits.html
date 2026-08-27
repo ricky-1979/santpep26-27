@@ -106,6 +106,13 @@
       border-radius:var(--radius); box-shadow:var(--shadow); }
     .changes h3 { margin:0 0 4px; color:var(--brand-dark); font-size:1.05rem; }
     .changes-meta { margin:0 0 12px; color:var(--muted); font-size:0.78rem; }
+    .changes-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+    .changes-nav { display:grid; grid-template-columns:auto minmax(70px,1fr) auto; gap:8px; align-items:center; margin-top:12px; }
+    .changes-nav button { display:inline-grid; place-items:center; width:32px; height:32px; min-width:0; padding:0;
+      border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--brand); cursor:pointer; }
+    .changes-nav button:disabled { opacity:0.42; cursor:not-allowed; }
+    .changes-nav svg { width:17px; height:17px; stroke:currentColor; }
+    .changes-position { color:var(--muted); font-size:0.74rem; font-weight:800; text-align:center; }
     .changes-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
     .change-item { border-left:4px solid var(--brand); padding-left:10px; }
     .change-item.added { border-left-color:#2e7d32; }
@@ -139,6 +146,8 @@
     const DATA = JSON.parse(document.getElementById('partitsData').textContent);
     const tabsEl = document.getElementById('tabs');
     const content = document.getElementById('content');
+    const CHANGES_PER_PAGE = 3;
+    let changesPage = 0;
 
     const MONTHS = ['gener','febrer','març','abril','maig','juny','juliol','agost','setembre','octubre','novembre','desembre'];
     function fmtDate(iso){ const p=iso.split('-').map(Number); return p[2]+' '+MONTHS[p[1]-1]; }
@@ -311,22 +320,57 @@
       return g.date + ' ' + g.time + ' · ' + g.team + ' ' + sex + ' vs ' + g.rival + ' · ' + where + loc + fr;
     }
 
+    function changeIcon(name){
+      if(name === 'prev'){
+        return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M15 18l-6-6 6-6"></path></svg>';
+      }
+      return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<path d="M9 18l6-6-6-6"></path></svg>';
+    }
+
+    function moveChanges(delta){
+      const changes=(DATA.latestChanges && DATA.latestChanges.changes) || [];
+      const maxPage=Math.max(0, Math.ceil(changes.length / CHANGES_PER_PAGE) - 1);
+      changesPage=Math.max(0, Math.min(maxPage, changesPage + delta));
+      renderContent();
+    }
+
+    function bindChangesNav(){
+      const prev=document.getElementById('changesPrev');
+      const next=document.getElementById('changesNext');
+      if(prev) prev.onclick=function(){ moveChanges(-1); };
+      if(next) next.onclick=function(){ moveChanges(1); };
+    }
+
     function renderLatestChanges(){
       const latest=DATA.latestChanges;
       if(!latest || !latest.changes || !latest.changes.length) return '';
+      const total=latest.changes.length;
+      const pages=Math.max(1, Math.ceil(total / CHANGES_PER_PAGE));
+      changesPage=Math.max(0, Math.min(changesPage, pages - 1));
+      const start=changesPage * CHANGES_PER_PAGE;
+      const visible=latest.changes.slice(start, start + CHANGES_PER_PAGE);
       const date=latest.importedAt ? new Date(latest.importedAt) : null;
       const meta=date && !Number.isNaN(date.getTime())
         ? 'Importat el ' + date.toLocaleDateString('ca-ES') + ' a les ' + date.toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'})
         : 'Última importació amb canvis';
-      const items=latest.changes.map(function(c){
+      const items=visible.map(function(c){
         const details=(c.fields||[]).map(function(f){
           return '<div class="change-detail">' + f.label + ': ' + f.from + ' → ' + f.to + '</div>';
         }).join('');
         return '<li class="change-item ' + c.type + '"><div class="change-kind">' + changeTypeLabel(c.type) + '</div>' +
           '<div class="change-main">' + changeGameLine(c.game) + '</div>' + details + '</li>';
       }).join('');
-      return '<section class="changes"><h3>Últims canvis</h3><p class="changes-meta">' + meta + '</p>' +
-        '<ul class="changes-list">' + items + '</ul></section>';
+      const nav=total > CHANGES_PER_PAGE
+        ? '<div class="changes-nav">' +
+          '<button type="button" id="changesPrev" title="Endarrere" aria-label="Endarrere" ' + (changesPage===0 ? 'disabled' : '') + '>' + changeIcon('prev') + '</button>' +
+          '<div class="changes-position">Canvis ' + (start + 1) + '-' + Math.min(start + CHANGES_PER_PAGE, total) + ' de ' + total + '</div>' +
+          '<button type="button" id="changesNext" title="Endavant" aria-label="Endavant" ' + (changesPage>=pages-1 ? 'disabled' : '') + '>' + changeIcon('next') + '</button>' +
+          '</div>'
+        : '';
+      return '<section class="changes"><div class="changes-head"><div><h3>Últims canvis</h3><p class="changes-meta">' + meta + '</p></div></div>' +
+        '<ul class="changes-list">' + items + '</ul>' + nav + '</section>';
     }
 
     const monthsEl = document.getElementById('months');
@@ -351,6 +395,7 @@
       const html=renderWeek(DATA.weeks[currentIdx]);
       const weekHtml = html.trim() ? html : '<p class="empty-filter">Cap partit per als filtres seleccionats.</p>';
       content.innerHTML = weekHtml + renderLatestChanges();
+      bindChangesNav();
     }
 
     // Dibuixa les setmanes del mes actiu i selecciona-ne una
