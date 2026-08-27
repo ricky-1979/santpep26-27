@@ -199,20 +199,102 @@ function buildData(calendars) {
   return { weeks };
 }
 
+function allGames(data) {
+  return (data.weeks || []).flatMap((w) => w.games || []);
+}
+
+function gameKey(g) {
+  return [g.date, g.time, g.team, g.sex, g.rival, g.loc || "", g.home ? "home" : "away", g.friendly ? "friendly" : ""].join("|");
+}
+
+function identityKey(g) {
+  return [g.team, g.sex, g.rival].join("|");
+}
+
+function changedFields(oldGame, newGame) {
+  const fields = [];
+  if (oldGame.date !== newGame.date) fields.push({ label: "Data", from: oldGame.date, to: newGame.date });
+  if (oldGame.time !== newGame.time) fields.push({ label: "Hora", from: oldGame.time, to: newGame.time });
+  if ((oldGame.loc || "") !== (newGame.loc || "")) fields.push({ label: "Lloc", from: oldGame.loc || "sense lloc", to: newGame.loc || "sense lloc" });
+  if (!!oldGame.home !== !!newGame.home) fields.push({ label: "Casa/fora", from: oldGame.home ? "casa" : "fora", to: newGame.home ? "casa" : "fora" });
+  if (!!oldGame.friendly !== !!newGame.friendly) fields.push({ label: "Tipus", from: oldGame.friendly ? "amistós" : "oficial", to: newGame.friendly ? "amistós" : "oficial" });
+  return fields;
+}
+
+function gameSnapshot(g) {
+  return {
+    date: g.date,
+    time: g.time,
+    team: g.team,
+    sex: g.sex,
+    rival: g.rival,
+    home: !!g.home,
+    loc: g.loc || "",
+    friendly: !!g.friendly,
+  };
+}
+
+function buildChangeList(oldData, newData) {
+  const oldGames = allGames(oldData);
+  const newGames = allGames(newData);
+  const oldExact = new Set(oldGames.map(gameKey));
+  const newExact = new Set(newGames.map(gameKey));
+  const addedRaw = newGames.filter((g) => !oldExact.has(gameKey(g)));
+  const removedRaw = oldGames.filter((g) => !newExact.has(gameKey(g)));
+
+  const removedByIdentity = new Map();
+  removedRaw.forEach((g) => {
+    const k = identityKey(g);
+    if (!removedByIdentity.has(k)) removedByIdentity.set(k, []);
+    removedByIdentity.get(k).push(g);
+  });
+
+  const changes = [];
+  const usedRemoved = new Set();
+
+  addedRaw.forEach((g) => {
+    const candidates = removedByIdentity.get(identityKey(g)) || [];
+    const old = candidates.find((x) => !usedRemoved.has(x) && changedFields(x, g).length);
+    if (old) {
+      usedRemoved.add(old);
+      changes.push({ type: "changed", game: gameSnapshot(g), fields: changedFields(old, g) });
+    } else {
+      changes.push({ type: "added", game: gameSnapshot(g) });
+    }
+  });
+
+  removedRaw
+    .filter((g) => !usedRemoved.has(g))
+    .forEach((g) => changes.push({ type: "removed", game: gameSnapshot(g) }));
+
+  return changes;
+}
+
 async function main() {
   const pagePath = path.join(__dirname, "..", "partits.html");
   const html = fs.readFileSync(pagePath, "utf8");
+  const re = /(<script id="partitsData"[^>]*>)([\s\S]*?)(<\/script>)/;
+  const current = html.match(re);
+  if (!current) {
+    throw new Error("No s'ha trobat el bloc partitsData a partits.html");
+  }
+  const oldData = JSON.parse(current[2]);
 
   const calendars = await Promise.all(
     CALENDARS.map(async (c) => ({ sex: c.sex, ics: await fetchText(c.url) }))
   );
   const data = buildData(calendars);
+  const latestChanges = buildChangeList(oldData, data);
+  if (latestChanges.length) {
+    data.latestChanges = {
+      importedAt: new Date().toISOString(),
+      changes: latestChanges,
+    };
+  } else if (oldData.latestChanges) {
+    data.latestChanges = oldData.latestChanges;
+  }
   const json = JSON.stringify(data);
 
-  const re = /(<script id="partitsData"[^>]*>)([\s\S]*?)(<\/script>)/;
-  if (!re.test(html)) {
-    throw new Error("No s'ha trobat el bloc partitsData a partits.html");
-  }
   const out = html.replace(re, (_, open, _old, close) => open + json + close);
 
   if (out === html) {
