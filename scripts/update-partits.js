@@ -163,8 +163,7 @@ function parseCalendar(ics) {
         ...(friendly ? { friendly: true } : {}),
       };
     })
-    .filter(Boolean)
-    .filter((g) => g.dow === 6 || g.dow === 0); // només cap de setmana
+    .filter(Boolean);
 }
 
 function buildData(calendars) {
