@@ -56,6 +56,10 @@
     .chip:hover { border-color: var(--brand); }
     .chip.active { background: var(--accent); color: #4a3800; border-color: var(--accent); }
     .chip-all.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .chip.sex-masc { border-color: #1565c0; color: #1565c0; }
+    .chip.sex-masc.active { background: #1565c0; color: #fff; border-color: #1565c0; }
+    .chip.sex-fem { border-color: #c2185b; color: #c2185b; }
+    .chip.sex-fem.active { background: #c2185b; color: #fff; border-color: #c2185b; }
     .empty-filter { color: var(--muted); font-style: italic; text-align: center; padding: 40px 0; }
     .section-title {
       font-size: 1.15rem; font-weight: 700; margin: 26px 0 4px; color: var(--brand-dark);
@@ -133,6 +137,7 @@
       if(/TECNIFICACI/.test(c)) return 'tec'; // gris (mateixa simbologia)
       const hasMasc = /\bMASC\b/.test(c);
       const hasFem = /\bFEM\b/.test(c);
+      if(/\b(PBM|PAM)\b/.test(c)) return 'masc';
       if(hasMasc && !hasFem) return 'masc';
       if(hasFem && !hasMasc) return 'fem';
       return ''; // sense gènere o mixt (no s'hi aplica color)
@@ -166,10 +171,13 @@
       if(!f.length) f.push("ALTRES");
       return f;
     }
-    const activeFilters = new Set(); // buit = mostra-ho tot
+    const activeFilters = new Set(); // buit = mostra totes les categories
+    const activeSex = new Set(); // buit = mostra tots els gèneres
     function passesFilter(cat){
-      if(activeFilters.size === 0) return true;
-      return familyOf(cat).some(fam => activeFilters.has(fam));
+      const okFam = activeFilters.size === 0 || familyOf(cat).some(fam => activeFilters.has(fam));
+      const sx = sexOf(cat);
+      const okSex = activeSex.size === 0 || activeSex.has(sx);
+      return okFam && okSex;
     }
 
     function renderVenue(v){
@@ -254,10 +262,15 @@
       tabsEl.appendChild(b);
     });
 
-    // Construeix els chips de filtre per categoria (només famílies presents a les dades)
+    // Construeix els chips de filtre per gènere i categoria.
     function buildFilters(){
       const present = new Set();
-      const scan = v => v.days.forEach(day => day.forEach(s => familyOf(s.cat).forEach(f=>present.add(f))));
+      const presentSex = new Set();
+      const scan = v => v.days.forEach(day => day.forEach(s => {
+        familyOf(s.cat).forEach(f=>present.add(f));
+        const sx = sexOf(s.cat);
+        if(sx === 'masc' || sx === 'fem') presentSex.add(sx);
+      }));
       const currentView = VIEWS[currentIdx];
       const isSeason = !currentView.dates;
       if(isSeason) DATA.season.venues.forEach(scan);
@@ -265,16 +278,41 @@
       const fams = FAMILY_ORDER.filter(f =>
         present.has(f) && (isSeason || !SEASON_ONLY_FILTERS.has(f))
       );
+      const sexes = [
+        ['masc','Masculí','sex-masc'],
+        ['fem','Femení','sex-fem']
+      ].filter(s => presentSex.has(s[0]));
       activeFilters.forEach(f => {
         if(!fams.includes(f)) activeFilters.delete(f);
+      });
+      activeSex.forEach(s => {
+        if(!sexes.some(x => x[0] === s)) activeSex.delete(s);
       });
 
       const filtersEl = document.getElementById("filters");
       filtersEl.innerHTML = "";
-      const lbl = document.createElement("span");
-      lbl.className = "filters-label"; lbl.textContent = "Filtra:";
-      filtersEl.appendChild(lbl);
+      function label(text){
+        const lbl = document.createElement("span");
+        lbl.className = "filters-label"; lbl.textContent = text;
+        filtersEl.appendChild(lbl);
+      }
 
+      label("Gènere:");
+      const allSexChip = document.createElement("button");
+      allSexChip.className = "chip chip-all sex-all active"; allSexChip.textContent = "Tots";
+      allSexChip.onclick = () => { activeSex.clear(); syncChips(); renderContent(); };
+      filtersEl.appendChild(allSexChip);
+      sexes.forEach(s => {
+        const b = document.createElement("button");
+        b.className = "chip " + s[2]; b.textContent = s[1]; b.dataset.sex = s[0];
+        b.onclick = () => {
+          if(activeSex.has(s[0])) activeSex.delete(s[0]); else activeSex.add(s[0]);
+          syncChips(); renderContent();
+        };
+        filtersEl.appendChild(b);
+      });
+
+      label("Categoria:");
       const allChip = document.createElement("button");
       allChip.className = "chip chip-all active"; allChip.textContent = "Tots";
       allChip.onclick = () => { activeFilters.clear(); syncChips(); renderContent(); };
@@ -291,6 +329,9 @@
       });
 
       function syncChips(){
+        allSexChip.classList.toggle("active", activeSex.size === 0);
+        [...filtersEl.querySelectorAll(".chip[data-sex]")].forEach(c =>
+          c.classList.toggle("active", activeSex.has(c.dataset.sex)));
         allChip.classList.toggle("active", activeFilters.size === 0);
         [...filtersEl.querySelectorAll(".chip[data-fam]")].forEach(c =>
           c.classList.toggle("active", activeFilters.has(c.dataset.fam)));
