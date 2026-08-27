@@ -534,28 +534,27 @@
         return opts;
       }
 
-      // Grup 1: gènere
+      // Grup 1: tipus
+      const typeGroup=group('Tipus');
       if(sexes.length>1){
-        const sexGroup=group('Gènere');
         const allS=document.createElement('button'); allS.className='chip chip-all sex-all active'; allS.textContent='Tots';
-        allS.onclick=function(){ activeSex.clear(); sync(); renderContent(); }; sexGroup.appendChild(allS);
+        allS.onclick=function(){ activeSex.clear(); sync(); renderContent(); }; typeGroup.appendChild(allS);
         sexes.forEach(function(s){
           const b=document.createElement('button');
           b.className='chip ' + (s[0]==='F' ? 'sex-fem' : 'sex-masc');
           b.textContent=s[1]; b.dataset.sex=s[0];
           b.onclick=function(){ if(activeSex.has(s[0])) activeSex.delete(s[0]); else activeSex.add(s[0]); sync(); renderContent(); };
-          sexGroup.appendChild(b);
+          typeGroup.appendChild(b);
         });
       }
 
-      const typeGroup=group('Tipus');
       const friendly=document.createElement('button');
       friendly.className='chip friendly-filter';
       friendly.textContent='Amistosos';
       friendly.onclick=function(){ activeFriendly=!activeFriendly; sync(); renderContent(); };
       typeGroup.appendChild(friendly);
 
-      // Grup 3: categoria
+      // Grup 2: categoria
       const famGroup=group('Categoria');
       const allF=document.createElement('button'); allF.className='chip chip-all fam-all active'; allF.textContent='Totes';
       allF.onclick=function(){ activeFilters.clear(); sync(); renderContent(); }; famGroup.appendChild(allF);
