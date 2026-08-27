@@ -83,6 +83,10 @@
     .chip.sex-fem { border-color:#c2185b; color:#c2185b; }
     .chip.friendly-filter { border-color:var(--brand); color:var(--brand); }
     .chip.friendly-filter.active { background:var(--brand); color:#fff; border-color:var(--brand); }
+    .legend { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin:-8px 0 20px;
+      color:var(--muted); font-size:0.78rem; font-weight:600; }
+    .legend-item { display:inline-flex; align-items:center; gap:5px; }
+    .legend .friendly, .legend .change-mark, .legend .conflict-mark { margin-left:0; }
     /* Graella de casa: 3 columnes iguals (les 3 hores de la franja) */
     .hgrid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
       align-items:start; margin:0 0 14px; }
@@ -139,6 +143,11 @@
     <div class="tabs" id="months"></div>
     <div class="tabs subtabs" id="tabs"></div>
     <div class="filters" id="filters"></div>
+    <div class="legend" aria-label="Llegenda d'icones">
+      <span class="legend-item"><span class="friendly" title="Partit amistós">🤝</span> Amistós</span>
+      <span class="legend-item"><span class="change-mark" title="Partit amb canvis recents">↻</span> Canvi recent</span>
+      <span class="legend-item"><span class="conflict-mark" title="Possible conflicte: mateix horari i pista">!</span> Mateixa hora i pista</span>
+    </div>
     <div id="content"></div>
   </main>
   <footer>Font: calendari Partits SamPep Masc · CB Sant Josep de Badalona</footer>
