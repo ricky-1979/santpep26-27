@@ -30,9 +30,13 @@
       padding:9px 16px; border-radius:999px; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
     .tab:hover { border-color:var(--brand); }
     .tab.active { background:var(--brand); color:#fff; border-color:var(--brand); }
-    .filters { display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
-    .filters-label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:700; margin-right:2px; }
-    .filters-label:not(:first-child) { margin-left:14px; padding-left:14px; border-left:1px solid var(--line); }
+    .filters { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:10px;
+      margin-bottom:20px; padding:12px; background:rgba(255,255,255,0.72); border:1px solid var(--line);
+      border-radius:var(--radius); box-shadow:0 1px 2px rgba(60,40,90,0.04); }
+    .filter-group { min-width:0; }
+    .filter-options { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+    .filters-label { display:block; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em;
+      color:var(--muted); font-weight:800; margin:0 0 6px; }
     .chip { border:1px solid var(--line); background:var(--card); color:var(--ink);
       padding:5px 12px; border-radius:999px; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
     .chip:hover { border-color:var(--brand); }
@@ -502,34 +506,49 @@
       const sexes=SEX_ORDER.filter(function(s){ return presentSex.has(s[0]); });
       const el=document.getElementById('filters');
       el.innerHTML='';
+      function group(label){
+        const wrap=document.createElement('div');
+        wrap.className='filter-group';
+        const l=document.createElement('span');
+        l.className='filters-label';
+        l.textContent=label;
+        const opts=document.createElement('div');
+        opts.className='filter-options';
+        wrap.appendChild(l);
+        wrap.appendChild(opts);
+        el.appendChild(wrap);
+        return opts;
+      }
 
       // Grup 1: gènere
       if(sexes.length>1){
-        const l1=document.createElement('span'); l1.className='filters-label'; l1.textContent='Gènere:'; el.appendChild(l1);
+        const sexGroup=group('Gènere');
         const allS=document.createElement('button'); allS.className='chip chip-all sex-all active'; allS.textContent='Tots';
-        allS.onclick=function(){ activeSex.clear(); sync(); renderContent(); }; el.appendChild(allS);
+        allS.onclick=function(){ activeSex.clear(); sync(); renderContent(); }; sexGroup.appendChild(allS);
         sexes.forEach(function(s){
           const b=document.createElement('button');
           b.className='chip ' + (s[0]==='F' ? 'sex-fem' : 'sex-masc');
           b.textContent=s[1]; b.dataset.sex=s[0];
           b.onclick=function(){ if(activeSex.has(s[0])) activeSex.delete(s[0]); else activeSex.add(s[0]); sync(); renderContent(); };
-          el.appendChild(b);
+          sexGroup.appendChild(b);
         });
-        const friendly=document.createElement('button');
-        friendly.className='chip friendly-filter';
-        friendly.textContent='Amistosos';
-        friendly.onclick=function(){ activeFriendly=!activeFriendly; sync(); renderContent(); };
-        el.appendChild(friendly);
       }
 
-      // Grup 2: categoria
-      const l2=document.createElement('span'); l2.className='filters-label'; l2.textContent='Categoria:'; el.appendChild(l2);
+      const typeGroup=group('Tipus');
+      const friendly=document.createElement('button');
+      friendly.className='chip friendly-filter';
+      friendly.textContent='Amistosos';
+      friendly.onclick=function(){ activeFriendly=!activeFriendly; sync(); renderContent(); };
+      typeGroup.appendChild(friendly);
+
+      // Grup 3: categoria
+      const famGroup=group('Categoria');
       const allF=document.createElement('button'); allF.className='chip chip-all fam-all active'; allF.textContent='Totes';
-      allF.onclick=function(){ activeFilters.clear(); sync(); renderContent(); }; el.appendChild(allF);
+      allF.onclick=function(){ activeFilters.clear(); sync(); renderContent(); }; famGroup.appendChild(allF);
       fams.forEach(function(f){
         const b=document.createElement('button'); b.className='chip'; b.textContent=f; b.dataset.fam=f;
         b.onclick=function(){ if(activeFilters.has(f)) activeFilters.delete(f); else activeFilters.add(f); sync(); renderContent(); };
-        el.appendChild(b);
+        famGroup.appendChild(b);
       });
 
       function sync(){
