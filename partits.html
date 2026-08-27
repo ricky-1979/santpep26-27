@@ -110,6 +110,7 @@
     .game-loc { font-size:0.76rem; color:var(--muted); display:flex; align-items:center; gap:4px; }
     .changes { margin-top:30px; padding:16px; background:var(--card); border:1px solid var(--line);
       border-radius:var(--radius); box-shadow:var(--shadow); }
+    .changes.conflicts { margin-top:0; border-left:4px solid #c62828; }
     .changes h3 { margin:0 0 4px; color:var(--brand-dark); font-size:1.05rem; }
     .changes-meta { margin:0 0 12px; color:var(--muted); font-size:0.78rem; }
     .changes-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
@@ -123,6 +124,7 @@
     .change-item { border-left:4px solid var(--brand); padding-left:10px; }
     .change-item.added { border-left-color:#2e7d32; }
     .change-item.removed { border-left-color:#c62828; }
+    .change-item.conflict { border-left-color:#c62828; }
     .change-kind { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
     .change-main { font-weight:700; font-size:0.9rem; }
     .change-detail { color:var(--muted); font-size:0.8rem; }
@@ -211,6 +213,28 @@
       return conflictKeys.has(placeTimeKey(g))
         ? ' <span class="conflict-mark" title="Possible conflicte: mateix horari i pista">!</span>'
         : '';
+    }
+
+    function renderConflicts(){
+      const conflicts=[];
+      gamesByPlaceTime.forEach(function(games,key){
+        if(games.length<=1) return;
+        conflicts.push({key,games});
+      });
+      if(!conflicts.length) return '';
+      conflicts.sort(function(a,b){ return a.key.localeCompare(b.key); });
+      const items=conflicts.map(function(c){
+        const first=c.games[0];
+        const loc=first.loc || 'Sense lloc';
+        const teams=c.games.map(function(g){
+          return '<div class="change-detail">' + g.team + ' ' + (g.sex==='F'?'F':'M') + ' vs ' + g.rival + '</div>';
+        }).join('');
+        return '<li class="change-item conflict"><div class="change-kind">Conflicte</div>' +
+          '<div class="change-main">' + first.date + ' ' + first.time + ' · ' + loc + '</div>' + teams + '</li>';
+      }).join('');
+      return '<section class="changes conflicts"><h3>Conflictes</h3>' +
+        '<p class="changes-meta">Partits amb el mateix dia, hora i lloc.</p>' +
+        '<ul class="changes-list">' + items + '</ul></section>';
     }
 
     function iconLegend(){
@@ -433,7 +457,7 @@
     function renderContent(){
       const html=renderWeek(DATA.weeks[currentIdx]);
       const weekHtml = html.trim() ? html : '<p class="empty-filter">Cap partit per als filtres seleccionats.</p>';
-      content.innerHTML = weekHtml + iconLegend() + renderLatestChanges();
+      content.innerHTML = weekHtml + iconLegend() + renderConflicts() + renderLatestChanges();
       bindChangesNav();
     }
 
