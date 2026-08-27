@@ -86,7 +86,7 @@
     .badge.home { background:var(--home); color:var(--home-ink); }
     .badge.away { background:var(--away); color:var(--away-ink); }
     .badge.day { background:#ede7f6; color:#4527a0; }
-    .friendly, .change-mark, .conflict-mark { cursor:help; font-size:0.9em; }
+    .friendly, .mini-mark, .change-mark, .conflict-mark { cursor:help; font-size:0.9em; }
     .change-mark { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;
       margin-left:4px; border-radius:50%; background:var(--accent); color:var(--brand-dark); font-weight:900; }
     .conflict-mark { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;
@@ -104,7 +104,7 @@
     .legend { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin:8px 0 20px;
       color:var(--muted); font-size:0.78rem; font-weight:600; }
     .legend-item { display:inline-flex; align-items:center; gap:5px; }
-    .legend .friendly, .legend .change-mark, .legend .conflict-mark { margin-left:0; }
+    .legend .friendly, .legend .mini-mark, .legend .change-mark, .legend .conflict-mark { margin-left:0; }
     /* Graella de casa: 3 columnes iguals (les 3 hores de la franja) */
     .hgrid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
       align-items:start; margin:0 0 14px; }
@@ -198,7 +198,7 @@
     function addDays(iso,n){ const p=iso.split('-').map(Number); const dt=new Date(Date.UTC(p[0],p[1]-1,p[2]+n)); return dt.toISOString().slice(0,10); }
     function weekLabel(monday){ return fmtDate(addDays(monday,5))+' – '+fmtDate(addDays(monday,6)); }
 
-    const FAMILY_ORDER=['SÈNIOR','JÚNIOR','CADET','INFANTIL'];
+    const FAMILY_ORDER=['SÈNIOR','JÚNIOR','CADET','INFANTIL','MINI'];
     const SEX_ORDER=[['M','Masculí'],['F','Femení']];
     const activeFilters=new Set(); // categories
     const activeSex=new Set();     // gèneres
@@ -276,9 +276,16 @@
     function iconLegend(){
       return '<div class="legend" aria-label="Llegenda d&apos;icones">' +
         '<span class="legend-item"><span class="friendly" title="Partit amistós">🤝</span> Amistós</span>' +
+        '<span class="legend-item"><span class="mini-mark" title="Partit de Mini">🍼</span> Mini</span>' +
         '<span class="legend-item"><span class="change-mark" title="Partit amb canvis recents">↻</span> Canvi recent</span>' +
         '<span class="legend-item"><span class="conflict-mark" title="Possible conflicte: mateix horari i pista">!</span> Mateixa hora i pista</span>' +
         '</div>';
+    }
+
+    function miniMark(g){
+      return g.fam === 'MINI'
+        ? ' <span class="mini-mark" title="Partit de Mini">🍼</span>'
+        : '';
     }
 
     function gameCard(g){
@@ -290,10 +297,11 @@
       const loc = showLoc ? '<div class="game-loc">📍 ' + g.loc + '</div>' : '';
       // Partit amistós: icona 🤝 amb tooltip.
       const fr = g.friendly ? ' <span class="friendly" title="Partit amistós">🤝</span>' : '';
+      const mini = miniMark(g);
       const ch = changeMark(g);
       const cf = conflictMark(g);
       // El gènere s'identifica pel color de la targeta (masc/fem), sense text.
-      return '<div class="game ' + sexCls + '"><div class="game-team">' + g.team + fr + ch + cf + '</div>' +
+      return '<div class="game ' + sexCls + '"><div class="game-team">' + g.team + fr + mini + ch + cf + '</div>' +
         vs + loc + '</div>';
     }
 
@@ -312,11 +320,12 @@
       const loc = showLoc ? '<div class="gchip-loc">📍 ' + venueName(g.loc) + '</div>' : '';
       // Partit amistós: icona 🤝 amb tooltip.
       const fr = g.friendly ? ' <span class="friendly" title="Partit amistós">🤝</span>' : '';
+      const mini = miniMark(g);
       const ch = changeMark(g);
       const cf = conflictMark(g);
       // El gènere s'identifica pel color de la targeta (masc/fem), sense text.
       return '<div class="gchip ' + sexCls + '"><div class="gchip-top">' +
-        '<span class="gchip-team">' + g.team + fr + ch + cf + '</span></div>' +
+        '<span class="gchip-team">' + g.team + fr + mini + ch + cf + '</span></div>' +
         '<div class="gchip-vs"><span class="lbl">vs</span> ' + g.rival + '</div>' + loc + '</div>';
     }
 

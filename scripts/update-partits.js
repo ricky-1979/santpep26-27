@@ -27,6 +27,8 @@ const OWN = {
   // Masculí
   IAM: { team: "Infantil A", fam: "INFANTIL", sex: "M" },
   IBM: { team: "Infantil B", fam: "INFANTIL", sex: "M" },
+  MAM: { team: "Mini A",     fam: "MINI",     sex: "M" },
+  MBM: { team: "Mini B",     fam: "MINI",     sex: "M" },
   CAM: { team: "Cadet A",    fam: "CADET",    sex: "M" },
   CBM: { team: "Cadet B",    fam: "CADET",    sex: "M" },
   JAM: { team: "Júnior A",   fam: "JÚNIOR",   sex: "M" },
@@ -34,7 +36,10 @@ const OWN = {
   SAM: { team: "Sènior A",   fam: "SÈNIOR",   sex: "M" },
   SBM: { team: "Sènior B",   fam: "SÈNIOR",   sex: "M" },
   // Femení
+  MAF: { team: "Mini A",     fam: "MINI",     sex: "F" },
+  MBF: { team: "Mini B",     fam: "MINI",     sex: "F" },
   IF:  { team: "Infantil",   fam: "INFANTIL", sex: "F" },
+  MF:  { team: "Mini",       fam: "MINI",     sex: "F" },
   CF:  { team: "Cadet",      fam: "CADET",    sex: "F" },
   JAF: { team: "Júnior A",   fam: "JÚNIOR",   sex: "F" },
   JBF: { team: "Júnior B",   fam: "JÚNIOR",   sex: "F" },
