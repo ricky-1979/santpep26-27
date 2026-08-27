@@ -45,7 +45,9 @@
     }
     .tab:hover { border-color: var(--brand); }
     .tab.active { background: var(--brand); color: #fff; border-color: var(--brand); }
-    .filters { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    .filters { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; align-items: stretch; }
+    .filter-row { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 8px; align-items: center; }
+    .filter-options { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; min-width: 0; }
     .filters-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
       color: var(--muted); font-weight: 700; margin-right: 2px; }
     .chip {
@@ -291,17 +293,24 @@
 
       const filtersEl = document.getElementById("filters");
       filtersEl.innerHTML = "";
-      function label(text){
+      function row(text){
+        const wrap = document.createElement("div");
+        wrap.className = "filter-row";
         const lbl = document.createElement("span");
         lbl.className = "filters-label"; lbl.textContent = text;
-        filtersEl.appendChild(lbl);
+        const opts = document.createElement("div");
+        opts.className = "filter-options";
+        wrap.appendChild(lbl);
+        wrap.appendChild(opts);
+        filtersEl.appendChild(wrap);
+        return opts;
       }
 
-      label("Gènere:");
+      const sexGroup = row("Gènere:");
       const allSexChip = document.createElement("button");
       allSexChip.className = "chip chip-all sex-all active"; allSexChip.textContent = "Tots";
       allSexChip.onclick = () => { activeSex.clear(); syncChips(); renderContent(); };
-      filtersEl.appendChild(allSexChip);
+      sexGroup.appendChild(allSexChip);
       sexes.forEach(s => {
         const b = document.createElement("button");
         b.className = "chip " + s[2]; b.textContent = s[1]; b.dataset.sex = s[0];
@@ -309,14 +318,14 @@
           if(activeSex.has(s[0])) activeSex.delete(s[0]); else activeSex.add(s[0]);
           syncChips(); renderContent();
         };
-        filtersEl.appendChild(b);
+        sexGroup.appendChild(b);
       });
 
-      label("Categoria:");
+      const famGroup = row("Categoria:");
       const allChip = document.createElement("button");
       allChip.className = "chip chip-all active"; allChip.textContent = "Tots";
       allChip.onclick = () => { activeFilters.clear(); syncChips(); renderContent(); };
-      filtersEl.appendChild(allChip);
+      famGroup.appendChild(allChip);
 
       fams.forEach(fam => {
         const b = document.createElement("button");
@@ -325,7 +334,7 @@
           if(activeFilters.has(fam)) activeFilters.delete(fam); else activeFilters.add(fam);
           syncChips(); renderContent();
         };
-        filtersEl.appendChild(b);
+        famGroup.appendChild(b);
       });
 
       function syncChips(){
