@@ -255,14 +255,9 @@
       label: "Temporada 26-27",
       dates: null,
       render: () => {
-        let html = '<div class="section-title">Proposta horaris temporada 26-27</div>' +
+        return '<div class="section-title">Proposta horaris temporada 26-27</div>' +
           '<p class="section-sub">Horari setmanal per instal·lació</p>' +
           DATA.season.venues.map(renderVenue).join("");
-        if(DATA.season.notes && DATA.season.notes.length){
-          html += '<div class="notes"><strong>Notes</strong><ul>' +
-            DATA.season.notes.map(n => '<li>' + n + '</li>').join("") + '</ul></div>';
-        }
-        return html;
       }
     });
 
