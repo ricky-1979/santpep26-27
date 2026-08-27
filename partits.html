@@ -30,6 +30,13 @@
     .nav-group { min-width:0; }
     .nav-label { display:block; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em;
       color:var(--muted); font-weight:800; margin:0 0 6px; }
+    .month-pager { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:8px; align-items:center; }
+    .month-current { min-height:38px; display:grid; place-items:center; border:1px solid var(--brand);
+      border-radius:999px; background:var(--brand); color:#fff; font-size:0.92rem; font-weight:800; }
+    .nav-arrow { display:inline-grid; place-items:center; width:38px; height:38px; border:1px solid var(--line);
+      border-radius:999px; background:var(--card); color:var(--brand); cursor:pointer; }
+    .nav-arrow svg { width:18px; height:18px; stroke:currentColor; }
+    .nav-arrow:disabled { opacity:0.42; cursor:not-allowed; }
     .tabs { display:flex; gap:8px; margin-bottom:0; flex-wrap:wrap; }
     .subtabs .tab { font-size:0.82rem; padding:7px 13px; }
     .tab { border:1px solid var(--line); background:var(--card); color:var(--brand);
@@ -155,7 +162,11 @@
     <section class="nav-panel" aria-label="Navegació del calendari">
       <div class="nav-group">
         <span class="nav-label">Mes</span>
-        <div class="tabs" id="months"></div>
+        <div class="month-pager">
+          <button class="nav-arrow" id="prevMonth" type="button" title="Mes anterior" aria-label="Mes anterior"></button>
+          <div class="month-current" id="currentMonthLabel"></div>
+          <button class="nav-arrow" id="nextMonth" type="button" title="Mes següent" aria-label="Mes següent"></button>
+        </div>
       </div>
       <div class="nav-group">
         <span class="nav-label">Cap de setmana</span>
@@ -454,7 +465,9 @@
         '<ul class="changes-list">' + items + '</ul>' + nav + '</section>';
     }
 
-    const monthsEl = document.getElementById('months');
+    const currentMonthLabelEl = document.getElementById('currentMonthLabel');
+    const prevMonthEl = document.getElementById('prevMonth');
+    const nextMonthEl = document.getElementById('nextMonth');
 
     // Assigna cada setmana a un mes segons el dissabte (primer dia visible del cap de setmana)
     function monthKeyOf(wk){ const sat=addDays(wk.monday,5); return sat.slice(0,7); } // "YYYY-MM"
@@ -503,15 +516,16 @@
 
     function showMonth(mi, weekIdx){
       currentMonth=mi;
-      Array.prototype.forEach.call(monthsEl.children, function(t,i){ t.classList.toggle('active', i===mi); });
+      currentMonthLabelEl.textContent=monthLabel(monthKeys[mi]);
+      prevMonthEl.disabled=mi<=0;
+      nextMonthEl.disabled=mi>=monthKeys.length-1;
       buildWeekTabs(weekIdx);
     }
 
-    monthKeys.forEach(function(key,mi){
-      const b=document.createElement('button');
-      b.className='tab'; b.textContent=monthLabel(key); b.onclick=function(){ showMonth(mi,null); };
-      monthsEl.appendChild(b);
-    });
+    prevMonthEl.innerHTML=changeIcon('prev');
+    nextMonthEl.innerHTML=changeIcon('next');
+    prevMonthEl.onclick=function(){ if(currentMonth>0) showMonth(currentMonth-1,null); };
+    nextMonthEl.onclick=function(){ if(currentMonth<monthKeys.length-1) showMonth(currentMonth+1,null); };
 
     function buildFilters(){
       const presentFam=new Set(), presentSex=new Set();
