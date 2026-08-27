@@ -37,14 +37,25 @@
       opacity: 0.85; letter-spacing: 0.04em; text-transform: uppercase; }
     .htext p { margin: 2px 0 0; font-size: 0.8rem; opacity: 0.9; }
     main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
-    .tab {
-      border: 1px solid var(--line); background: var(--card); color: var(--brand);
-      padding: 9px 16px; border-radius: 999px; font-size: 0.9rem; font-weight: 600;
-      cursor: pointer; transition: all 0.15s;
+    .week-pager {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 8px; align-items: center; margin-bottom: 22px;
     }
-    .tab:hover { border-color: var(--brand); }
-    .tab.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .week-current {
+      min-height: 38px; display: grid; place-items: center;
+      border: 1px solid var(--brand); border-radius: 999px;
+      background: var(--brand); color: #fff; font-size: 0.92rem;
+      font-weight: 800; text-align: center; padding: 0 12px;
+    }
+    .nav-arrow {
+      display: inline-grid; place-items: center; width: 38px; height: 38px;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: var(--card); color: var(--brand); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-arrow:hover:not(:disabled) { border-color: var(--brand); background: #faf7fd; }
+    .nav-arrow svg { width: 18px; height: 18px; stroke: currentColor; }
+    .nav-arrow:disabled { opacity: 0.42; cursor: not-allowed; }
     .filters { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; align-items: stretch; }
     .filter-row { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 8px; align-items: center; }
     .filter-options { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; min-width: 0; }
@@ -114,7 +125,11 @@
     </div>
   </header>
   <main>
-    <div class="tabs" id="tabs"></div>
+    <div class="week-pager" aria-label="Navegació de setmanes d'entrenament">
+      <button class="nav-arrow" id="prevView" type="button" title="Setmana anterior" aria-label="Setmana anterior"></button>
+      <div class="week-current" id="currentViewLabel"></div>
+      <button class="nav-arrow" id="nextView" type="button" title="Setmana següent" aria-label="Setmana següent"></button>
+    </div>
     <div class="filters" id="filters"></div>
     <div id="content"></div>
   </main>
@@ -125,7 +140,14 @@
     const DATA = JSON.parse(document.getElementById("horarisData").textContent);
     const DAYS = DATA.dayNames;
     const content = document.getElementById("content");
-    const tabsEl = document.getElementById("tabs");
+    const currentViewLabelEl = document.getElementById("currentViewLabel");
+    const prevViewEl = document.getElementById("prevView");
+    const nextViewEl = document.getElementById("nextView");
+
+    function navIcon(name){
+      const path = name === "prev" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6";
+      return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + path + '"></path></svg>';
+    }
 
     function venuePin(name){ return "📍"; }
 
@@ -252,17 +274,18 @@
         : '<p class="empty-filter">Cap entrenament per als filtres seleccionats.</p>';
     }
     function show(idx){
-      currentIdx = idx;
+      currentIdx = Math.max(0, Math.min(idx, VIEWS.length - 1));
       buildFilters();
       renderContent();
-      [...tabsEl.children].forEach((t,i)=>t.classList.toggle("active", i===idx));
+      currentViewLabelEl.textContent = VIEWS[currentIdx].label;
+      prevViewEl.disabled = currentIdx <= 0;
+      nextViewEl.disabled = currentIdx >= VIEWS.length - 1;
       window.scrollTo({top:0, behavior:"smooth"});
     }
-    VIEWS.forEach((v,i)=>{
-      const b=document.createElement("button");
-      b.className="tab"; b.textContent=v.label; b.onclick=()=>show(i);
-      tabsEl.appendChild(b);
-    });
+    prevViewEl.innerHTML = navIcon("prev");
+    nextViewEl.innerHTML = navIcon("next");
+    prevViewEl.onclick = () => { if(currentIdx > 0) show(currentIdx - 1); };
+    nextViewEl.onclick = () => { if(currentIdx < VIEWS.length - 1) show(currentIdx + 1); };
 
     // Construeix els chips de filtre per gènere i categoria.
     function buildFilters(){
