@@ -24,7 +24,13 @@
     .htext h1 .club { display:block; font-size:0.72rem; font-weight:500; opacity:0.85; letter-spacing:0.04em; text-transform:uppercase; }
     .htext p { margin:2px 0 0; font-size:0.8rem; opacity:0.9; }
     main { max-width:1100px; margin:0 auto; padding:20px 16px 60px; }
-    .tabs { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+    .nav-panel { display:grid; gap:10px; margin-bottom:14px; padding:12px;
+      background:rgba(255,255,255,0.72); border:1px solid var(--line);
+      border-radius:var(--radius); box-shadow:0 1px 2px rgba(60,40,90,0.04); }
+    .nav-group { min-width:0; }
+    .nav-label { display:block; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em;
+      color:var(--muted); font-weight:800; margin:0 0 6px; }
+    .tabs { display:flex; gap:8px; margin-bottom:0; flex-wrap:wrap; }
     .subtabs .tab { font-size:0.82rem; padding:7px 13px; }
     .tab { border:1px solid var(--line); background:var(--card); color:var(--brand);
       padding:9px 16px; border-radius:999px; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
@@ -146,8 +152,16 @@
     </div>
   </header>
   <main>
-    <div class="tabs" id="months"></div>
-    <div class="tabs subtabs" id="tabs"></div>
+    <section class="nav-panel" aria-label="Navegació del calendari">
+      <div class="nav-group">
+        <span class="nav-label">Mes</span>
+        <div class="tabs" id="months"></div>
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">Cap de setmana</span>
+        <div class="tabs subtabs" id="tabs"></div>
+      </div>
+    </section>
     <div class="filters" id="filters"></div>
     <div id="content"></div>
   </main>
