@@ -68,9 +68,11 @@
     .badge.home { background:var(--home); color:var(--home-ink); }
     .badge.away { background:var(--away); color:var(--away-ink); }
     .badge.day { background:#ede7f6; color:#4527a0; }
-    .friendly, .change-mark { cursor:help; font-size:0.9em; }
+    .friendly, .change-mark, .conflict-mark { cursor:help; font-size:0.9em; }
     .change-mark { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;
       margin-left:4px; border-radius:50%; background:var(--accent); color:var(--brand-dark); font-weight:900; }
+    .conflict-mark { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;
+      margin-left:4px; border-radius:50%; background:#c62828; color:#fff; font-weight:900; }
     /* Gènere identificat només per color (vora + fons suau) */
     .game.masc, .gchip.masc { border-left:5px solid #1565c0; border-right:5px solid #1565c0; background:#f2f8fe; }
     .game.fem, .gchip.fem { border-left:5px solid #c2185b; border-right:5px solid #c2185b; background:#fdf3f7; }
@@ -184,6 +186,29 @@
         : '';
     }
 
+    function placeTimeKey(g){
+      return [g.date,g.time,String(g.loc||'').trim().replace(/\s+/g,' ').toUpperCase()].join('|');
+    }
+
+    const conflictKeys=new Set();
+    const gamesByPlaceTime=new Map();
+    DATA.weeks.forEach(function(wk){
+      wk.games.forEach(function(g){
+        const key=placeTimeKey(g);
+        if(!gamesByPlaceTime.has(key)) gamesByPlaceTime.set(key,[]);
+        gamesByPlaceTime.get(key).push(g);
+      });
+    });
+    gamesByPlaceTime.forEach(function(games,key){
+      if(games.length>1) conflictKeys.add(key);
+    });
+
+    function conflictMark(g){
+      return conflictKeys.has(placeTimeKey(g))
+        ? ' <span class="conflict-mark" title="Possible conflicte: mateix horari i pista">!</span>'
+        : '';
+    }
+
     function gameCard(g){
       const sexCls = g.sex==='F' ? 'fem' : 'masc';
       const vs = g.home
@@ -194,8 +219,9 @@
       // Partit amistós: icona 🤝 amb tooltip.
       const fr = g.friendly ? ' <span class="friendly" title="Partit amistós">🤝</span>' : '';
       const ch = changeMark(g);
+      const cf = conflictMark(g);
       // El gènere s'identifica pel color de la targeta (masc/fem), sense text.
-      return '<div class="game ' + sexCls + '"><div class="game-team">' + g.team + fr + ch + '</div>' +
+      return '<div class="game ' + sexCls + '"><div class="game-team">' + g.team + fr + ch + cf + '</div>' +
         vs + loc + '</div>';
     }
 
@@ -215,9 +241,10 @@
       // Partit amistós: icona 🤝 amb tooltip.
       const fr = g.friendly ? ' <span class="friendly" title="Partit amistós">🤝</span>' : '';
       const ch = changeMark(g);
+      const cf = conflictMark(g);
       // El gènere s'identifica pel color de la targeta (masc/fem), sense text.
       return '<div class="gchip ' + sexCls + '"><div class="gchip-top">' +
-        '<span class="gchip-team">' + g.team + fr + ch + '</span></div>' +
+        '<span class="gchip-team">' + g.team + fr + ch + cf + '</span></div>' +
         '<div class="gchip-vs"><span class="lbl">vs</span> ' + g.rival + '</div>' + loc + '</div>';
     }
 
