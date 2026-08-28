@@ -274,6 +274,34 @@ function buildChangeList(oldData, newData) {
   return changes;
 }
 
+function changeKey(change) {
+  const fields = (change.fields || [])
+    .map((field) => [field.label, field.from, field.to].join("="))
+    .join(";");
+  return [change.type, gameKey(change.game || {}), fields].join("||");
+}
+
+function mergeChangeHistory(oldData, newChanges, importedAt) {
+  const previousChanges = Array.isArray(oldData.latestChanges?.changes)
+    ? oldData.latestChanges.changes
+    : [];
+  if (!newChanges.length && !previousChanges.length) return null;
+
+  const seen = new Set();
+  const changes = [];
+  [...newChanges, ...previousChanges].forEach((change) => {
+    const key = changeKey(change);
+    if (seen.has(key)) return;
+    seen.add(key);
+    changes.push(change);
+  });
+
+  return {
+    importedAt: newChanges.length ? importedAt : oldData.latestChanges?.importedAt || importedAt,
+    changes,
+  };
+}
+
 async function main() {
   const pagePath = path.join(__dirname, "..", "partits.html");
   const html = fs.readFileSync(pagePath, "utf8");
@@ -289,14 +317,8 @@ async function main() {
   );
   const data = buildData(calendars);
   const latestChanges = buildChangeList(oldData, data);
-  if (latestChanges.length) {
-    data.latestChanges = {
-      importedAt: new Date().toISOString(),
-      changes: latestChanges,
-    };
-  } else if (oldData.latestChanges) {
-    data.latestChanges = oldData.latestChanges;
-  }
+  const mergedChanges = mergeChangeHistory(oldData, latestChanges, new Date().toISOString());
+  if (mergedChanges) data.latestChanges = mergedChanges;
   const json = JSON.stringify(data);
 
   const out = html.replace(re, (_, open, _old, close) => open + json + close);
