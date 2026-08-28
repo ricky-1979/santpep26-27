@@ -112,7 +112,14 @@ function madrid(d) {
 
 function cleanLoc(loc) {
   if (!loc) return "";
-  return loc.replace(/\\,/g, ",").split(",")[0].trim();
+  return cleanText(loc).replace(/\\,/g, ",").split(",")[0].trim();
+}
+
+function cleanText(value) {
+  return String(value || "")
+    .replace(/\uFFFD/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function mondayISO(dateStr) {
@@ -138,12 +145,12 @@ function parseCalendar(ics) {
     .map((e) => {
       // La 🤝 al títol marca un partit amistós.
       const friendly = /🤝/.test(e.sum);
-      const s = e.sum.replace(/🏀|🤝|🍼/g, "").trim();
+      const s = cleanText(e.sum).replace(/🏀|🤝|🍼/g, "").trim();
       const parts = s.split(/\s+Vs\s+/i).map((x) => x.trim());
       let ownSide = -1, sigla = "";
       parts.forEach((p, i) => { if (OWN[p]) { ownSide = i; sigla = p; } });
       if (ownSide < 0) return null; // partit sense equip propi identificable
-      const rival = parts[ownSide === 0 ? 1 : 0] || "";
+      const rival = cleanText(parts[ownSide === 0 ? 1 : 0] || "");
       let home = /LA COLINA|GRAN BRETANYA/i.test(e.loc); // casa = pavelló propi
       const M = madrid(e.start.d);
       const info = OWN[sigla];
@@ -208,7 +215,7 @@ function allGames(data) {
 }
 
 function gameKey(g) {
-  return [g.date, g.time, g.team, g.sex, g.rival, g.loc || "", g.home ? "home" : "away", g.friendly ? "friendly" : ""].join("|");
+  return [g.date, g.time, cleanText(g.team), g.sex, cleanText(g.rival), cleanText(g.loc), g.home ? "home" : "away", g.friendly ? "friendly" : ""].join("|");
 }
 
 function normalizeHistoryText(value) {
@@ -235,7 +242,7 @@ function historyGameKey(g) {
 }
 
 function identityKey(g) {
-  return [g.team, g.sex, g.rival].join("|");
+  return [cleanText(g.team), g.sex, cleanText(g.rival)].join("|");
 }
 
 function changedFields(oldGame, newGame) {
