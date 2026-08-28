@@ -224,7 +224,7 @@
     const changedGames=new Set();
     if(DATA.latestChanges && DATA.latestChanges.changes){
       DATA.latestChanges.changes.forEach(function(c){
-        if(c.type!=='changed' || !c.game) return;
+        if(c.type==='removed' || !c.game) return;
         changedGames.add(changedGameKey(c.game));
       });
     }
@@ -493,7 +493,7 @@
           '<button type="button" id="changesNext" title="Endavant" aria-label="Endavant" ' + (changesPage>=pages-1 ? 'disabled' : '') + '>' + changeIcon('next') + '</button>' +
           '</div>'
         : '';
-      return '<section class="changes"><div class="changes-head"><div><h3>Últims canvis</h3><p class="changes-meta">' + meta + '</p></div></div>' +
+      return '<section class="changes"><div class="changes-head"><div><h3>Últims canvis (' + total + ')</h3><p class="changes-meta">' + meta + '</p></div></div>' +
         '<ul class="changes-list">' + items + '</ul>' + nav + '</section>';
     }
 
