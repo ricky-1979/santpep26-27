@@ -211,6 +211,29 @@ function gameKey(g) {
   return [g.date, g.time, g.team, g.sex, g.rival, g.loc || "", g.home ? "home" : "away", g.friendly ? "friendly" : ""].join("|");
 }
 
+function normalizeHistoryText(value) {
+  return String(value || "")
+    .replace(/\uFFFD/g, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
+}
+
+function historyGameKey(g) {
+  return [
+    g.date,
+    g.time,
+    normalizeHistoryText(g.team),
+    g.sex,
+    normalizeHistoryText(g.rival),
+    normalizeHistoryText(g.loc),
+    g.home ? "home" : "away",
+    g.friendly ? "friendly" : "",
+  ].join("|");
+}
+
 function identityKey(g) {
   return [g.team, g.sex, g.rival].join("|");
 }
@@ -278,7 +301,14 @@ function changeKey(change) {
   const fields = (change.fields || [])
     .map((field) => [field.label, field.from, field.to].join("="))
     .join(";");
-  return [change.type, gameKey(change.game || {}), fields].join("||");
+  return [change.type, historyGameKey(change.game || {}), fields].join("||");
+}
+
+function hasEncodingNoise(change) {
+  const game = change.game || {};
+  return [game.team, game.rival, game.loc]
+    .concat((change.fields || []).flatMap((field) => [field.from, field.to]))
+    .some((value) => String(value || "").includes("\uFFFD"));
 }
 
 function mergeChangeHistory(oldData, newChanges, importedAt) {
@@ -288,11 +318,16 @@ function mergeChangeHistory(oldData, newChanges, importedAt) {
   if (!newChanges.length && !previousChanges.length) return null;
 
   const seen = new Set();
+  const visibleGames = new Set();
   const changes = [];
   [...newChanges, ...previousChanges].forEach((change) => {
+    if (hasEncodingNoise(change)) return;
+    const gameHistoryKey = historyGameKey(change.game || {});
+    if (change.type === "removed" && visibleGames.has(gameHistoryKey)) return;
     const key = changeKey(change);
     if (seen.has(key)) return;
     seen.add(key);
+    if (change.type !== "removed") visibleGames.add(gameHistoryKey);
     changes.push(change);
   });
 
