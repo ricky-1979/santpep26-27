@@ -350,9 +350,16 @@
     (async function init(){
       setStatus("Carregant...");
       try {
-        await Promise.all([loadGames(), loadAssignments()]);
+        await loadGames();
+        try {
+          await loadAssignments();
+        } catch (error) {
+          console.warn(error);
+          assignments = {};
+          setStatus("Firebase no deixa carregar assignacions.", "error");
+        }
         render();
-        setStatus("");
+        if (!els.status.textContent) setStatus("");
       } catch (error) {
         console.error(error);
         setStatus(error.message, "error");
