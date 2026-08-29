@@ -182,6 +182,11 @@
       return "Pendent";
     }
 
+    function isClubVenue(game){
+      const loc = normalize(game.loc || "");
+      return game.home || loc.includes("la-colina") || loc.includes("montigala") || loc.includes("bufala") || loc.includes("pomar");
+    }
+
     async function loadGames(){
       const response = await fetch("partits.html", { cache:"no-store" });
       if (!response.ok) throw new Error("No s'ha pogut carregar partits.html");
@@ -191,7 +196,7 @@
       if (!raw) throw new Error("No s'han trobat les dades de partits");
       const data = JSON.parse(raw.textContent);
       games = data.weeks.flatMap(week => week.games || [])
-        .filter(game => game.home && (game.fam === "MINI" || game.friendly))
+        .filter(game => isClubVenue(game) && (game.fam === "MINI" || game.friendly))
         .map(game => ({ ...game, id: gameId(game) }))
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
     }
@@ -286,7 +291,7 @@
         stateBadge.textContent = stateText(state);
         meta.append(
           Object.assign(document.createElement("span"), { className:"badge", textContent:`${formatDate(game.date)} · ${game.time || "Hora pendent"}` }),
-          Object.assign(document.createElement("span"), { className:"badge", textContent:game.home ? "A casa" : "Fora" }),
+          Object.assign(document.createElement("span"), { className:"badge", textContent:isClubVenue(game) ? "A casa" : "Fora" }),
           Object.assign(document.createElement("span"), { className:"badge", textContent:game.fam === "MINI" ? "Mini" : "Amistós" }),
           stateBadge
         );
