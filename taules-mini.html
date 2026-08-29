@@ -292,6 +292,7 @@
         meta.append(
           Object.assign(document.createElement("span"), { className:"badge", textContent:`${formatDate(game.date)} · ${game.time || "Hora pendent"}` }),
           Object.assign(document.createElement("span"), { className:"badge", textContent:isClubVenue(game) ? "A casa" : "Fora" }),
+          Object.assign(document.createElement("span"), { className:"badge", textContent:game.sex === "F" ? "Femení" : "Masculí" }),
           Object.assign(document.createElement("span"), { className:"badge", textContent:game.fam === "MINI" ? "Mini" : "Amistós" }),
           stateBadge
         );
