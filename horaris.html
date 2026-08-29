@@ -131,6 +131,8 @@
       .days { grid-template-columns: 1fr; }
       .day { border-right: none; }
     }
+      .page-nav { margin:0 0 16px; }
+    .back { color:var(--brand); font-weight:800; text-decoration:none; font-size:0.86rem; }
   </style>
 </head>
 <body>
@@ -142,6 +144,7 @@
     </div>
   </header>
   <main>
+    <nav class="page-nav"><a class="back" href="index.html">← Tornar</a></nav>
     <div class="week-pager" aria-label="Navegació de setmanes d'entrenament">
       <button class="nav-arrow" id="prevView" type="button" title="Setmana anterior" aria-label="Setmana anterior"></button>
       <div class="week-current" id="currentViewLabel"></div>

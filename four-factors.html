@@ -181,6 +181,8 @@
       .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .saved-nav .btn { width:30px; height:30px; }
     }
+      .page-nav { margin:0 0 16px; }
+    .back { color:var(--brand); font-weight:800; text-decoration:none; font-size:0.86rem; }
   </style>
 </head>
 <body>
@@ -192,6 +194,7 @@
     </div>
   </header>
   <main>
+    <nav class="page-nav"><a class="back" href="index.html">← Tornar</a></nav>
     <div class="toolbar">
       <button class="btn primary" type="button" id="sampleBtn">Exemple</button>
       <button class="btn primary" type="button" id="saveGameBtn">Guardar</button>
