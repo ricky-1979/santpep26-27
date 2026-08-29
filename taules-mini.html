@@ -191,7 +191,7 @@
       if (!raw) throw new Error("No s'han trobat les dades de partits");
       const data = JSON.parse(raw.textContent);
       games = data.weeks.flatMap(week => week.games || [])
-        .filter(game => game.fam === "MINI")
+        .filter(game => game.fam === "MINI" || game.friendly)
         .map(game => ({ ...game, id: gameId(game) }))
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
     }
@@ -252,7 +252,7 @@
       if (!visible.length) {
         const empty = document.createElement("div");
         empty.className = "empty";
-        empty.textContent = games.length ? "No hi ha partits amb aquest filtre." : "Encara no hi ha partits MINI importats.";
+        empty.textContent = games.length ? "No hi ha partits amb aquest filtre." : "Encara no hi ha partits MINI ni amistosos importats.";
         els.content.appendChild(empty);
         return;
       }
@@ -287,6 +287,7 @@
         meta.append(
           Object.assign(document.createElement("span"), { className:"badge", textContent:`${formatDate(game.date)} · ${game.time || "Hora pendent"}` }),
           Object.assign(document.createElement("span"), { className:"badge", textContent:game.home ? "A casa" : "Fora" }),
+          Object.assign(document.createElement("span"), { className:"badge", textContent:game.fam === "MINI" ? "Mini" : "Amistós" }),
           stateBadge
         );
 
