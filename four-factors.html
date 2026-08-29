@@ -194,7 +194,8 @@
   <main>
     <div class="toolbar">
       <button class="btn primary" type="button" id="sampleBtn">Exemple</button>
-      <button class="btn primary" type="button" id="saveGameBtn">Guardar partit</button>
+      <button class="btn primary" type="button" id="saveGameBtn">Guardar</button>
+      <button class="btn primary" type="button" id="closeGameBtn">Tancar partit</button>
       <button class="btn danger" type="button" id="resetBtn">Reinicia</button>
     </div>
 
@@ -290,6 +291,7 @@
     };
     const EFFICIENCY_POSSESSION_THRESHOLD = 10;
     const STORAGE_KEY = "santpep.fourFactors.games.v1";
+    const DRAFT_KEY = "santpep.fourFactors.currentDraft.v1";
     const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
     const FIREBASE_GAMES_PATH = "fourFactorsGames/jbf-1er-any-pref";
     const DEFAULT_MATCH_TEAM_NAME = "JBF";
@@ -527,6 +529,54 @@
         return [];
       }
     }
+    function collectDraft(){
+      return {
+        savedAt: new Date().toISOString(),
+        currentGameId,
+        meta: {
+          date: matchText("gameDate"),
+          teamName: matchText("matchTeamName"),
+          category: matchText("matchCategory")
+        },
+        teams: {
+          team: { name: matchText("localName"), counters: collectCounters("team") },
+          opp: { name: matchText("visitorName"), counters: collectCounters("opp") }
+        }
+      };
+    }
+    function saveDraft(){
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(collectDraft()));
+        setSaveStatus("Dades guardades. Es recuperaran si refresques la pàgina.");
+      } catch(error) {
+        setSaveStatus("No s'han pogut guardar les dades actuals.");
+      }
+    }
+    function clearDraft(){
+      try {
+        localStorage.removeItem(DRAFT_KEY);
+      } catch(error) {}
+    }
+    function restoreDraft(){
+      try {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if(!raw) return false;
+        const draft = JSON.parse(raw);
+        currentGameId = draft.currentGameId || null;
+        resetMatchDefaults();
+        document.getElementById("gameDate").value = draft.meta && draft.meta.date ? draft.meta.date : todayIsoDate();
+        document.getElementById("localName").value = draft.teams && draft.teams.team && draft.teams.team.name ? draft.teams.team.name : "";
+        document.getElementById("visitorName").value = draft.teams && draft.teams.opp && draft.teams.opp.name ? draft.teams.opp.name : "";
+        setCounters("team", draft.teams && draft.teams.team ? draft.teams.team.counters : {});
+        setCounters("opp", draft.teams && draft.teams.opp ? draft.teams.opp.counters : {});
+        setSaveStatus("Dades recuperades del darrer guardat.");
+        return true;
+      } catch(error) {
+        clearDraft();
+        setSaveStatus("No s'han pogut recuperar les dades guardades.");
+        return false;
+      }
+    }
     function orderedSavedGames(games){
       return [...games].sort((a, b) =>
         String(a.savedAt || a.updatedAt || "").localeCompare(String(b.savedAt || b.updatedAt || ""))
@@ -666,7 +716,7 @@
         summary: summaryValues("team", "opp", teamFactors, oppFactors)
       };
     }
-    async function saveGame(){
+    async function closeGame(){
       try {
         const games = await readSyncedSavedGames();
         const existingIndex = currentGameId ? games.findIndex(game => game.id === currentGameId) : -1;
@@ -680,14 +730,15 @@
         savedGamesViewIndex = 0;
         writeSavedGames(games);
         await renderSavedGames(games);
+        clearDraft();
         try {
           await saveFirebaseGame(payload);
-          setSaveStatus("Partit guardat i sincronitzat.");
+          setSaveStatus("Partit tancat i sincronitzat.");
         } catch(error) {
-          setSaveStatus("Partit guardat en aquest navegador. Firebase no permet sincronitzar.");
+          setSaveStatus("Partit tancat en aquest navegador. Firebase no permet sincronitzar.");
         }
       } catch(error) {
-        setSaveStatus("No s'ha pogut guardar el partit en aquest navegador.");
+        setSaveStatus("No s'ha pogut tancar el partit en aquest navegador.");
       }
     }
     function setCounters(side, counters){
@@ -706,6 +757,7 @@
       const ok = window.confirm("Carregar aquest partit substituirà les dades actuals de la calculadora. Vols continuar?");
       if(!ok) return;
       currentGameId = game.id;
+      clearDraft();
       resetMatchDefaults();
       document.getElementById("gameDate").value = game.meta && game.meta.date ? game.meta.date : todayIsoDate();
       document.getElementById("localName").value = game.teams && game.teams.team && game.teams.team.name ? game.teams.team.name : "";
@@ -893,11 +945,13 @@
       "opp-fg": 11, "opp-fga": 38, "opp-tp": 1, "opp-fta": 10,
       "opp-ft": 5, "opp-orb": 8, "opp-drb": 11, "opp-tov": 19
     });
-    document.getElementById("saveGameBtn").onclick = saveGame;
+    document.getElementById("saveGameBtn").onclick = saveDraft;
+    document.getElementById("closeGameBtn").onclick = closeGame;
     document.getElementById("resetBtn").onclick = () => {
       const ok = window.confirm("Segur que vols reiniciar la calculadora?");
       if(!ok) return;
       currentGameId = null;
+      clearDraft();
       resetMatchDefaults();
       document.getElementById("localName").value = "";
       document.getElementById("visitorName").value = "";
@@ -911,6 +965,7 @@
     };
     resetMatchDefaults();
     buildInputs();
+    restoreDraft();
     render();
     renderSavedGames();
   </script>
