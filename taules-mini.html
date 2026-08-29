@@ -100,7 +100,7 @@
   </main>
 
   <script>
-    const PEOPLE = ["", "Alex Rojas", "Roger Fusté", "Jana Llibre", "Ferran Dauder"];
+    const PEOPLE = ["", "Alex Rojas", "Roger Fusté", "Jana Llibre", "Ferran Dauder", "Aina Sánchez"];
     const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
     const FIREBASE_PATH = "miniTablesAssignments/season-26-27";
 
@@ -191,7 +191,7 @@
       if (!raw) throw new Error("No s'han trobat les dades de partits");
       const data = JSON.parse(raw.textContent);
       games = data.weeks.flatMap(week => week.games || [])
-        .filter(game => game.fam === "MINI" || game.friendly)
+        .filter(game => game.home && (game.fam === "MINI" || game.friendly))
         .map(game => ({ ...game, id: gameId(game) }))
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
     }
