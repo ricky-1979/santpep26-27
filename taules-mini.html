@@ -147,6 +147,10 @@
       return `${day}/${month}/${year}`;
     }
 
+    function formatCost(value){
+      return Number(value).toLocaleString("ca-ES", { maximumFractionDigits: 2 }) + "€";
+    }
+
     function monthLabel(iso){
       const date = new Date(`${iso}T12:00:00`);
       return date.toLocaleDateString("ca-ES", { month:"long", year:"numeric" });
@@ -317,7 +321,7 @@
         if (game.cost != null) {
           const cost = document.createElement("div");
           cost.className = "cost";
-          cost.textContent = `Cost: ${game.cost}€`;
+          cost.textContent = `Cost: ${formatCost(game.cost)}`;
           main.appendChild(cost);
         }
 

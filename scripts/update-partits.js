@@ -69,7 +69,7 @@ const ROW_ORDER = {
 // Costos manuals dels partits amistosos. Clau: "sigla|rival normalitzat".
 const FRIENDLY_COSTS = {
   "JAM|MANRESA": 17,
-  "SAM|CERDANYOLA": 23,
+  "SAM|CERDANYOLA": 23.5,
   "IAM|GRUP BARNA": 12,
   "JAF|LLUISOS": 15,
 };
