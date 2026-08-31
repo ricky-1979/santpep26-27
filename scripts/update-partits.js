@@ -66,6 +66,14 @@ const ROW_ORDER = {
   "2026-09-13|19:30": ["Infantil A", "Cadet B"], // Infantil A a dalt, Cadet B a sota
 };
 
+// Costos manuals dels partits amistosos. Clau: "sigla|rival normalitzat".
+const FRIENDLY_COSTS = {
+  "JAM|MANRESA": 17,
+  "SAM|CERDANYOLA": 23,
+  "IAM|GRUP BARNA": 12,
+  "JAF|LLUISOS": 15,
+};
+
 function fetchText(url) {
   return new Promise((resolve, reject) => {
     https
@@ -163,11 +171,13 @@ function parseCalendar(ics) {
         if (ov.home != null) home = ov.home;
       }
 
+      const cost = friendly ? friendlyCost(sigla, rival) : null;
       return {
         date: M.date, dow: wdmap[M.wd], time: M.time,
         team: info.team, fam: info.fam, sex: info.sex,
         rival, home, loc,
         ...(friendly ? { friendly: true } : {}),
+        ...(cost != null ? { cost } : {}),
       };
     })
     .filter(Boolean);
@@ -226,6 +236,25 @@ function normalizeHistoryText(value) {
     .replace(/\s+/g, " ")
     .trim()
     .toUpperCase();
+}
+
+function friendlyCost(sigla, rival) {
+  const exact = FRIENDLY_COSTS[sigla + "|" + normalizeHistoryText(rival)];
+  if (exact != null) return exact;
+
+  const normalizedRival = normalizeHistoryText(rival)
+    .replace(/\bCB\b/g, "")
+    .replace(/\bCLUB BASQUET\b/g, "")
+    .replace(/\bBASQUET\b/g, "")
+    .replace(/\bDE GRACIA\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const loose = Object.entries(FRIENDLY_COSTS).find(([key]) => {
+    const [keySigla, keyRival] = key.split("|");
+    return keySigla === sigla && normalizedRival.includes(keyRival);
+  });
+  return loose ? loose[1] : null;
 }
 
 function historyGameKey(g) {
