@@ -242,7 +242,7 @@ function historyGameKey(g) {
 }
 
 function identityKey(g) {
-  return [cleanText(g.team), g.sex, cleanText(g.rival)].join("|");
+  return [normalizeHistoryText(g.team), g.sex, normalizeHistoryText(g.rival)].join("|");
 }
 
 function changedFields(oldGame, newGame) {
@@ -271,10 +271,10 @@ function gameSnapshot(g) {
 function buildChangeList(oldData, newData) {
   const oldGames = allGames(oldData);
   const newGames = allGames(newData);
-  const oldExact = new Set(oldGames.map(gameKey));
-  const newExact = new Set(newGames.map(gameKey));
-  const addedRaw = newGames.filter((g) => !oldExact.has(gameKey(g)));
-  const removedRaw = oldGames.filter((g) => !newExact.has(gameKey(g)));
+  const oldExact = new Set(oldGames.map(historyGameKey));
+  const newExact = new Set(newGames.map(historyGameKey));
+  const addedRaw = newGames.filter((g) => !oldExact.has(historyGameKey(g)));
+  const removedRaw = oldGames.filter((g) => !newExact.has(historyGameKey(g)));
 
   const removedByIdentity = new Map();
   removedRaw.forEach((g) => {
@@ -318,18 +318,64 @@ function hasEncodingNoise(change) {
     .some((value) => String(value || "").includes("\uFFFD"));
 }
 
+function looseGameKey(change) {
+  const game = change.game || {};
+  return [
+    game.date,
+    game.time,
+    normalizeHistoryText(game.team),
+    game.sex,
+    normalizeHistoryText(game.rival).replace(/O/g, ""),
+    normalizeHistoryText(game.loc),
+    game.home ? "home" : "away",
+    game.friendly ? "friendly" : "",
+  ].join("|");
+}
+
 function mergeChangeHistory(oldData, newChanges, importedAt) {
   const previousChanges = Array.isArray(oldData.latestChanges?.changes)
     ? oldData.latestChanges.changes
     : [];
   if (!newChanges.length && !previousChanges.length) return null;
 
+  const combined = [...newChanges, ...previousChanges].filter((change) => !hasEncodingNoise(change));
+  const looseAdded = new Map();
+  const looseRemoved = new Map();
+  combined.forEach((change) => {
+    const key = looseGameKey(change);
+    if (change.type === "added") {
+      if (!looseAdded.has(key)) looseAdded.set(key, new Set());
+      looseAdded.get(key).add(historyGameKey(change.game || {}));
+    }
+    if (change.type === "removed") {
+      if (!looseRemoved.has(key)) looseRemoved.set(key, new Set());
+      looseRemoved.get(key).add(historyGameKey(change.game || {}));
+    }
+  });
+  const encodingOnlyPairs = new Set();
+  looseAdded.forEach((addedKeys, key) => {
+    const removedKeys = looseRemoved.get(key);
+    if (!removedKeys) return;
+    const exactOverlap = [...addedKeys].some((item) => removedKeys.has(item));
+    if (!exactOverlap) encodingOnlyPairs.add(key);
+  });
+  const removedGameKeys = new Set(
+    combined
+      .filter((change) => change.type === "removed")
+      .map((change) => historyGameKey(change.game || {}))
+  );
+
   const seen = new Set();
   const visibleGames = new Set();
   const changes = [];
-  [...newChanges, ...previousChanges].forEach((change) => {
-    if (hasEncodingNoise(change)) return;
+  combined.forEach((change) => {
+    const looseKey = looseGameKey(change);
+    if (
+      (change.type === "added" || change.type === "removed") &&
+      encodingOnlyPairs.has(looseKey)
+    ) return;
     const gameHistoryKey = historyGameKey(change.game || {});
+    if (change.type === "added" && removedGameKeys.has(gameHistoryKey)) return;
     if (change.type === "removed" && visibleGames.has(gameHistoryKey)) return;
     const key = changeKey(change);
     if (seen.has(key)) return;
