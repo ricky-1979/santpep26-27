@@ -73,7 +73,7 @@ const FRIENDLY_COSTS = {
   "SAM|CERDANYOLA": 23.5,
   "SAM|MONTCADA": 21,
   "IAM|GRUP BARNA": 11.5,
-  "JAF|LLUISOS": 15,
+  "JAF|LLUISOS": 14.5,
 };
 
 function fetchText(url) {
