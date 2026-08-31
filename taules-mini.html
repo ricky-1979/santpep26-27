@@ -43,7 +43,8 @@
     .period-arrow { display:inline-grid; place-items:center; width:40px; height:40px; border:1px solid var(--line);
       border-radius:999px; background:#fff; color:var(--brand); font-size:1.15rem; font-weight:900; cursor:pointer; }
     .period-arrow:disabled { opacity:0.42; cursor:not-allowed; }
-    .cost-panel { margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
+    .cost-panel { background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:12px; margin:18px 0 0; }
     .cost-title { margin:0 0 8px; color:var(--muted); font-size:0.72rem; font-weight:900;
       letter-spacing:0.08em; text-transform:uppercase; }
     .cost-list { display:flex; flex-wrap:wrap; gap:8px; }
@@ -119,13 +120,13 @@
         <div id="currentPeriod" class="period-current"></div>
         <button id="nextPeriod" class="period-arrow" type="button" aria-label="Període següent">›</button>
       </div>
-      <div class="cost-panel" aria-label="Costos del període">
-        <h2 class="cost-title">Costos</h2>
-        <div id="costSummary" class="cost-list"></div>
-      </div>
     </section>
 
     <section id="content"></section>
+    <section class="cost-panel" aria-label="Costos amistosos del període">
+      <h2 class="cost-title">Costos amistosos</h2>
+      <div id="costSummary" class="cost-list"></div>
+    </section>
   </main>
 
   <script>
