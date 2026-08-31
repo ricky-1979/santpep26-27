@@ -47,7 +47,13 @@
       box-shadow:var(--shadow); padding:12px; margin:18px 0 0; }
     .cost-title { margin:0 0 8px; color:var(--muted); font-size:0.72rem; font-weight:900;
       letter-spacing:0.08em; text-transform:uppercase; }
-    .cost-list { display:flex; flex-wrap:wrap; gap:8px; }
+    .cost-list { display:grid; gap:10px; }
+    .cost-group { border:1px solid var(--line); border-radius:14px; background:#faf8fc; padding:10px; }
+    .cost-group-head { display:flex; justify-content:space-between; gap:10px; align-items:baseline; color:var(--brand-dark); font-weight:900; }
+    .cost-group-total { color:var(--ink); white-space:nowrap; }
+    .cost-detail { display:grid; gap:4px; margin-top:7px; color:var(--muted); font-size:0.8rem; font-weight:750; }
+    .cost-detail-row { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:8px; align-items:center; }
+    .cost-detail-rival { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .cost-chip { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line);
       border-radius:999px; background:#faf8fc; color:var(--brand-dark); padding:6px 10px; font-size:0.78rem; font-weight:850; }
     .cost-chip.total { background:var(--accent); border-color:var(--accent); color:#4a3800; }
@@ -356,9 +362,9 @@
       const teamCosts = new Map();
       visibleCostGames.forEach(game => {
         const key = `${game.team} ${game.sex}`;
-        const current = teamCosts.get(key) || { label: key, total: 0, count: 0 };
+        const current = teamCosts.get(key) || { label: key, total: 0, games: [] };
         current.total += Number(game.cost) || 0;
-        current.count += 1;
+        current.games.push(game);
         teamCosts.set(key, current);
       });
       let total = 0;
@@ -366,11 +372,31 @@
         .sort((a, b) => a.label.localeCompare(b.label, "ca-ES"))
         .forEach(teamCost => {
           total += teamCost.total;
-          const chip = document.createElement("span");
-          chip.className = "cost-chip";
-          const gamesLabel = teamCost.count === 1 ? "1 partit" : `${teamCost.count} partits`;
-          chip.textContent = `${teamCost.label} · ${formatCost(teamCost.total)} · ${gamesLabel}`;
-          els.costSummary.appendChild(chip);
+          const group = document.createElement("div");
+          group.className = "cost-group";
+          const head = document.createElement("div");
+          head.className = "cost-group-head";
+          const gamesLabel = teamCost.games.length === 1 ? "1 partit" : `${teamCost.games.length} partits`;
+          head.append(
+            Object.assign(document.createElement("span"), { textContent: `${teamCost.label} · ${gamesLabel}` }),
+            Object.assign(document.createElement("span"), { className:"cost-group-total", textContent: formatCost(teamCost.total) })
+          );
+          const detail = document.createElement("div");
+          detail.className = "cost-detail";
+          teamCost.games
+            .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))
+            .forEach(game => {
+              const row = document.createElement("div");
+              row.className = "cost-detail-row";
+              row.append(
+                Object.assign(document.createElement("span"), { textContent: formatDate(game.date) }),
+                Object.assign(document.createElement("span"), { className:"cost-detail-rival", textContent: game.rival || "Rival pendent" }),
+                Object.assign(document.createElement("span"), { textContent: formatCost(game.cost) })
+              );
+              detail.appendChild(row);
+            });
+          group.append(head, detail);
+          els.costSummary.appendChild(group);
         });
       const totalChip = document.createElement("span");
       totalChip.className = "cost-chip total";
