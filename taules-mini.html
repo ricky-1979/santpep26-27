@@ -353,14 +353,25 @@
         els.costSummary.appendChild(empty);
         return;
       }
-      let total = 0;
+      const teamCosts = new Map();
       visibleCostGames.forEach(game => {
-        total += Number(game.cost) || 0;
-        const chip = document.createElement("span");
-        chip.className = "cost-chip";
-        chip.textContent = `${game.team} ${game.sex} vs ${game.rival} · ${formatCost(game.cost)}`;
-        els.costSummary.appendChild(chip);
+        const key = `${game.team} ${game.sex}`;
+        const current = teamCosts.get(key) || { label: key, total: 0, count: 0 };
+        current.total += Number(game.cost) || 0;
+        current.count += 1;
+        teamCosts.set(key, current);
       });
+      let total = 0;
+      [...teamCosts.values()]
+        .sort((a, b) => a.label.localeCompare(b.label, "ca-ES"))
+        .forEach(teamCost => {
+          total += teamCost.total;
+          const chip = document.createElement("span");
+          chip.className = "cost-chip";
+          const gamesLabel = teamCost.count === 1 ? "1 partit" : `${teamCost.count} partits`;
+          chip.textContent = `${teamCost.label} · ${formatCost(teamCost.total)} · ${gamesLabel}`;
+          els.costSummary.appendChild(chip);
+        });
       const totalChip = document.createElement("span");
       totalChip.className = "cost-chip total";
       totalChip.textContent = `Total: ${formatCost(total)}`;
