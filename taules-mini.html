@@ -135,6 +135,7 @@
     const FIREBASE_PATH = "miniTablesAssignments/season-26-27";
 
     let games = [];
+    let costGames = [];
     let assignments = {};
     let activeFilter = "all";
     let periods = [];
@@ -265,9 +266,13 @@
       const raw = doc.getElementById("partitsData");
       if (!raw) throw new Error("No s'han trobat les dades de partits");
       const data = JSON.parse(raw.textContent);
-      games = data.weeks.flatMap(week => week.games || [])
+      const importedGames = data.weeks.flatMap(week => week.games || [])
+        .map(game => ({ ...game, id: gameId(game) }));
+      games = importedGames
         .filter(game => isClubVenue(game) && (game.fam === "MINI" || game.friendly))
-        .map(game => ({ ...game, id: gameId(game) }))
+        .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
+      costGames = importedGames
+        .filter(game => game.friendly && game.cost != null)
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
     }
 
@@ -338,9 +343,10 @@
     }
 
     function renderCosts(){
-      const costGames = gamesForActivePeriod().filter(game => game.cost != null);
+      const period = periods[activePeriodIndex];
+      const visibleCostGames = period ? costGames.filter(game => periodKey(game) === period.key) : [];
       els.costSummary.innerHTML = "";
-      if (!costGames.length) {
+      if (!visibleCostGames.length) {
         const empty = document.createElement("span");
         empty.className = "cost-chip";
         empty.textContent = "Sense costos";
@@ -348,7 +354,7 @@
         return;
       }
       let total = 0;
-      costGames.forEach(game => {
+      visibleCostGames.forEach(game => {
         total += Number(game.cost) || 0;
         const chip = document.createElement("span");
         chip.className = "cost-chip";
