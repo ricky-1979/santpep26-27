@@ -35,6 +35,21 @@
     .filter { border:1px solid var(--line); border-radius:999px; background:var(--card); color:var(--brand);
       padding:8px 13px; font-size:0.82rem; font-weight:800; cursor:pointer; box-shadow:0 1px 3px rgba(60,40,90,0.05); }
     .filter.active { background:var(--brand); color:#fff; border-color:var(--brand); }
+    .period-panel { background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:12px; margin:0 0 16px; }
+    .period-pager { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px; align-items:center; }
+    .period-current { min-height:40px; display:grid; place-items:center; border-radius:999px;
+      background:var(--brand); color:#fff; font-size:0.9rem; font-weight:900; text-align:center; padding:0 12px; }
+    .period-arrow { display:inline-grid; place-items:center; width:40px; height:40px; border:1px solid var(--line);
+      border-radius:999px; background:#fff; color:var(--brand); font-size:1.15rem; font-weight:900; cursor:pointer; }
+    .period-arrow:disabled { opacity:0.42; cursor:not-allowed; }
+    .cost-panel { margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
+    .cost-title { margin:0 0 8px; color:var(--muted); font-size:0.72rem; font-weight:900;
+      letter-spacing:0.08em; text-transform:uppercase; }
+    .cost-list { display:flex; flex-wrap:wrap; gap:8px; }
+    .cost-chip { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line);
+      border-radius:999px; background:#faf8fc; color:var(--brand-dark); padding:6px 10px; font-size:0.78rem; font-weight:850; }
+    .cost-chip.total { background:var(--accent); border-color:var(--accent); color:#4a3800; }
     .month { margin:22px 0 10px; color:var(--brand-dark); font-size:1rem; font-weight:900; }
     .games { display:grid; gap:12px; }
     .game { background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
@@ -98,6 +113,18 @@
       <button class="filter" type="button" data-filter="review">Revisar</button>
     </div>
 
+    <section class="period-panel" aria-label="Paginació mensual">
+      <div class="period-pager">
+        <button id="prevPeriod" class="period-arrow" type="button" aria-label="Període anterior">‹</button>
+        <div id="currentPeriod" class="period-current"></div>
+        <button id="nextPeriod" class="period-arrow" type="button" aria-label="Període següent">›</button>
+      </div>
+      <div class="cost-panel" aria-label="Costos del període">
+        <h2 class="cost-title">Costos</h2>
+        <div id="costSummary" class="cost-list"></div>
+      </div>
+    </section>
+
     <section id="content"></section>
   </main>
 
@@ -109,13 +136,19 @@
     let games = [];
     let assignments = {};
     let activeFilter = "all";
+    let periods = [];
+    let activePeriodIndex = 0;
 
     const els = {
       status: document.getElementById("status"),
       content: document.getElementById("content"),
       total: document.getElementById("totalCount"),
       complete: document.getElementById("completeCount"),
-      pending: document.getElementById("pendingCount")
+      pending: document.getElementById("pendingCount"),
+      currentPeriod: document.getElementById("currentPeriod"),
+      prevPeriod: document.getElementById("prevPeriod"),
+      nextPeriod: document.getElementById("nextPeriod"),
+      costSummary: document.getElementById("costSummary")
     };
 
     function setStatus(text, tone){
@@ -154,6 +187,35 @@
     function monthLabel(iso){
       const date = new Date(`${iso}T12:00:00`);
       return date.toLocaleDateString("ca-ES", { month:"long", year:"numeric" });
+    }
+
+    function periodKey(game){
+      const [year, month] = String(game.date).split("-");
+      if (year === "2026" && (month === "08" || month === "09")) return "2026-08-09";
+      return `${year}-${month}`;
+    }
+
+    function periodLabel(key){
+      if (key === "2026-08-09") return "Agost i setembre 2026";
+      const [year, month] = key.split("-");
+      return monthLabel(`${year}-${month}-01`).replace(/^./, chr => chr.toUpperCase());
+    }
+
+    function periodSortValue(key){
+      if (key === "2026-08-09") return "2026-08";
+      return key;
+    }
+
+    function buildPeriods(){
+      periods = [...new Set(games.map(periodKey))]
+        .sort((a, b) => periodSortValue(a).localeCompare(periodSortValue(b)))
+        .map(key => ({ key, label: periodLabel(key) }));
+      const today = new Date();
+      const currentKey = today.getFullYear() === 2026 && (today.getMonth() + 1 === 8 || today.getMonth() + 1 === 9)
+        ? "2026-08-09"
+        : `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+      activePeriodIndex = Math.max(0, periods.findIndex(period => period.key === currentKey));
+      if (activePeriodIndex < 0) activePeriodIndex = 0;
     }
 
     function gameSnapshot(game){
@@ -247,24 +309,68 @@
     }
 
     function renderSummary(){
-      const states = games.map(game => assignmentState(assignmentFor(game.id)));
-      els.total.textContent = games.length;
+      const periodGames = gamesForActivePeriod();
+      const states = periodGames.map(game => assignmentState(assignmentFor(game.id)));
+      els.total.textContent = periodGames.length;
       els.complete.textContent = states.filter(state => state === "complete").length;
       els.pending.textContent = states.filter(state => state !== "complete").length;
     }
 
-    function render(){
-      renderSummary();
-      const visible = games.filter(game => {
+    function gamesForActivePeriod(){
+      const active = periods[activePeriodIndex];
+      if (!active) return [];
+      return games.filter(game => periodKey(game) === active.key);
+    }
+
+    function filteredGames(){
+      return gamesForActivePeriod().filter(game => {
         const state = assignmentState(assignmentFor(game.id));
         return activeFilter === "all" || state === activeFilter;
       });
+    }
+
+    function renderPeriodControls(){
+      const active = periods[activePeriodIndex];
+      els.currentPeriod.textContent = active ? active.label : "Sense partits";
+      els.prevPeriod.disabled = activePeriodIndex <= 0;
+      els.nextPeriod.disabled = activePeriodIndex >= periods.length - 1;
+    }
+
+    function renderCosts(){
+      const costGames = gamesForActivePeriod().filter(game => game.cost != null);
+      els.costSummary.innerHTML = "";
+      if (!costGames.length) {
+        const empty = document.createElement("span");
+        empty.className = "cost-chip";
+        empty.textContent = "Sense costos";
+        els.costSummary.appendChild(empty);
+        return;
+      }
+      let total = 0;
+      costGames.forEach(game => {
+        total += Number(game.cost) || 0;
+        const chip = document.createElement("span");
+        chip.className = "cost-chip";
+        chip.textContent = `${game.team} ${game.sex} vs ${game.rival} · ${formatCost(game.cost)}`;
+        els.costSummary.appendChild(chip);
+      });
+      const totalChip = document.createElement("span");
+      totalChip.className = "cost-chip total";
+      totalChip.textContent = `Total: ${formatCost(total)}`;
+      els.costSummary.appendChild(totalChip);
+    }
+
+    function render(){
+      renderPeriodControls();
+      renderCosts();
+      renderSummary();
+      const visible = filteredGames();
 
       els.content.innerHTML = "";
       if (!visible.length) {
         const empty = document.createElement("div");
         empty.className = "empty";
-        empty.textContent = games.length ? "No hi ha partits amb aquest filtre." : "Encara no hi ha partits MINI ni amistosos importats.";
+        empty.textContent = games.length ? "No hi ha partits amb aquest filtre en aquest període." : "Encara no hi ha partits MINI ni amistosos importats.";
         els.content.appendChild(empty);
         return;
       }
@@ -348,6 +454,18 @@
       });
     });
 
+    els.prevPeriod.addEventListener("click", () => {
+      if (activePeriodIndex <= 0) return;
+      activePeriodIndex -= 1;
+      render();
+    });
+
+    els.nextPeriod.addEventListener("click", () => {
+      if (activePeriodIndex >= periods.length - 1) return;
+      activePeriodIndex += 1;
+      render();
+    });
+
     els.content.addEventListener("change", async event => {
       if (event.target.tagName !== "SELECT") return;
       const id = event.target.dataset.gameId;
@@ -369,6 +487,7 @@
       setStatus("Carregant...");
       try {
         await loadGames();
+        buildPeriods();
         try {
           await loadAssignments();
         } catch (error) {
