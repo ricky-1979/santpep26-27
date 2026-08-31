@@ -51,6 +51,7 @@
     .cost-group { border:1px solid var(--line); border-radius:14px; background:#faf8fc; padding:10px; }
     .cost-group-head { display:flex; justify-content:space-between; gap:10px; align-items:baseline; color:var(--brand-dark); font-weight:900; }
     .cost-group-total { color:var(--ink); white-space:nowrap; }
+    .cost-coach { margin-top:2px; color:var(--muted); font-size:0.78rem; font-weight:800; }
     .cost-detail { display:grid; gap:4px; margin-top:7px; color:var(--muted); font-size:0.8rem; font-weight:750; }
     .cost-detail-row { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:8px; align-items:center; }
     .cost-detail-rival { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -137,6 +138,12 @@
 
   <script>
     const PEOPLE = ["", "Aina Parera", "Aina Sánchez", "Alex Rojas", "Ferran Dauder", "Jana Llibre", "Jan Rodríguez", "Karim Garcia", "Marc Sánchez", "Miki Villareal", "Roger Fusté"];
+    const TEAM_COACHES = {
+      "Infantil A M": "Mario Martín",
+      "Júnior A F": "Jesús Agustín Curá",
+      "Júnior A M": "Jessica Garcia",
+      "Sènior A M": "Oriol Ramoneda"
+    };
     const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
     const FIREBASE_PATH = "miniTablesAssignments/season-26-27";
 
@@ -381,6 +388,9 @@
             Object.assign(document.createElement("span"), { textContent: `${teamCost.label} · ${gamesLabel}` }),
             Object.assign(document.createElement("span"), { className:"cost-group-total", textContent: formatCost(teamCost.total) })
           );
+          const coach = document.createElement("div");
+          coach.className = "cost-coach";
+          coach.textContent = `Coach: ${TEAM_COACHES[teamCost.label] || "Pendent"}`;
           const detail = document.createElement("div");
           detail.className = "cost-detail";
           teamCost.games
@@ -395,7 +405,7 @@
               );
               detail.appendChild(row);
             });
-          group.append(head, detail);
+          group.append(head, coach, detail);
           els.costSummary.appendChild(group);
         });
       const totalChip = document.createElement("span");
