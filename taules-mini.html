@@ -49,6 +49,7 @@
     .team { color:#2b97d5; text-transform:uppercase; }
     .rival { color:#ef473d; text-transform:uppercase; }
     .loc { margin-top:6px; color:var(--muted); font-size:0.82rem; }
+    .cost { margin-top:4px; color:var(--brand-dark); font-size:0.82rem; font-weight:900; }
     .assign { display:grid; gap:8px; }
     .slot { display:grid; grid-template-columns:72px 1fr; gap:8px; align-items:center; }
     label { color:var(--muted); font-size:0.74rem; font-weight:900; letter-spacing:0.06em; text-transform:uppercase; }
@@ -161,7 +162,8 @@
         rival: game.rival || "",
         loc: game.loc || "",
         home: !!game.home,
-        friendly: !!game.friendly
+        friendly: !!game.friendly,
+        cost: game.cost == null ? null : game.cost
       };
     }
 
@@ -312,6 +314,12 @@
         loc.className = "loc";
         loc.textContent = game.loc || "Localització pendent";
         main.append(meta, title, loc);
+        if (game.cost != null) {
+          const cost = document.createElement("div");
+          cost.className = "cost";
+          cost.textContent = `Cost: ${game.cost}€`;
+          main.appendChild(cost);
+        }
 
         const assign = document.createElement("div");
         assign.className = "assign";
