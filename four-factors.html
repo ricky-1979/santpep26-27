@@ -338,7 +338,7 @@
       const reboundRate = safeDiv(orb, orb + otherDrb);
       return {
         efg: safeDiv(fieldGoalsMade(side) + 0.5 * tp, fga),
-        tov: safeDiv(tov, possessions(side)),
+        tov: safeDiv(tov, possessions(side, other)),
         reb: reboundRate,
         orb: orbRate,
         drb: drbRate,
@@ -366,17 +366,20 @@
     function totalPlays(side){
       return n(side, "fga") + 0.44 * n(side, "fta") + n(side, "tov");
     }
-    function possessions(side){
-      return n(side, "fga") - n(side, "orb") + n(side, "tov") + 0.44 * n(side, "fta");
+    function teamPossessionEstimate(side){
+      return n(side, "fga") + 0.44 * n(side, "fta") + n(side, "tov") - n(side, "orb");
     }
-    function pointsPerPossession(side){
-      return safeDiv(points(side), possessions(side));
+    function possessions(side, other){
+      return (teamPossessionEstimate(side) + teamPossessionEstimate(other)) / 2;
     }
-    function offensiveEfficiency(side){
-      return pointsPerPossession(side) * 100;
+    function pointsPerPossession(side, other){
+      return safeDiv(points(side), possessions(side, other));
     }
-    function defensiveEfficiency(other){
-      return offensiveEfficiency(other);
+    function offensiveEfficiency(side, other){
+      return pointsPerPossession(side, other) * 100;
+    }
+    function defensiveEfficiency(side, other){
+      return offensiveEfficiency(other, side);
     }
     function factorShare(key, own, other){
       const ownValue = own[key];
@@ -419,9 +422,9 @@
       document.getElementById(scoreId).textContent = points(side);
     }
     function updateSummary(side, other, summaryId){
-      const poss = possessions(side);
-      const oer = offensiveEfficiency(side);
-      const der = defensiveEfficiency(other);
+      const poss = possessions(side, other);
+      const oer = offensiveEfficiency(side, other);
+      const der = defensiveEfficiency(side, other);
       const ownFactors = calc(side, other);
       const otherFactors = calc(other, side);
       const win = winRate(side, other, ownFactors, otherFactors);
@@ -683,9 +686,9 @@
     function summaryValues(side, other, ownFactors, otherFactors){
       return {
         winRate: winRate(side, other, ownFactors, otherFactors),
-        possessions: possessions(side),
-        oer: offensiveEfficiency(side),
-        der: defensiveEfficiency(other)
+        possessions: possessions(side, other),
+        oer: offensiveEfficiency(side, other),
+        der: defensiveEfficiency(side, other)
       };
     }
     function buildGamePayload(existing, games){
