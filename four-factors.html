@@ -947,6 +947,7 @@
     document.getElementById("saveGameBtn").onclick = saveDraft;
     document.getElementById("closeGameBtn").onclick = closeGame;
     document.getElementById("resetBtn").onclick = () => {
+      if(!statsStarted()) return;
       const ok = window.confirm("Segur que vols reiniciar la calculadora?");
       if(!ok) return;
       currentGameId = null;
