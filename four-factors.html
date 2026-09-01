@@ -331,11 +331,10 @@
       const orb = n(side, "orb");
       const drb = n(side, "drb");
       const tov = n(side, "tov");
-      const otherOrb = n(other, "orb");
       const otherDrb = n(other, "drb");
       const orbRate = safeDiv(orb, orb + n(other, "drb"));
       const drbRate = safeDiv(drb, drb + n(other, "orb"));
-      const reboundRate = safeDiv(orb + drb, orb + drb + otherOrb + otherDrb);
+      const reboundRate = safeDiv(orb, orb + otherDrb);
       return {
         efg: safeDiv(fieldGoalsMade(side) + 0.5 * tp, fga),
         tov: safeDiv(tov, possessions(side)),
