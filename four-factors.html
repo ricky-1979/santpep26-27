@@ -315,7 +315,7 @@
     function decimal(value){ return Number.isFinite(value) ? value.toFixed(1) : "-"; }
     function whole(value){ return Number.isFinite(value) ? Math.round(value) : "-"; }
     function safeDiv(a, b){ return b > 0 ? a / b : NaN; }
-    function factorFormatter(key){ return key === "ftfga" ? ratio : pct; }
+    function factorFormatter(key){ return pct; }
     function factorTone(key, own, other){
       const ownValue = own[key];
       const otherValue = other[key];
