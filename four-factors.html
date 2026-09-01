@@ -292,13 +292,15 @@
     // Equips del club que fan servir aquesta calculadora. Cada equip té el
     // seu propi node a Firebase i el seu propi esborrany/llista local, per
     // no barrejar dades entre equips en el mateix navegador.
+    // Claus opaques (no lligades al nom de l'equip) per no facilitar
+    // l'accés directe a la calculadora d'un altre equip només mirant la URL.
     const TEAMS = {
-      jbf: { teamName: "JBF", category: "1er Any Pref.", firebasePath: "fourFactorsGames/jbf-1er-any-pref" },
-      jam: { teamName: "JAM", category: "Preferent", firebasePath: "fourFactorsGames/jam-preferent" }
+      lgf1vqte4cb7: { teamName: "JBF", category: "1er Any Pref.", firebasePath: "fourFactorsGames/jbf-1er-any-pref" },
+      "41zgmppra86l": { teamName: "JAM", category: "Preferent", firebasePath: "fourFactorsGames/jam-preferent" }
     };
-    const DEFAULT_TEAM_KEY = "jbf";
+    const DEFAULT_TEAM_KEY = "lgf1vqte4cb7";
     const params = new URLSearchParams(window.location.search);
-    const TEAM_KEY = TEAMS[params.get("team")] ? params.get("team") : DEFAULT_TEAM_KEY;
+    const TEAM_KEY = TEAMS[params.get("t")] ? params.get("t") : DEFAULT_TEAM_KEY;
     const TEAM = TEAMS[TEAM_KEY];
     const STORAGE_KEY = "santpep.fourFactors.games." + TEAM_KEY + ".v1";
     const DRAFT_KEY = "santpep.fourFactors.currentDraft." + TEAM_KEY + ".v1";
