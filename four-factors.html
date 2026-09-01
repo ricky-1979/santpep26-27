@@ -719,6 +719,10 @@
       };
     }
     async function closeGame(){
+      if(!statsStarted()) {
+        setSaveStatus("No hi ha cap dada introduïda. No s'ha guardat cap partit.");
+        return;
+      }
       try {
         const games = await readSyncedSavedGames();
         const existingIndex = currentGameId ? games.findIndex(game => game.id === currentGameId) : -1;
