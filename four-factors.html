@@ -196,7 +196,6 @@
   <main>
     <nav class="page-nav"><a class="back" href="index.html">← Tornar</a></nav>
     <div class="toolbar">
-      <button class="btn primary" type="button" id="sampleBtn">Exemple</button>
       <button class="btn primary" type="button" id="saveGameBtn">Guardar</button>
       <button class="btn primary" type="button" id="closeGameBtn">Tancar partit</button>
       <button class="btn danger" type="button" id="resetBtn">Reinicia</button>
@@ -506,20 +505,6 @@
         setCounterValue(inputId(side, "fta"), n(side, "fta") + (next - current));
       }
       enforceAttemptMinimums(side);
-      render();
-    }
-    function setValues(values){
-      Object.entries(values).forEach(([id, value]) => {
-        const el = document.getElementById(id);
-        if(!el) return;
-        if(el.dataset && el.dataset.value !== undefined) {
-          setCounterValue(id, value);
-        } else if(el.value !== undefined) {
-          el.value = value;
-        } else {
-          el.textContent = value;
-        }
-      });
       render();
     }
     function gameId(){
@@ -944,13 +929,6 @@
       const status = document.getElementById("saveStatus");
       if(status) status.textContent = message;
     }
-    document.getElementById("sampleBtn").onclick = () => setValues({
-      "localName": "JBF", "visitorName": "REUS DEP",
-      "team-fg": 31, "team-fga": 54, "team-tp": 3, "team-fta": 20,
-      "team-ft": 7, "team-orb": 13, "team-drb": 15, "team-tov": 17,
-      "opp-fg": 11, "opp-fga": 38, "opp-tp": 1, "opp-fta": 10,
-      "opp-ft": 5, "opp-orb": 8, "opp-drb": 11, "opp-tov": 19
-    });
     document.getElementById("saveGameBtn").onclick = saveDraft;
     document.getElementById("closeGameBtn").onclick = closeGame;
     document.getElementById("resetBtn").onclick = () => {
