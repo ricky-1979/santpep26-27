@@ -195,6 +195,7 @@
     <div class="toolbar">
       <button class="btn primary" type="button" id="saveGameBtn">Guardar</button>
       <button class="btn primary" type="button" id="closeGameBtn">Tancar partit</button>
+      <button class="btn" type="button" id="exampleBtn" hidden>Exemple</button>
       <button class="btn danger" type="button" id="resetBtn">Reinicia</button>
     </div>
 
@@ -305,6 +306,14 @@
     const TEAM = TEAMS[TEAM_KEY];
     const STORAGE_KEY = "santpep.fourFactors.games." + TEAM_KEY + ".v1";
     const DRAFT_KEY = "santpep.fourFactors.currentDraft." + TEAM_KEY + ".v1";
+    const PCM_TEAM_KEY = "2j9sj0ah5guu";
+    const EXAMPLE_GAME = {
+      date: "2026-09-19",
+      localName: "PCM",
+      visitorName: "Rival exemple",
+      team: { fg: 18, fga: 39, tp: 6, fta: 15, ft: 10, orb: 11, drb: 24, tov: 13 },
+      opp: { fg: 16, fga: 42, tp: 4, fta: 18, ft: 11, orb: 9, drb: 21, tov: 16 }
+    };
     const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
     const FIREBASE_GAMES_PATH = TEAM.firebasePath;
     const DEFAULT_MATCH_TEAM_NAME = TEAM.teamName;
@@ -609,6 +618,23 @@
       if(date) date.disabled = locked;
       const field = document.querySelector(".date-field");
       if(field) field.classList.toggle("locked", locked);
+    }
+    async function loadExampleGame(){
+      if(statsStarted()) {
+        const ok = window.confirm("Carregar l'exemple substituirà les dades actuals de la calculadora. Vols continuar?");
+        if(!ok) return;
+      }
+      currentGameId = null;
+      clearDraft();
+      resetMatchDefaults();
+      document.getElementById("gameDate").value = EXAMPLE_GAME.date;
+      document.getElementById("localName").value = EXAMPLE_GAME.localName;
+      document.getElementById("visitorName").value = EXAMPLE_GAME.visitorName;
+      setCounters("team", EXAMPLE_GAME.team);
+      setCounters("opp", EXAMPLE_GAME.opp);
+      render();
+      await renderSavedGames();
+      setSaveStatus("Exemple carregat. No s'ha guardat cap partit.");
     }
     function todayIsoDate(){
       return new Date().toISOString().slice(0, 10);
@@ -946,6 +972,7 @@
     }
     document.getElementById("saveGameBtn").onclick = saveDraft;
     document.getElementById("closeGameBtn").onclick = closeGame;
+    document.getElementById("exampleBtn").onclick = loadExampleGame;
     document.getElementById("resetBtn").onclick = () => {
       if(!statsStarted()) return;
       const ok = window.confirm("Segur que vols reiniciar la calculadora?");
@@ -963,6 +990,7 @@
       renderSavedGames();
       setSaveStatus("");
     };
+    document.getElementById("exampleBtn").hidden = TEAM_KEY !== PCM_TEAM_KEY;
     document.title = "Calculadora 4 Factors · " + TEAM.teamName + " · CB Sant Josep";
     resetMatchDefaults();
     buildInputs();
