@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light" />
-  <title>Calendari de partits Â· CB Sant Josep</title>
+  <title>Calendari de partits · CB Sant Josep</title>
   <style>
     :root {
       --brand: #713f97; --brand-dark: #5a2f7d; --accent: #fcdb20;
@@ -91,10 +91,10 @@
       margin-left:4px; border-radius:50%; background:var(--accent); color:var(--brand-dark); font-weight:900; }
     .conflict-mark { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;
       margin-left:4px; border-radius:50%; background:#c62828; color:#fff; font-weight:900; }
-    /* GÃ¨nere identificat nomÃ©s per color (vora + fons suau) */
+    /* Gènere identificat només per color (vora + fons suau) */
     .game.masc, .gchip.masc { border-left:5px solid #1565c0; border-right:5px solid #1565c0; background:#f2f8fe; }
     .game.fem, .gchip.fem { border-left:5px solid #c2185b; border-right:5px solid #c2185b; background:#fdf3f7; }
-    /* Chips de filtre de gÃ¨nere: mateix codi de color */
+    /* Chips de filtre de gènere: mateix codi de color */
     .chip.sex-masc.active { background:#1565c0; color:#fff; border-color:#1565c0; }
     .chip.sex-fem.active { background:#c2185b; color:#fff; border-color:#c2185b; }
     .chip.sex-masc { border-color:#1565c0; color:#1565c0; }
@@ -164,14 +164,14 @@
     </div>
   </header>
   <main>
-    <nav class="page-nav"><a class="back" href="index.html">â Tornar</a></nav>
-    <section class="nav-panel" aria-label="NavegaciÃ³ del calendari">
+    <nav class="page-nav"><a class="back" href="index.html">← Tornar</a></nav>
+    <section class="nav-panel" aria-label="Navegació del calendari">
       <div class="nav-group">
         <span class="nav-label">Mes</span>
         <div class="month-pager">
           <button class="nav-arrow" id="prevMonth" type="button" title="Mes anterior" aria-label="Mes anterior"></button>
           <div class="month-current" id="currentMonthLabel"></div>
-          <button class="nav-arrow" id="nextMonth" type="button" title="Mes segÃ¼ent" aria-label="Mes segÃ¼ent"></button>
+          <button class="nav-arrow" id="nextMonth" type="button" title="Mes següent" aria-label="Mes següent"></button>
         </div>
       </div>
       <div class="nav-group">
@@ -179,14 +179,14 @@
         <div class="week-pager">
           <button class="nav-arrow" id="prevWeek" type="button" title="Setmana anterior" aria-label="Setmana anterior"></button>
           <div class="week-current" id="currentWeekLabel"></div>
-          <button class="nav-arrow" id="nextWeek" type="button" title="Setmana segÃ¼ent" aria-label="Setmana segÃ¼ent"></button>
+          <button class="nav-arrow" id="nextWeek" type="button" title="Setmana següent" aria-label="Setmana següent"></button>
         </div>
       </div>
     </section>
     <div class="filters" id="filters"></div>
     <div id="content"></div>
   </main>
-  <footer>Font: calendari Partits SamPep Masc Â· CB Sant Josep de Badalona</footer>
+  <footer>Font: calendari Partits SamPep Masc · CB Sant Josep de Badalona</footer>
 
   <script id="partitsData" type="application/json">{"latestChanges":{"changes":[{"game":{"date":"2026-08-28","dow":5,"fam":"CADET","friendly":true,"home":false,"loc":"Montgat","rival":"UE Montgat","sex":"M","team":"Cadet A","time":"17:00"},"type":"added"},{"game":{"date":"2026-08-28","dow":5,"fam":"CADET","home":false,"loc":"Montgat","rival":"UE Montgat","sex":"M","team":"Cadet A","time":"17:00"},"type":"removed"},{"game":{"cost":25,"date":"2026-08-29","dow":6,"fam":"JÚNIOR","friendly":true,"home":false,"loc":"Terrassa","rival":"CN Terrassa","sex":"M","team":"Júnior B","time":"17:00"},"type":"added"},{"game":{"date":"2026-08-29","dow":6,"fam":"JÚNIOR","home":false,"loc":"Terrassa","rival":"CN Terrassa","sex":"M","team":"Júnior B","time":"17:00"},"type":"removed"},{"game":{"date":"2026-08-29","dow":6,"fam":"JÚNIOR","friendly":true,"home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"MANRESA","sex":"M","team":"Júnior A","time":"17:45"},"type":"added"},{"game":{"date":"2026-08-29","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"MANRESA","sex":"M","team":"Júnior A","time":"17:45"},"type":"removed"},{"game":{"cost":21,"date":"2026-08-30","dow":0,"fam":"SÈNIOR","friendly":true,"home":false,"loc":"Montcada i Reixac, 08110 Montcada i Reixac, Barcelona","rival":"Montcada","sex":"M","team":"Sènior A","time":"18:00"},"type":"added"},{"game":{"date":"2026-08-30","dow":0,"fam":"SÈNIOR","home":false,"loc":"Montcada i Reixac, 08110 Montcada i Reixac, Barcelona","rival":"Montcada","sex":"M","team":"Sènior A","time":"18:00"},"type":"removed"}],"importedAt":"2026-09-02T21:26:08Z"},"weeks":[{"games":[{"date":"2026-08-28","dow":5,"fam":"CADET","friendly":true,"home":false,"loc":"Montgat","rival":"UE Montgat","sex":"M","team":"Cadet A","time":"17:00"},{"date":"2026-08-29","dow":6,"fam":"JÚNIOR","friendly":true,"home":false,"loc":"Deltebre","rival":"REUS DEPORTIU","sex":"F","team":"Júnior B","time":"09:30"},{"cost":25,"date":"2026-08-29","dow":6,"fam":"JÚNIOR","friendly":true,"home":false,"loc":"Terrassa","rival":"CN Terrassa","sex":"M","team":"Júnior B","time":"17:00"},{"date":"2026-08-29","dow":6,"fam":"JÚNIOR","friendly":true,"home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"MANRESA","sex":"M","team":"Júnior A","time":"17:45"},{"date":"2026-08-30","dow":0,"fam":"JÚNIOR","friendly":true,"home":false,"loc":"Deltebre","rival":"CB CORNELLÀ","sex":"F","team":"Júnior B","time":"09:30"},{"cost":21,"date":"2026-08-30","dow":0,"fam":"SÈNIOR","friendly":true,"home":false,"loc":"Montcada i Reixac, 08110 Montcada i Reixac, Barcelona","rival":"Montcada","sex":"M","team":"Sènior A","time":"18:00"}],"monday":"2026-08-24"},{"games":[{"date":"2026-09-05","dow":6,"fam":"INFANTIL","home":false,"loc":"ESPORTIU CLAROR, SARDENYA, 333, Barcelona","rival":"BÀSQUET SAFA CLAROR 1","sex":"M","team":"Infantil B","time":"11:00"},{"date":"2026-09-05","dow":6,"fam":"CADET","home":false,"loc":"PAVELLO D'ESPORTS D'ARGENTONA, CTRA. VILASSAR, S/N, Argentona","rival":"CB ARGENTONA 2012 NEGRE","sex":"M","team":"Cadet B","time":"12:00"},{"date":"2026-09-05","dow":6,"fam":"INFANTIL","home":false,"loc":"PAVELLO C.B. GRANOLLERS","rival":"CB GRANOLLERS 2","sex":"F","team":"Infantil","time":"12:15"},{"date":"2026-09-05","dow":6,"fam":"INFANTIL","friendly":true,"home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"GRUP BARNA","sex":"M","team":"Infantil A","time":"12:30"},{"date":"2026-09-05","dow":6,"fam":"JÚNIOR","home":false,"loc":"CIUTAT ESPORTIVA BLANES, MAS CUNI, 43, Blanes","rival":"NAYOX FORÇA LLEIDA A","sex":"M","team":"Júnior A","time":"15:15"},{"date":"2026-09-05","dow":6,"fam":"CADET","home":true,"loc":"CIUTAT ESPORTIVA BLANES, MAS CUNI, 43, Blanes","rival":"DROOP CENTRE C.B. L'HOSPITALET A","sex":"M","team":"Cadet A","time":"17:15"},{"date":"2026-09-05","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"NAYOX FORÇA LLEIDA B","sex":"F","team":"Júnior B","time":"17:45"},{"date":"2026-09-05","dow":6,"fam":"SÈNIOR","friendly":true,"home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB Cerdanyola","sex":"M","team":"Sènior A","time":"19:30"},{"date":"2026-09-05","dow":6,"fam":"JÚNIOR","home":false,"loc":"PAVELLO DEL CENTRE - MARCEL·LI MANEJA, DIGOINE-CANT.RIERA ESCORXADOR, L'Hospitalet de Llobregat","rival":"C.B. L'HOSPITALET B","sex":"M","team":"Júnior B","time":"20:00"},{"cost":14.5,"date":"2026-09-06","dow":0,"fam":"JÚNIOR","friendly":true,"home":true,"loc":"PAVELLO LA COLINA","rival":"Lluïsos de Gràcia","sex":"F","team":"Júnior A","time":"12:30"}],"monday":"2026-08-31"},{"games":[{"date":"2026-09-12","dow":6,"fam":"JÚNIOR","home":false,"loc":"ESCOLA SANT GERVASI","rival":"SANT GERVASI 1","sex":"F","team":"Júnior A","time":"09:00"},{"date":"2026-09-12","dow":6,"fam":"JÚNIOR","home":false,"loc":"POLIESPORTIU LLEFIA","rival":"U. B. LLEFIÀ B","sex":"F","team":"Júnior B","time":"12:30"},{"date":"2026-09-12","dow":6,"fam":"CADET","home":false,"loc":"B. ATENEU MONTSERRAT","rival":"BASQUET ATENEU MONTSERRAT INTERTERRITORIAL","sex":"F","team":"Cadet","time":"19:00"},{"date":"2026-09-13","dow":0,"fam":"INFANTIL","home":true,"loc":"Pavelló de Montigalà","rival":"FLORANGE U.E.MATARÓ","sex":"F","team":"Infantil","time":"16:00"},{"date":"2026-09-13","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"JAC SANTS BARCELONA U17 1","sex":"M","team":"Júnior B","time":"16:00"},{"date":"2026-09-13","dow":0,"fam":"INFANTIL","home":true,"loc":"Montigalà","rival":"CB ADEPAF TXOT'S","sex":"M","team":"Infantil B","time":"17:45"},{"date":"2026-09-13","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB TARRAGONA","sex":"M","team":"Júnior A","time":"17:45"},{"date":"2026-09-13","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"UE SANT CUGAT - OCCIDENT 2012","sex":"M","team":"Cadet B","time":"19:30"},{"date":"2026-09-13","dow":0,"fam":"INFANTIL","home":true,"loc":"Montigalà","rival":"CB BOET MATARÓ 2013","sex":"M","team":"Infantil A","time":"19:30"}],"monday":"2026-09-07"},{"games":[{"date":"2026-09-15","dow":2,"fam":"CADET","home":false,"loc":"PALAU D'ESP. JOSEP MORA MATARO, PASSEIG CARLES PADROS, 12, Mataró","rival":"FLORANGE U.E.MATARÓ","sex":"M","team":"Cadet A","time":"21:15"},{"date":"2026-09-19","dow":6,"fam":"PREMINI","friendly":true,"home":false,"loc":"Premià de Mar, Barcelona","rival":"AB Premià","sex":"M","team":"Premini A","time":"09:00","cost":15},{"date":"2026-09-19","dow":6,"fam":"JÚNIOR","friendly":true,"home":false,"loc":"Lluïsos de Gràcia","rival":"LLUÏSOS DE GRÀCIA A B","sex":"F","team":"Júnior B","time":"11:00"},{"date":"2026-09-19","dow":6,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB TARRAGONA","sex":"M","team":"Cadet A","time":"16:00"},{"date":"2026-09-19","dow":6,"fam":"CADET","home":false,"loc":"PAVELLO MUNICIPAL AGNES GREGORI DE LLEIDA, C/ BARO DE MAIALS, 117, Lleida","rival":"NAYOX FORÇA LLEIDA B","sex":"M","team":"Cadet B","time":"16:00"},{"date":"2026-09-19","dow":6,"fam":"JÚNIOR","home":false,"loc":"MÀGIC LAU, JARDI, 72-74, Sabadell","rival":"FIKA CE SANT NICOLAU","sex":"M","team":"Júnior A","time":"16:00"},{"date":"2026-09-19","dow":6,"fam":"JÚNIOR","home":false,"loc":"POLIESPORTIU VALLDEMIA, MOSSEN FORNELLS, S/N, Mataró","rival":"FLORANGE U.E.MATARÓ","sex":"M","team":"Júnior B","time":"19:30"},{"date":"2026-09-20","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA","rival":"UE SANT CUGAT - OCCIDENT 2014","sex":"F","team":"Infantil","time":"09:00"},{"date":"2026-09-20","dow":0,"fam":"INFANTIL","home":false,"loc":"POLIESP. MUNICIPAL SILVIA DOMINGUEZ, AV. DE LA UNIO, S/N, Montgat","rival":"UE.MONTGAT - VERMELL","sex":"M","team":"Infantil A","time":"09:00"},{"date":"2026-09-20","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA","rival":"FEMENÍ SANT ADRIÀ LILA","sex":"F","team":"Cadet","time":"10:45"},{"date":"2026-09-20","dow":0,"fam":"INFANTIL","home":false,"loc":"PAVELLÓ ST EUGENIA MONTFALGARS DE GIRONA, C/ ENRIC MARQUÉS RIBALTA, 12, Girona","rival":"BÀSQUET GIRONA U13","sex":"M","team":"Infantil B","time":"12:30"},{"date":"2026-09-20","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"PROMOVIATGES CBF CERDANYOLA JUNIOR VERD","sex":"F","team":"Júnior A","time":"12:30"}],"monday":"2026-09-14"},{"games":[{"date":"2026-09-26","dow":6,"fam":"PREMINI","friendly":true,"home":false,"loc":"Alella, 08328 Alella, Barcelona","rival":"Alellla","sex":"M","team":"Premini A","time":"09:15","cost":15},{"date":"2026-09-26","dow":6,"fam":"INFANTIL","home":false,"loc":"NAU PARC CLOT","rival":"C.B GRUP BARNA B","sex":"F","team":"Infantil","time":"10:45"},{"date":"2026-09-26","dow":6,"fam":"CADET","home":false,"loc":"ESPORTIU CLAROR","rival":"BASQUET SAFA CLAROR 2","sex":"F","team":"Cadet","time":"12:45"},{"date":"2026-09-26","dow":6,"fam":"CADET","home":false,"loc":"PAVELLÓ ST EUGENIA MONTFALGARS DE GIRONA, C/ ENRIC MARQUÉS RIBALTA, 12, Girona","rival":"BÀSQUET GIRONA U16","sex":"M","team":"Cadet A","time":"16:00"},{"date":"2026-09-26","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"IGMESA CBS U18 2009 BLAU","sex":"M","team":"Júnior A","time":"16:00"},{"date":"2026-09-26","dow":6,"fam":"JÚNIOR","home":false,"loc":"INST.MUNICIPALS ILLA DIAGONAL","rival":"CB MANYANET LES CORTS GROC","sex":"F","team":"Júnior A","time":"17:45"},{"date":"2026-09-26","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"IDÒNIA - BASQUET SANT PERE","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2026-09-26","dow":6,"fam":"JÚNIOR","home":false,"loc":"TARRAGONA - COL. SAGRAT COR","rival":"TGN BÀSQUET F10A","sex":"F","team":"Júnior B","time":"19:00"},{"date":"2026-09-27","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"JAC SANTS BARCELONA U13 1","sex":"M","team":"Infantil B","time":"09:00"},{"date":"2026-09-27","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"AESE","sex":"M","team":"Infantil A","time":"10:45"},{"date":"2026-09-27","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"JAC SANTS BARCELONA U15 1","sex":"M","team":"Cadet B","time":"12:30"},{"date":"2026-09-27","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"C.B. CIC A","sex":"M","team":"Sènior B","time":"16:00"},{"date":"2026-09-27","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"SESE B","sex":"M","team":"Júnior B","time":"17:45"},{"date":"2026-09-27","dow":0,"fam":"SÈNIOR","home":false,"loc":"PAVELLO MUNICIPAL AGNES GREGORI DE LLEIDA","rival":"NAYOX FORÇA LLEIDA","sex":"F","team":"Sènior A","time":"17:45"}],"monday":"2026-09-21"},{"games":[{"date":"2026-10-03","dow":6,"fam":"INFANTIL","home":false,"loc":"PARC ESPORTIU MUNICIPAL GUIERA, AV. GUIERA, 6-8, Cerdanyola del Vallès","rival":"CB CERDANYOLA NUROIL","sex":"M","team":"Infantil B","time":"10:45"},{"date":"2026-10-03","dow":6,"fam":"INFANTIL","home":false,"loc":"PODIUM VILADECANSESPORTS JOAN MASGRAU, c/ POMPEU FABRA, 5, Viladecans","rival":"CB VILADECANS VERD","sex":"M","team":"Infantil A","time":"16:00"},{"date":"2026-10-03","dow":6,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BARÇA","sex":"M","team":"Cadet A","time":"17:45"},{"date":"2026-10-03","dow":6,"fam":"SÈNIOR","home":false,"loc":"U.E. HORTA, FELIU I CODINA 27, Barcelona","rival":"UE HORTA B","sex":"M","team":"Sènior B","time":"18:45"},{"date":"2026-10-03","dow":6,"fam":"JÚNIOR","home":false,"loc":"POLIESPORTIU EUSEBI MILLAN, SANT CUGAT, 146, Mataró","rival":"CB BOET MATARÓ 2009","sex":"M","team":"Júnior A","time":"19:00"},{"date":"2026-10-04","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA","rival":"#SOMCAPITAL CB SANTFELIUENC U13","sex":"F","team":"Infantil","time":"09:00"},{"date":"2026-10-04","dow":0,"fam":"CADET","home":false,"loc":"TARRAGONA - PAVELLO DEL SERRALLO, JOSEP CATALA I RUFA S/N, Tarragona","rival":"CB TARRAGONA","sex":"M","team":"Cadet B","time":"10:30"},{"date":"2026-10-04","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA","rival":"CE SANT NICOLAU 1","sex":"F","team":"Cadet","time":"10:45"},{"date":"2026-10-04","dow":0,"fam":"SÈNIOR","home":false,"loc":"PAV OLIMPIC ESPANYA INDUSTRIAL, PARC ESPANYA INDUSTRIAL, Barcelona","rival":"BASQUET ATENEU MONTSERRAT A","sex":"M","team":"Sènior A","time":"10:45"},{"date":"2026-10-04","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"SESE B","sex":"F","team":"Júnior B","time":"12:30"},{"date":"2026-10-04","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"U.E. CLARET A","sex":"F","team":"Júnior A","time":"16:00"},{"date":"2026-10-04","dow":0,"fam":"JÚNIOR","home":false,"loc":"TARRAGONA - PAVELLO DEL SERRALLO, JOSEP CATALA I RUFA S/N, Tarragona","rival":"CB TARRAGONA","sex":"M","team":"Júnior B","time":"17:30"},{"date":"2026-10-04","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"RACC ESPLUGUES - CB SANT JUST","sex":"F","team":"Sènior A","time":"17:45"}],"monday":"2026-09-28"},{"games":[{"date":"2026-10-10","dow":6,"fam":"INFANTIL","home":false,"loc":"TARRAGONA - COL. SAGRAT COR","rival":"TGN BÀSQUET F14A","sex":"F","team":"Infantil","time":"11:00"},{"date":"2026-10-10","dow":6,"fam":"JÚNIOR","home":false,"loc":"CIUTAT ESPORTIVA BLANES","rival":"CB BLANES A","sex":"F","team":"Júnior B","time":"12:15"},{"date":"2026-10-10","dow":6,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"C.B GRUP BARNA B","sex":"M","team":"Cadet B","time":"17:45"},{"date":"2026-10-10","dow":6,"fam":"JÚNIOR","home":false,"loc":"PAVELLO MUNICIPAL PLANA LLEDO, AV. CALDES DE MONTBUI, 1, Mollet del Vallès","rival":"CB MOLLET A","sex":"M","team":"Júnior A","time":"17:45"},{"date":"2026-10-10","dow":6,"fam":"JÚNIOR","home":false,"loc":"PAVELLÓ ST EUGENIA MONTFALGARS DE GIRONA, C/ ENRIC MARQUÉS RIBALTA, 12, Girona","rival":"BÀSQUET GIRONA U17","sex":"M","team":"Júnior B","time":"17:45"},{"date":"2026-10-11","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BASKET ALMEDA NEGRE","sex":"M","team":"Infantil B","time":"09:00"},{"date":"2026-10-11","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"KENWOOD JOVENTUT LES CORTS U14","sex":"M","team":"Infantil A","time":"10:45"},{"date":"2026-10-11","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"JOVENTUT BADALONA A","sex":"M","team":"Cadet A","time":"12:30"},{"date":"2026-10-11","dow":0,"fam":"SÈNIOR","home":false,"loc":"PAVELLO ESPORTIU CLARET, NAPOLS 348, Barcelona","rival":"U.E. CLARET B","sex":"M","team":"Sènior B","time":"12:30"},{"date":"2026-10-11","dow":0,"fam":"CADET","home":false,"loc":"C.E.M. CAN CASABLANQUES - Pista Nova","rival":"SANT QUIRZE BÀSQUET CLUB A","sex":"F","team":"Cadet","time":"16:00"},{"date":"2026-10-11","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"CE SANT NICOLAU 1","sex":"F","team":"Júnior A","time":"16:00"},{"date":"2026-10-11","dow":0,"fam":"SÈNIOR","home":false,"loc":"PAVELLO FRANCESC DOMENECH PUIG DE CERVERA, CARRETERA DE GUISSONA, S/N, Cervera","rival":"CB CERVERA MOBEL LINEA NEGRE","sex":"M","team":"Sènior A","time":"17:30"},{"date":"2026-10-11","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"C.B. PRAT - MONTIBELLO","sex":"F","team":"Sènior A","time":"17:45"}],"monday":"2026-10-05"},{"games":[{"date":"2026-10-17","dow":6,"fam":"INFANTIL","home":false,"loc":"PAVELLO D'ESPORTS D'ARGENTONA, CTRA. VILASSAR, S/N, Argentona","rival":"CB ARGENTONA 2014 NEGRE","sex":"M","team":"Infantil B","time":"12:15"},{"date":"2026-10-17","dow":6,"fam":"CADET","home":false,"loc":"COMPLEX VELL CONGOST, CTRA. MANRESA-ST. JOAN VILATORRADA S/N, Manresa","rival":"KIDS&US MANRESA U16","sex":"M","team":"Cadet A","time":"16:00"},{"date":"2026-10-17","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BASKET ALMEDA 1","sex":"M","team":"Júnior A","time":"16:00"},{"date":"2026-10-17","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BASQUETPIASABADELL A","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2026-10-17","dow":6,"fam":"SÈNIOR","home":false,"loc":"POLIESP. MUNICIPAL LES PLANES","rival":"CE SAMONTÀ-CBLH","sex":"F","team":"Sènior A","time":"19:30"},{"date":"2026-10-18","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA","rival":"NAYOX FORÇA LLEIDA B","sex":"F","team":"Infantil","time":"09:00"},{"date":"2026-10-18","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA","rival":"BÀSQUET PB9 - U16F","sex":"F","team":"Cadet","time":"10:45"},{"date":"2026-10-18","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"CESET U17 VERD","sex":"F","team":"Júnior B","time":"12:30"},{"date":"2026-10-18","dow":0,"fam":"CADET","home":false,"loc":"PAVELLO MUNICIPAL VIRREI AMAT, JUAN ALCOVER, 6, Barcelona","rival":"SESE B","sex":"M","team":"Cadet B","time":"13:00"},{"date":"2026-10-18","dow":0,"fam":"INFANTIL","home":false,"loc":"PAVELLO ALMEDA, SANT FERRAN 45 BIS, Cornellà de Llobregat","rival":"BASKET ALMEDA GROC","sex":"M","team":"Infantil A","time":"16:00"},{"date":"2026-10-18","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"KIDS&US MANRESA U17","sex":"M","team":"Júnior B","time":"16:00"},{"date":"2026-10-18","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CLUB BÀSQUET COLL A","sex":"M","team":"Sènior B","time":"17:45"},{"date":"2026-10-18","dow":0,"fam":"JÚNIOR","home":false,"loc":"ESCOLA PIA SABADELL","rival":"BASQUETPIASABADELL BLAU","sex":"F","team":"Júnior A","time":"19:45"}],"monday":"2026-10-12"},{"games":[{"date":"2026-10-24","dow":6,"fam":"JÚNIOR","home":false,"loc":"PAVELLO MUNICIPAL BARRIS NORD DE LLEIDA","rival":"NAYOX FORÇA LLEIDA B","sex":"F","team":"Júnior B","time":"13:45"},{"date":"2026-10-24","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"C.B. L'HOSPITALET B","sex":"M","team":"Júnior B","time":"16:00"},{"date":"2026-10-24","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"NAYOX FORÇA LLEIDA A","sex":"M","team":"Júnior A","time":"17:45"},{"date":"2026-10-24","dow":6,"fam":"SÈNIOR","home":false,"loc":"PAVELLO COTXERES BORBO, RAMON ALBO, 41-57 (NOU BARRIS), Barcelona","rival":"CLINICAS HCG BASQUET CEISSA","sex":"M","team":"Sènior A","time":"19:00"},{"date":"2026-10-25","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA","rival":"CB GRANOLLERS 2","sex":"F","team":"Infantil","time":"09:00"},{"date":"2026-10-25","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BÀSQUET GIRONA U13","sex":"M","team":"Infantil B","time":"09:00"},{"date":"2026-10-25","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CLUB BÀSQUET ARGENTONA","sex":"M","team":"Infantil A","time":"10:45"},{"date":"2026-10-25","dow":0,"fam":"CADET","home":false,"loc":"PAVELLO DEL CENTRE - MARCEL·LI MANEJA, DIGOINE-CANT.RIERA ESCORXADOR, L'Hospitalet de Llobregat","rival":"DROOP CENTRE C.B. L'HOSPITALET A","sex":"M","team":"Cadet A","time":"12:30"},{"date":"2026-10-25","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB ARGENTONA 2012 NEGRE","sex":"M","team":"Cadet B","time":"12:30"},{"date":"2026-10-25","dow":0,"fam":"CADET","home":false,"loc":"PAVELLO MUNICIPAL SANT CUGAT","rival":"UE SANT CUGAT - OCCIDENT NEGRE","sex":"F","team":"Cadet","time":"15:45"},{"date":"2026-10-25","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"QBASKET SANT CUGAT 1","sex":"F","team":"Júnior A","time":"16:00"},{"date":"2026-10-25","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"OPENLLAR VILÀBASQUET VILADECANS SFB","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2026-10-25","dow":0,"fam":"SÈNIOR","home":false,"loc":"COL.LEGI SANT IGNASI, GENERAL VIVES 34, Barcelona","rival":"SANT IGNASI","sex":"M","team":"Sènior B","time":"19:30"}],"monday":"2026-10-19"},{"games":[{"date":"2026-10-31","dow":6,"fam":"INFANTIL","home":false,"loc":"POLIESPORTIU MUNICIPAL ROSER LLOP, PLAÇA DELS VOLUNTARIS S/N, Figueres","rival":"CB ADEPAF TXOT'S","sex":"M","team":"Infantil B","time":"12:00"},{"date":"2026-10-31","dow":6,"fam":"JÚNIOR","home":false,"loc":"CENTRE ESPORTIU LA BORDETA, NOGUERA PALLARESA 34-42, Barcelona","rival":"JAC SANTS BARCELONA U17 1","sex":"M","team":"Júnior B","time":"12:30"},{"date":"2026-10-31","dow":6,"fam":"INFANTIL","home":false,"loc":"POLIESPORTIU EUSEBI MILLAN, SANT CUGAT, 146, Mataró","rival":"CB BOET MATARÓ 2013","sex":"M","team":"Infantil A","time":"15:30"},{"date":"2026-10-31","dow":6,"fam":"CADET","home":false,"loc":"PAVELLO MUNICIPAL SANT CUGAT, C/ JAUME SABAT, S/N, Sant Cugat del Vallès","rival":"UE SANT CUGAT - OCCIDENT 2012","sex":"M","team":"Cadet B","time":"16:00"},{"date":"2026-10-31","dow":6,"fam":"INFANTIL","home":false,"loc":"POLIESPORTIU VALLDEMIA","rival":"FLORANGE U.E.MATARÓ","sex":"F","team":"Infantil","time":"16:00"},{"date":"2026-11-01","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA","rival":"BASQUET ATENEU MONTSERRAT INTERTERRITORIAL","sex":"F","team":"Cadet","time":"10:45"},{"date":"2026-11-01","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"U. B. LLEFIÀ B","sex":"F","team":"Júnior B","time":"12:30"},{"date":"2026-11-01","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"SANT GERVASI 1","sex":"F","team":"Júnior A","time":"16:00"},{"date":"2026-11-01","dow":0,"fam":"JÚNIOR","home":false,"loc":"TARRAGONA - PAVELLO DEL SERRALLO, JOSEP CATALA I RUFA S/N, Tarragona","rival":"CB TARRAGONA","sex":"M","team":"Júnior A","time":"17:30"},{"date":"2026-11-01","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"FLORANGE U.E.MATARÓ","sex":"M","team":"Cadet A","time":"17:45"}],"monday":"2026-10-26"},{"games":[{"date":"2026-11-07","dow":6,"fam":"INFANTIL","home":false,"loc":"PAVELLO MUNICIPAL SANT CUGAT","rival":"UE SANT CUGAT - OCCIDENT 2014","sex":"F","team":"Infantil","time":"10:15"},{"date":"2026-11-07","dow":6,"fam":"CADET","home":false,"loc":"PAVELLO MUNICIPAL SANT ADRIA","rival":"FEMENÍ SANT ADRIÀ LILA","sex":"F","team":"Cadet","time":"16:00"},{"date":"2026-11-07","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"FIKA CE SANT NICOLAU","sex":"M","team":"Júnior A","time":"16:00"},{"date":"2026-11-07","dow":6,"fam":"JÚNIOR","home":false,"loc":"PARC ESPORTIU MUNICIPAL GUIERA","rival":"PROMOVIATGES CBF CERDANYOLA JUNIOR VERD","sex":"F","team":"Júnior A","time":"16:00"},{"date":"2026-11-07","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"SESE B","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2026-11-07","dow":6,"fam":"SÈNIOR","home":false,"loc":"TARRAGONA - PAVELLO DEL SERRALLO","rival":"VOLVO DISELAUTO CBT","sex":"F","team":"Sènior A","time":"19:00"},{"date":"2026-11-08","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BÀSQUET SAFA CLAROR 1","sex":"M","team":"Infantil B","time":"09:00"},{"date":"2026-11-08","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"UE.MONTGAT - VERMELL","sex":"M","team":"Infantil A","time":"10:45"},{"date":"2026-11-08","dow":0,"fam":"CADET","home":false,"loc":"TARRAGONA - PAVELLO DEL SERRALLO, JOSEP CATALA I RUFA S/N, Tarragona","rival":"CB TARRAGONA","sex":"M","team":"Cadet A","time":"12:00"},{"date":"2026-11-08","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"NAYOX FORÇA LLEIDA B","sex":"M","team":"Cadet B","time":"12:30"},{"date":"2026-11-08","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"FLORANGE U.E.MATARÓ","sex":"M","team":"Júnior B","time":"16:00"},{"date":"2026-11-08","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"MARISTES ADEMAR B","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2026-11-02"},{"games":[{"date":"2026-11-14","dow":6,"fam":"INFANTIL","home":false,"loc":"POLIESPORTIU SANTA EULALIA, JACINT VERDAGUER, 15-17, L'Hospitalet de Llobregat","rival":"AESE","sex":"M","team":"Infantil A","time":"13:00"},{"date":"2026-11-14","dow":6,"fam":"INFANTIL","home":false,"loc":"CENTRE ESPORTIU LA BORDETA, NOGUERA PALLARESA 34-42, Barcelona","rival":"JAC SANTS BARCELONA U13 1","sex":"M","team":"Infantil B","time":"17:15"},{"date":"2026-11-14","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"TGN BÀSQUET F10A","sex":"F","team":"Júnior B","time":"17:45"},{"date":"2026-11-14","dow":6,"fam":"SÈNIOR","home":false,"loc":"COL.LEGI ESCOLAPIS SARRIA, IMMACULADA, 25-35, Barcelona","rival":"ESCOLAPIS SARRIÀ A","sex":"M","team":"Sènior A","time":"18:00"},{"date":"2026-11-14","dow":6,"fam":"SÈNIOR","home":false,"loc":"PAVELLO LA PLANA, LA PLANA, S/N, Badalona","rival":"A.E. BADALONÈS - PINTURAS CORBACHO","sex":"M","team":"Sènior B","time":"19:30"},{"date":"2026-11-15","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA","rival":"C.B GRUP BARNA B","sex":"F","team":"Infantil","time":"09:00"},{"date":"2026-11-15","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA","rival":"BASQUET SAFA CLAROR 2","sex":"F","team":"Cadet","time":"10:45"},{"date":"2026-11-15","dow":0,"fam":"CADET","home":false,"loc":"CENTRE ESPORTIU LA BORDETA, NOGUERA PALLARESA 34-42, Barcelona","rival":"JAC SANTS BARCELONA U15 1","sex":"M","team":"Cadet B","time":"12:00"},{"date":"2026-11-15","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BÀSQUET GIRONA U16","sex":"M","team":"Cadet A","time":"12:30"},{"date":"2026-11-15","dow":0,"fam":"JÚNIOR","home":false,"loc":"PALAU MUNICIPAL D'ESPORTS JUAN CARLOS NAVARRO, SANTIAGO RUSIÑOL, S/N, Sant Feliu de Llobregat","rival":"IGMESA CBS U18 2009 BLAU","sex":"M","team":"Júnior A","time":"15:45"},{"date":"2026-11-15","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"CB MANYANET LES CORTS GROC","sex":"F","team":"Júnior A","time":"16:00"},{"date":"2026-11-15","dow":0,"fam":"JÚNIOR","home":false,"loc":"PAVELLO MUNICIPAL VIRREI AMAT, JUAN ALCOVER, 6, Barcelona","rival":"SESE B","sex":"M","team":"Júnior B","time":"17:45"},{"date":"2026-11-15","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"LA CASA AGENCY - C.B. SANT JOSEP OBRER A","sex":"F","team":"Sènior A","time":"17:45"}],"monday":"2026-11-09"},{"games":[{"date":"2026-11-21","dow":6,"fam":"INFANTIL","home":false,"loc":"PALAU MUNICIPAL D'ESPORTS JUAN CARLOS NAVARRO","rival":"#SOMCAPITAL CB SANTFELIUENC U13","sex":"F","team":"Infantil","time":"12:00"},{"date":"2026-11-21","dow":6,"fam":"CADET","home":false,"loc":"MÀGIC LAU","rival":"CE SANT NICOLAU 1","sex":"F","team":"Cadet","time":"14:00"},{"date":"2026-11-21","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB BOET MATARÓ 2009","sex":"M","team":"Júnior A","time":"16:00"},{"date":"2026-11-21","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CN TERRASSA A","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2026-11-22","dow":0,"fam":"CADET","home":false,"loc":"CIUTAT ESPORTIVA JOAN GAMPER, DEL SOL, S/N, Sant Joan Despí","rival":"BARÇA","sex":"M","team":"Cadet A","time":"09:00"},{"date":"2026-11-22","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB CERDANYOLA NUROIL","sex":"M","team":"Infantil B","time":"09:00"},{"date":"2026-11-22","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB VILADECANS VERD","sex":"M","team":"Infantil A","time":"10:45"},{"date":"2026-11-22","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB TARRAGONA","sex":"M","team":"Cadet B","time":"12:30"},{"date":"2026-11-22","dow":0,"fam":"JÚNIOR","home":false,"loc":"PAVELLO ESPORTIU CLARET","rival":"U.E. CLARET A","sex":"F","team":"Júnior A","time":"16:00"},{"date":"2026-11-22","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB TARRAGONA","sex":"M","team":"Júnior B","time":"16:00"},{"date":"2026-11-22","dow":0,"fam":"JÚNIOR","home":false,"loc":"PAVELLO MUNICIPAL VIRREI AMAT","rival":"SESE B","sex":"F","team":"Júnior B","time":"17:45"},{"date":"2026-11-22","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BASKET CORAS","sex":"M","team":"Sènior B","time":"17:45"},{"date":"2026-11-22","dow":0,"fam":"SÈNIOR","home":false,"loc":"C.N. TERRASSA - PAVELLÓ DE BÀSQUET","rival":"CN TERRASSA A","sex":"F","team":"Sènior A","time":"19:15"}],"monday":"2026-11-16"},{"games":[{"date":"2026-11-28","dow":6,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB MOLLET A","sex":"M","team":"Júnior A","time":"17:45"},{"date":"2026-11-28","dow":6,"fam":"SÈNIOR","home":false,"loc":"PAVELLO MUNICIPAL SANT CUGAT, C/ JAUME SABAT, S/N, Sant Cugat del Vallès","rival":"UE SANT CUGAT - OCCIDENT B","sex":"M","team":"Sènior A","time":"19:30"},{"date":"2026-11-29","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA","rival":"TGN BÀSQUET F14A","sex":"F","team":"Infantil","time":"09:00"},{"date":"2026-11-29","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA","rival":"SANT QUIRZE BÀSQUET CLUB A","sex":"F","team":"Cadet","time":"10:45"},{"date":"2026-11-29","dow":0,"fam":"INFANTIL","home":false,"loc":"PAVELLO ALMEDA, SANT FERRAN 45 BIS, Cornellà de Llobregat","rival":"BASKET ALMEDA NEGRE","sex":"M","team":"Infantil B","time":"10:45"},{"date":"2026-11-29","dow":0,"fam":"INFANTIL","home":false,"loc":"POLIESPORTIU UPC, JORDI GIRONA 11, Barcelona","rival":"KENWOOD JOVENTUT LES CORTS U14","sex":"M","team":"Infantil A","time":"11:30"},{"date":"2026-11-29","dow":0,"fam":"CADET","home":false,"loc":"NAU PARC CLOT, CANTONADA C/ LLACUNA Nº. 170, Barcelona","rival":"C.B GRUP BARNA B","sex":"M","team":"Cadet B","time":"12:30"},{"date":"2026-11-29","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"CB BLANES A","sex":"F","team":"Júnior B","time":"12:30"},{"date":"2026-11-29","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BÀSQUET GIRONA U17","sex":"M","team":"Júnior B","time":"16:00"},{"date":"2026-11-29","dow":0,"fam":"CADET","home":false,"loc":"PALAU D'ESPORTS DE BADALONA, ALFONS XIII, S/N CANT. PONENT, Badalona","rival":"JOVENTUT BADALONA A","sex":"M","team":"Cadet A","time":"17:45"},{"date":"2026-11-29","dow":0,"fam":"JÚNIOR","home":false,"loc":"MÀGIC LAU","rival":"CE SANT NICOLAU 1","sex":"F","team":"Júnior A","time":"17:45"},{"date":"2026-11-29","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"U. B. LLEFIÀ B","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2026-11-29","dow":0,"fam":"SÈNIOR","home":false,"loc":"PAVELLÓ AYMÀ - POBLENOU, PASSSATGE AYMÀ, 18-26, Barcelona","rival":"BÀSQUET PB9 'A'","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2026-11-23"},{"games":[{"date":"2026-12-12","dow":6,"fam":"CADET","home":false,"loc":"PAVELLÓ AYMÀ - POBLENOU","rival":"BÀSQUET PB9 - U16F","sex":"F","team":"Cadet","time":"10:45"},{"date":"2026-12-12","dow":6,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"SESE B","sex":"M","team":"Cadet B","time":"16:00"},{"date":"2026-12-12","dow":6,"fam":"JÚNIOR","home":false,"loc":"PAVELLO POLIESPORTIU STA EUGENIA DE GIRONA","rival":"CESET U17 VERD","sex":"F","team":"Júnior B","time":"16:00"},{"date":"2026-12-12","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"NOU BÀSQUET OLESA","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2026-12-12","dow":6,"fam":"SÈNIOR","home":false,"loc":"PAVELLO MUNICIPAL DE BASQUET-OLESA","rival":"NOU BÀSQUET OLESA A","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2026-12-12","dow":6,"fam":"JÚNIOR","home":false,"loc":"PAVELLO ALMEDA, SANT FERRAN 45 BIS, Cornellà de Llobregat","rival":"BASKET ALMEDA 1","sex":"M","team":"Júnior A","time":"19:30"},{"date":"2026-12-12","dow":6,"fam":"JÚNIOR","home":false,"loc":"COMPLEX VELL CONGOST, CTRA. MANRESA-ST. JOAN VILATORRADA S/N, Manresa","rival":"KIDS&US MANRESA U17","sex":"M","team":"Júnior B","time":"19:45"},{"date":"2026-12-13","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB ARGENTONA 2014 NEGRE","sex":"M","team":"Infantil B","time":"09:00"},{"date":"2026-12-13","dow":0,"fam":"INFANTIL","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BASKET ALMEDA GROC","sex":"M","team":"Infantil A","time":"10:45"},{"date":"2026-12-13","dow":0,"fam":"INFANTIL","home":false,"loc":"PAVELLO MUNICIPAL AGNES GREGORI DE LLEIDA","rival":"NAYOX FORÇA LLEIDA B","sex":"F","team":"Infantil","time":"11:00"},{"date":"2026-12-13","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"KIDS&US MANRESA U16","sex":"M","team":"Cadet A","time":"12:30"},{"date":"2026-12-13","dow":0,"fam":"JÚNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"BASQUETPIASABADELL BLAU","sex":"F","team":"Júnior A","time":"16:00"},{"date":"2026-12-13","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"AE BELLSPORT","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2026-12-07"},{"games":[{"date":"2026-12-19","dow":6,"fam":"SÈNIOR","home":false,"loc":"POLIESPORTIU LA MARINA, c/ DEL COURE, S/N, Barcelona","rival":"CE LA MARINA A","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2026-12-20","dow":0,"fam":"INFANTIL","home":false,"loc":"PAVELLO D'ESPORTS D'ARGENTONA, CTRA. VILASSAR, S/N, Argentona","rival":"CLUB BÀSQUET ARGENTONA","sex":"M","team":"Infantil A","time":"09:30"},{"date":"2026-12-20","dow":0,"fam":"JÚNIOR","home":false,"loc":"PAVELLO MUNICIPAL SANT CUGAT","rival":"QBASKET SANT CUGAT 1","sex":"F","team":"Júnior A","time":"10:15"},{"date":"2026-12-20","dow":0,"fam":"CADET","home":true,"loc":"PAVELLO LA COLINA","rival":"UE SANT CUGAT - OCCIDENT NEGRE","sex":"F","team":"Cadet","time":"10:45"},{"date":"2026-12-20","dow":0,"fam":"SÈNIOR","home":false,"loc":"POLIESPORTIU SA.FA. HORTA, TORRENT DEL CARMEL, 1, Barcelona","rival":"LIMA-HORTA BARCELONA","sex":"M","team":"Sènior B","time":"12:30"},{"date":"2026-12-20","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"BASQUET NEUS A","sex":"F","team":"Sènior A","time":"17:45"}],"monday":"2026-12-14"},{"games":[{"date":"2027-01-09","dow":6,"fam":"SÈNIOR","home":false,"loc":"MÀGIC LAU","rival":"CE SANT NICOLAU","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-01-09","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"LA SALLE MANRESA SGOL","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-01-10","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"KENWOOD JOVENTUT LES CORTS","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2027-01-04"},{"games":[{"date":"2027-01-16","dow":6,"fam":"SÈNIOR","home":false,"loc":"PAVELLO PAISOS CATALANS, AUSIAS MARCH, 61-77, Badalona","rival":"A.E. SANT ANDREU NATZARET-B","sex":"M","team":"Sènior B","time":"16:00"},{"date":"2027-01-16","dow":6,"fam":"SÈNIOR","home":false,"loc":"PAVELLO PAISOS CATALANS, AUSIAS MARCH, 61-77, Badalona","rival":"A.E SANT ANDREU NATZARET","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-01-17","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"PETROPINTO ASFE A","sex":"F","team":"Sènior A","time":"17:45"}],"monday":"2027-01-11"},{"games":[{"date":"2027-01-23","dow":6,"fam":"SÈNIOR","home":false,"loc":"SANT PERE TERRASSA, MAJOR DE SANT PERE, 63, Terrassa","rival":"IDÒNIA - BASQUET SANT PERE","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-01-24","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"NAYOX FORÇA LLEIDA","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-01-24","dow":0,"fam":"SÈNIOR","home":false,"loc":"JESUS MARIA SANT GERVASI, C/ JESUS I MARIA, 1-25, Barcelona","rival":"C.B. CIC A","sex":"M","team":"Sènior B","time":"19:30"}],"monday":"2027-01-18"},{"games":[{"date":"2027-01-30","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BASQUET ATENEU MONTSERRAT A","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-01-31","dow":0,"fam":"SÈNIOR","home":false,"loc":"PAVELLO MUNICIPAL LA BONAIGUA","rival":"RACC ESPLUGUES - CB SANT JUST","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-01-31","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"UE HORTA B","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2027-01-25"},{"games":[{"date":"2027-02-06","dow":6,"fam":"SÈNIOR","home":false,"loc":"CEM ESTRUCH-PAV.JOAN BUSQUETS","rival":"C.B. PRAT - MONTIBELLO","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-02-06","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CB CERVERA MOBEL LINEA NEGRE","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-02-07","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"U.E. CLARET B","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2027-02-01"},{"games":[{"date":"2027-02-14","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"CE SAMONTÀ-CBLH","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-02-14","dow":0,"fam":"SÈNIOR","home":false,"loc":"ESCOLA PIA SABADELL, GARCILASO, 99, Sabadell","rival":"BASQUETPIASABADELL A","sex":"M","team":"Sènior A","time":"18:00"},{"date":"2027-02-14","dow":0,"fam":"SÈNIOR","home":false,"loc":"PISTA CREUETA DEL COLL, CASTELLTERÇOL, S/N, Barcelona","rival":"CLUB BÀSQUET COLL A","sex":"M","team":"Sènior B","time":"19:45"}],"monday":"2027-02-08"},{"games":[{"date":"2027-02-27","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CLINICAS HCG BASQUET CEISSA","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-02-28","dow":0,"fam":"SÈNIOR","home":false,"loc":"ATRIUM VILADECANS","rival":"OPENLLAR VILÀBASQUET VILADECANS SFB","sex":"F","team":"Sènior A","time":"12:45"},{"date":"2027-02-28","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"SANT IGNASI","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2027-02-22"},{"games":[{"date":"2027-03-06","dow":6,"fam":"SÈNIOR","home":false,"loc":"PAVELLO MUNICIPAL VIRREI AMAT, JUAN ALCOVER, 6, Barcelona","rival":"SESE B","sex":"M","team":"Sènior A","time":"19:30"},{"date":"2027-03-07","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"VOLVO DISELAUTO CBT","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-03-07","dow":0,"fam":"SÈNIOR","home":false,"loc":"PAVELLO LA PLANA, LA PLANA, S/N, Badalona","rival":"MARISTES ADEMAR B","sex":"M","team":"Sènior B","time":"19:30"}],"monday":"2027-03-01"},{"games":[{"date":"2027-03-13","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"ESCOLAPIS SARRIÀ A","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-03-13","dow":6,"fam":"SÈNIOR","home":false,"loc":"COMPLEX ESP. L'HOSPITALET NORD","rival":"LA CASA AGENCY - C.B. SANT JOSEP OBRER A","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-03-14","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"A.E. BADALONÈS - PINTURAS CORBACHO","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2027-03-08"},{"games":[{"date":"2027-04-03","dow":6,"fam":"SÈNIOR","home":false,"loc":"SAGRAT COR - SORT.9 RDA.DALT, RAMON MIQUEL I PLANAS, 38-40, Barcelona","rival":"BASKET CORAS","sex":"M","team":"Sènior B","time":"20:00"},{"date":"2027-04-04","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"CN TERRASSA A","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-04-04","dow":0,"fam":"SÈNIOR","home":false,"loc":"C.N. TERRASSA - PAVELLO POLIESPORTIU, JOCS OLIMPICS, S/N, Terrassa","rival":"CN TERRASSA A","sex":"M","team":"Sènior A","time":"18:30"}],"monday":"2027-03-29"},{"games":[{"date":"2027-04-10","dow":6,"fam":"SÈNIOR","home":false,"loc":"POLIESPORTIU LLEFIA","rival":"U. B. LLEFIÀ B","sex":"F","team":"Sènior A","time":"16:00"},{"date":"2027-04-10","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"UE SANT CUGAT - OCCIDENT B","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-04-11","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"BÀSQUET PB9 'A'","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2027-04-05"},{"games":[{"date":"2027-04-18","dow":0,"fam":"SÈNIOR","home":false,"loc":"POLIESPORTIU SERGIO MANZANO, AV.MARE DE DEU DE BELLVITGE, 7, L'Hospitalet de Llobregat","rival":"AE BELLSPORT","sex":"M","team":"Sènior B","time":"12:30"},{"date":"2027-04-18","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"NOU BÀSQUET OLESA A","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-04-18","dow":0,"fam":"SÈNIOR","home":false,"loc":"PAVELLO MUNICIPAL DE BASQUET-OLESA, PRIORAT, S/N, Olesa de Montserrat","rival":"NOU BÀSQUET OLESA","sex":"M","team":"Sènior A","time":"18:00"}],"monday":"2027-04-12"},{"games":[{"date":"2027-04-24","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"CE LA MARINA A","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-04-25","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"LIMA-HORTA BARCELONA","sex":"M","team":"Sènior B","time":"17:45"},{"date":"2027-04-25","dow":0,"fam":"SÈNIOR","home":false,"loc":"PAVELLO LA BASTIDA","rival":"BASQUET NEUS A","sex":"F","team":"Sènior A","time":"19:45"}],"monday":"2027-04-19"},{"games":[{"date":"2027-05-08","dow":6,"fam":"SÈNIOR","home":false,"loc":"COL.LEGI LA SALLE MANRESA, LA PAU, S/N, Manresa","rival":"LA SALLE MANRESA SGOL","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-05-09","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA","rival":"CE SANT NICOLAU","sex":"F","team":"Sènior A","time":"17:45"},{"date":"2027-05-09","dow":0,"fam":"SÈNIOR","home":false,"loc":"INST.MUNICIPALS ILLA DIAGONAL, NUMANCIA, 142, Barcelona","rival":"KENWOOD JOVENTUT LES CORTS","sex":"M","team":"Sènior B","time":"18:00"}],"monday":"2027-05-03"},{"games":[{"date":"2027-05-15","dow":6,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"A.E SANT ANDREU NATZARET","sex":"M","team":"Sènior A","time":"17:45"},{"date":"2027-05-15","dow":6,"fam":"SÈNIOR","home":false,"loc":"POLIESPORTIU MUNICIPAL SANT FRUITOS DE BAGES","rival":"PETROPINTO ASFE A","sex":"F","team":"Sènior A","time":"19:00"},{"date":"2027-05-16","dow":0,"fam":"SÈNIOR","home":true,"loc":"PAVELLO LA COLINA, GRAN BRETANYA, S/N, Badalona","rival":"A.E. SANT ANDREU NATZARET-B","sex":"M","team":"Sènior B","time":"17:45"}],"monday":"2027-05-10"}]}
 </script>
@@ -196,7 +196,7 @@
     const CHANGES_PER_PAGE = 3;
     let changesPage = 0;
 
-    const MONTHS = ['gener','febrer','marÃ§','abril','maig','juny','juliol','agost','setembre','octubre','novembre','desembre'];
+    const MONTHS = ['gener','febrer','març','abril','maig','juny','juliol','agost','setembre','octubre','novembre','desembre'];
     function fmtDate(iso){
       const p=iso.split('-').map(Number);
       return p[2]+' '+MONTHS[p[1]-1];
@@ -209,13 +209,13 @@
       return label === 'Data' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? fmtDateNumeric(value) : value;
     }
     function addDays(iso,n){ const p=iso.split('-').map(Number); const dt=new Date(Date.UTC(p[0],p[1]-1,p[2]+n)); return dt.toISOString().slice(0,10); }
-    function fullWeekLabel(monday){ return fmtDate(monday)+' â '+fmtDate(addDays(monday,6)); }
+    function fullWeekLabel(monday){ return fmtDate(monday)+' – '+fmtDate(addDays(monday,6)); }
 
-    const FAMILY_ORDER=['SÃNIOR','JÃNIOR','CADET','INFANTIL','MINI'];
-    const SEX_ORDER=[['M','MasculÃ­'],['F','FemenÃ­']];
+    const FAMILY_ORDER=['SÈNIOR','JÚNIOR','CADET','INFANTIL','MINI'];
+    const SEX_ORDER=[['M','Masculí'],['F','Femení']];
     const activeFilters=new Set(); // categories
-    const activeSex=new Set();     // gÃ¨neres
-    let activeFriendly=false;      // nomÃ©s amistosos
+    const activeSex=new Set();     // gèneres
+    let activeFriendly=false;      // només amistosos
     function passes(g){
       const okFam = activeFilters.size===0 || activeFilters.has(g.fam);
       const okSex = activeSex.size===0 || activeSex.has(g.sex);
@@ -237,7 +237,7 @@
 
     function changeMark(g){
       return changedGames.has(changedGameKey(g))
-        ? ' <span class="change-mark" title="Partit amb canvis recents">â»</span>'
+        ? ' <span class="change-mark" title="Partit amb canvis recents">↻</span>'
         : '';
     }
 
@@ -279,7 +279,7 @@
           return '<div class="change-detail">' + g.team + ' ' + (g.sex==='F'?'F':'M') + ' vs ' + g.rival + '</div>';
         }).join('');
         return '<li class="change-item conflict"><div class="change-kind">Conflicte</div>' +
-          '<div class="change-main">' + fmtDateNumeric(first.date) + ' ' + first.time + ' Â· ' + loc + '</div>' + teams + '</li>';
+          '<div class="change-main">' + fmtDateNumeric(first.date) + ' ' + first.time + ' · ' + loc + '</div>' + teams + '</li>';
       }).join('');
       return '<section class="changes conflicts"><h3>Conflictes</h3>' +
         '<p class="changes-meta">Partits amb el mateix dia, hora i lloc.</p>' +
@@ -288,16 +288,16 @@
 
     function iconLegend(){
       return '<div class="legend" aria-label="Llegenda d&apos;icones">' +
-        '<span class="legend-item"><span class="friendly" title="Partit amistÃ³s">ð¤</span> AmistÃ³s</span>' +
-        '<span class="legend-item"><span class="mini-mark" title="Partit de Mini">ð¼</span> Mini</span>' +
-        '<span class="legend-item"><span class="change-mark" title="Partit amb canvis recents">â»</span> Canvi recent</span>' +
+        '<span class="legend-item"><span class="friendly" title="Partit amistós">🤝</span> Amistós</span>' +
+        '<span class="legend-item"><span class="mini-mark" title="Partit de Mini">🍼</span> Mini</span>' +
+        '<span class="legend-item"><span class="change-mark" title="Partit amb canvis recents">↻</span> Canvi recent</span>' +
         '<span class="legend-item"><span class="conflict-mark" title="Possible conflicte: mateix horari i pista">!</span> Mateixa hora i pista</span>' +
         '</div>';
     }
 
     function miniMark(g){
       return g.fam === 'MINI'
-        ? ' <span class="mini-mark" title="Partit de Mini">ð¼</span>'
+        ? ' <span class="mini-mark" title="Partit de Mini">🍼</span>'
         : '';
     }
 
@@ -305,56 +305,56 @@
       const sexCls = g.sex==='F' ? 'fem' : 'masc';
       const vs = g.home
         ? '<div class="game-vs"><span class="lbl">vs</span> ' + g.rival + '</div>'
-        : '<div class="game-vs"><span class="lbl">l\'equip rival Ã©s</span> ' + g.rival + '</div>';
+        : '<div class="game-vs"><span class="lbl">l\'equip rival és</span> ' + g.rival + '</div>';
       const showLoc = !!g.loc;
-      const loc = showLoc ? '<div class="game-loc">ð ' + g.loc + '</div>' : '';
+      const loc = showLoc ? '<div class="game-loc">📍 ' + g.loc + '</div>' : '';
       const cost = g.cost != null ? '<div class="game-cost">Cost: ' + formatCost(g.cost) + '</div>' : '';
-      // Partit amistÃ³s: icona ð¤ amb tooltip.
-      const fr = g.friendly ? ' <span class="friendly" title="Partit amistÃ³s">ð¤</span>' : '';
+      // Partit amistós: icona 🤝 amb tooltip.
+      const fr = g.friendly ? ' <span class="friendly" title="Partit amistós">🤝</span>' : '';
       const mini = miniMark(g);
       const ch = changeMark(g);
       const cf = conflictMark(g);
-      // El gÃ¨nere s'identifica pel color de la targeta (masc/fem), sense text.
+      // El gènere s'identifica pel color de la targeta (masc/fem), sense text.
       return '<div class="game ' + sexCls + '"><div class="game-team">' + g.team + fr + mini + ch + cf + '</div>' +
         vs + loc + cost + '</div>';
     }
 
-    // Nom curt de pavellÃ³ per a les capÃ§aleres de fila de la graella de casa.
+    // Nom curt de pavelló per a les capçaleres de fila de la graella de casa.
     function venueName(loc){
       if(!loc) return 'Pista';
       if(/LA COLINA/i.test(loc)) return 'La Colina';
-      if(/MONTIGAL/i.test(loc)) return 'MontigalÃ ';
+      if(/MONTIGAL/i.test(loc)) return 'Montigalà';
       return loc;
     }
 
-    // Targeta compacta per a les celÂ·les de la graella de casa.
+    // Targeta compacta per a les cel·les de la graella de casa.
     function gameChip(g){
       const sexCls = g.sex==='F' ? 'fem' : 'masc';
       const showLoc = !!g.loc;
-      const loc = showLoc ? '<div class="gchip-loc">ð ' + venueName(g.loc) + '</div>' : '';
+      const loc = showLoc ? '<div class="gchip-loc">📍 ' + venueName(g.loc) + '</div>' : '';
       const cost = g.cost != null ? '<div class="gchip-cost">Cost: ' + formatCost(g.cost) + '</div>' : '';
-      // Partit amistÃ³s: icona ð¤ amb tooltip.
-      const fr = g.friendly ? ' <span class="friendly" title="Partit amistÃ³s">ð¤</span>' : '';
+      // Partit amistós: icona 🤝 amb tooltip.
+      const fr = g.friendly ? ' <span class="friendly" title="Partit amistós">🤝</span>' : '';
       const mini = miniMark(g);
       const ch = changeMark(g);
       const cf = conflictMark(g);
-      // El gÃ¨nere s'identifica pel color de la targeta (masc/fem), sense text.
+      // El gènere s'identifica pel color de la targeta (masc/fem), sense text.
       return '<div class="gchip ' + sexCls + '"><div class="gchip-top">' +
         '<span class="gchip-team">' + g.team + fr + mini + ch + cf + '</span></div>' +
         '<div class="gchip-vs"><span class="lbl">vs</span> ' + g.rival + '</div>' + loc + cost + '</div>';
     }
 
     function formatCost(value){
-      return Number(value).toLocaleString('ca-ES', { maximumFractionDigits: 2 }) + 'â¬';
+      return Number(value).toLocaleString('ca-ES', { maximumFractionDigits: 2 }) + '€';
     }
 
-    // Graella horitzontal per a un dia de casa: files=pavellÃ³, columnes=franja.
-    // Franges fixes de casa: bloc de matÃ­ i bloc de tarda.
+    // Graella horitzontal per a un dia de casa: files=pavelló, columnes=franja.
+    // Franges fixes de casa: bloc de matí i bloc de tarda.
     const HOME_MORNING=['09:00','10:45','12:30'];
     const HOME_AFTERNOON=['16:00','17:45','19:30'];
 
-    // Un bloc (matÃ­ o tarda): 3 columnes iguals per a les 3 hores fixes.
-    // Cada celÂ·la apila els partits d'aquella hora (2n partit = 2a fila).
+    // Un bloc (matí o tarda): 3 columnes iguals per a les 3 hores fixes.
+    // Cada cel·la apila els partits d'aquella hora (2n partit = 2a fila).
     function homeBlock(gs, cols){
       const bySlot={};
       gs.forEach(function(g){ (bySlot[g.time]=bySlot[g.time]||[]).push(g); });
@@ -378,7 +378,7 @@
       let h='';
       if(morning.length) h += homeBlock(morning, HOME_MORNING);
       if(afternoon.length) h += homeBlock(afternoon, HOME_AFTERNOON);
-      // Hores fora d'horari estÃ ndard: bloc propi amb les seves columnes.
+      // Hores fora d'horari estàndard: bloc propi amb les seves columnes.
       if(other.length){
         const cols=[]; other.forEach(function(g){ if(cols.indexOf(g.time)<0) cols.push(g.time); });
         cols.sort();
@@ -416,10 +416,10 @@
           if(!gs.length) return;
           let inner='';
           if(sec.home){
-            // Casa: graella horitzontal (files=pavellÃ³, columnes=franja fixa)
+            // Casa: graella horitzontal (files=pavelló, columnes=franja fixa)
             inner = homeGrid(gs);
           } else {
-            // Fora: blocs per franja horÃ ria en fila, d'esquerra a dreta (per hora)
+            // Fora: blocs per franja horària en fila, d'esquerra a dreta (per hora)
             const slots=[]; const bySlot={};
             gs.forEach(function(g){ if(!(g.time in bySlot)){ bySlot[g.time]=[]; slots.push(g.time); } bySlot[g.time].push(g); });
             slots.sort();
@@ -431,7 +431,7 @@
             inner += '</div>';
           }
           daysHtml += '<div class="daygroup"><div class="daygroup-head">' + d.name +
-            ' Â· ' + fmtDate(addDays(wk.monday,d.off)) + '</div>' + inner + '</div>';
+            ' · ' + fmtDate(addDays(wk.monday,d.off)) + '</div>' + inner + '</div>';
         });
         // Els dies amb partits es mostren en ordre de setmana; dins de cada dia,
         // els partits van d'esquerra a dreta per hora.
@@ -450,9 +450,9 @@
     function changeGameLine(g){
       const sex=g.sex==='F'?'F':'M';
       const where=g.home?'casa':'fora';
-      const loc=g.loc ? ' Â· ' + g.loc : '';
-      const fr=g.friendly ? ' Â· amistÃ³s' : '';
-      return fmtDateNumeric(g.date) + ' ' + g.time + ' Â· ' + g.team + ' ' + sex + ' vs ' + g.rival + ' Â· ' + where + loc + fr;
+      const loc=g.loc ? ' · ' + g.loc : '';
+      const fr=g.friendly ? ' · amistós' : '';
+      return fmtDateNumeric(g.date) + ' ' + g.time + ' · ' + g.team + ' ' + sex + ' vs ' + g.rival + ' · ' + where + loc + fr;
     }
 
     function changeIcon(name){
@@ -489,11 +489,11 @@
       const date=latest.importedAt ? new Date(latest.importedAt) : null;
       const meta=date && !Number.isNaN(date.getTime())
         ? 'Importat el ' + date.toLocaleDateString('ca-ES') + ' a les ' + date.toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'})
-        : 'Ãltima importaciÃ³ amb canvis';
+        : 'Última importació amb canvis';
       const items=visible.map(function(c){
         const details=(c.fields||[]).map(function(f){
           return '<div class="change-detail">' + f.label + ': ' +
-            fmtChangeValue(f.label, f.from) + ' â ' + fmtChangeValue(f.label, f.to) + '</div>';
+            fmtChangeValue(f.label, f.from) + ' → ' + fmtChangeValue(f.label, f.to) + '</div>';
         }).join('');
         return '<li class="change-item ' + c.type + '"><div class="change-kind">' + changeTypeLabel(c.type) + '</div>' +
           '<div class="change-main">' + changeGameLine(c.game) + '</div>' + details + '</li>';
@@ -505,7 +505,7 @@
           '<button type="button" id="changesNext" title="Endavant" aria-label="Endavant" ' + (changesPage>=pages-1 ? 'disabled' : '') + '>' + changeIcon('next') + '</button>' +
           '</div>'
         : '';
-      return '<section class="changes"><div class="changes-head"><div><h3>Ãltims canvis (' + total + ')</h3></div></div>' +
+      return '<section class="changes"><div class="changes-head"><div><h3>Últims canvis (' + total + ')</h3></div></div>' +
         '<ul class="changes-list">' + items + '</ul><p class="changes-meta">' + meta + '</p>' + nav + '</section>';
     }
 
@@ -516,7 +516,7 @@
     const prevWeekEl = document.getElementById('prevWeek');
     const nextWeekEl = document.getElementById('nextWeek');
 
-    // Assigna cada setmana a un mes segons el dissabte (primer dia visible de competiciÃ³)
+    // Assigna cada setmana a un mes segons el dissabte (primer dia visible de competició)
     function monthKeyOf(wk){ const sat=addDays(wk.monday,5); return sat.slice(0,7); } // "YYYY-MM"
     function monthLabel(key){ const p=key.split('-').map(Number); const n=MONTHS[p[1]-1]; return n.charAt(0).toUpperCase()+n.slice(1)+' '+p[0]; }
 
@@ -526,11 +526,11 @@
     DATA.weeks.forEach(function(wk,i){
       const k=monthKeyOf(wk);
       if(!(k in weeksByMonth)){ weeksByMonth[k]=[]; monthKeys.push(k); }
-      weeksByMonth[k].push(i); // guarda Ã­ndex global de la setmana
+      weeksByMonth[k].push(i); // guarda índex global de la setmana
     });
 
-    let currentMonth=0;   // Ã­ndex dins monthKeys
-    let currentIdx=0;     // Ã­ndex global de setmana dins DATA.weeks
+    let currentMonth=0;   // índex dins monthKeys
+    let currentIdx=0;     // índex global de setmana dins DATA.weeks
 
     function renderContent(){
       const html=renderWeek(DATA.weeks[currentIdx]);
@@ -543,7 +543,7 @@
     function buildWeekTabs(weekIdx){
       const key=monthKeys[currentMonth];
       const idxs=weeksByMonth[key];
-      // setmana a seleccionar: la demanada si Ã©s del mes, si no la primera del mes
+      // setmana a seleccionar: la demanada si és del mes, si no la primera del mes
       const target = (weekIdx!=null && idxs.indexOf(weekIdx)>=0) ? weekIdx : idxs[0];
       showWeek(target);
     }
@@ -620,7 +620,7 @@
 
       const friendly=document.createElement('button');
       friendly.className='chip friendly-filter';
-      friendly.textContent='AmistÃ³s';
+      friendly.textContent='Amistós';
       friendly.onclick=function(){ activeFriendly=!activeFriendly; sync(); renderContent(); };
       typeGroup.appendChild(friendly);
 
