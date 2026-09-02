@@ -235,7 +235,7 @@
     }
 
     function buildPeriods(){
-      periods = [...new Set(games.map(periodKey))]
+      periods = [...new Set([...games, ...costGames].map(periodKey))]
         .sort((a, b) => periodSortValue(a).localeCompare(periodSortValue(b)))
         .map(key => ({ key, label: periodLabel(key) }));
       const today = new Date();
@@ -295,7 +295,7 @@
       const importedGames = data.weeks.flatMap(week => week.games || [])
         .map(game => ({ ...game, id: gameId(game) }));
       games = importedGames
-        .filter(game => game.fam === "MINI" || game.fam === "PREMINI" || game.friendly)
+        .filter(game => isClubVenue(game) && (game.fam === "MINI" || game.fam === "PREMINI" || game.friendly))
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
       costGames = importedGames
         .filter(game => game.friendly && game.cost != null)
