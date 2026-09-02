@@ -151,6 +151,7 @@
     let games = [];
     let costGames = [];
     let assignments = {};
+    let assignmentAliases = {};
     let activeFilter = "all";
     let periods = [];
     let activePeriodIndex = 0;
@@ -188,6 +189,16 @@
       return [
         game.date, game.time, game.team, game.sex, game.rival,
         game.loc || "", game.home ? "home" : "away", game.friendly ? "friendly" : "official"
+      ].map(normalize).join("_");
+    }
+
+    function stableGameKey(game){
+      return [
+        game.date,
+        game.time,
+        game.team,
+        game.sex || "",
+        game.rival || ""
       ].map(normalize).join("_");
     }
 
@@ -250,7 +261,7 @@
     }
 
     function assignmentFor(id){
-      return assignments[id] || {};
+      return assignments[id] || assignmentAliases[id] || {};
     }
 
     function assignmentState(assignment){
@@ -283,7 +294,7 @@
       const importedGames = data.weeks.flatMap(week => week.games || [])
         .map(game => ({ ...game, id: gameId(game) }));
       games = importedGames
-        .filter(game => isClubVenue(game) && (game.fam === "MINI" || game.friendly))
+        .filter(game => game.fam === "MINI" || game.fam === "PREMINI" || game.friendly)
         .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
       costGames = importedGames
         .filter(game => game.friendly && game.cost != null)
@@ -294,6 +305,17 @@
       const response = await fetch(firebaseUrl(), { cache:"no-store" });
       if (!response.ok) throw new Error("No s'han pogut carregar les assignacions");
       assignments = await response.json() || {};
+      assignmentAliases = {};
+      const savedByStableKey = {};
+      Object.entries(assignments).forEach(([id, assignment]) => {
+        if (assignment && assignment.game) savedByStableKey[stableGameKey(assignment.game)] = assignment;
+      });
+      games.forEach(game => {
+        if (!assignments[game.id]) {
+          const legacy = savedByStableKey[stableGameKey(game)];
+          if (legacy) assignmentAliases[game.id] = legacy;
+        }
+      });
     }
 
     async function saveAssignment(id){
@@ -460,7 +482,7 @@
         meta.append(
           Object.assign(document.createElement("span"), { className:"badge", textContent:`${formatDate(game.date)} · ${game.time || "Hora pendent"}` }),
           Object.assign(document.createElement("span"), { className:"badge", textContent:game.sex === "F" ? "Femení" : "Masculí" }),
-          Object.assign(document.createElement("span"), { className:"badge", textContent:game.fam === "MINI" ? "Mini" : "Amistós" }),
+          Object.assign(document.createElement("span"), { className:"badge", textContent:game.fam === "MINI" ? "Mini" : game.fam === "PREMINI" ? "Premini" : "Amistós" }),
           stateBadge
         );
 
