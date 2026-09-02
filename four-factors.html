@@ -26,6 +26,8 @@
       letter-spacing:0.04em; text-transform:uppercase; }
     .htext p { margin:2px 0 0; font-size:0.8rem; opacity:0.9; }
     main { max-width:860px; margin:0 auto; padding:22px 14px 60px; }
+    .page-nav { margin:0 0 16px; }
+    .back { color:var(--brand); font-weight:800; text-decoration:none; font-size:0.86rem; }
     .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:0 0 16px; }
     .btn { border:1px solid var(--line); background:#fff; color:var(--brand-dark);
       border-radius:8px; padding:9px 12px; font:inherit; font-size:0.85rem; font-weight:800;
@@ -190,6 +192,7 @@
     </div>
   </header>
   <main>
+    <nav class="page-nav" id="backNav" hidden><a class="back" href="equips-4factors.html">← Tornar</a></nav>
     <div class="toolbar">
       <button class="btn primary" type="button" id="saveGameBtn">Guardar</button>
       <button class="btn primary" type="button" id="closeGameBtn">Tancar partit</button>
@@ -299,6 +302,7 @@
     const params = new URLSearchParams(window.location.search);
     const TEAM_KEY = TEAMS[params.get("t")] ? params.get("t") : DEFAULT_TEAM_KEY;
     const TEAM = TEAMS[TEAM_KEY];
+    document.getElementById("backNav").hidden = TEAM.teamName !== "JBF";
     const STORAGE_KEY = "santpep.fourFactors.games." + TEAM_KEY + ".v1";
     const DRAFT_KEY = "santpep.fourFactors.currentDraft." + TEAM_KEY + ".v1";
     const PCM_TEAM_KEY = "2j9sj0ah5guu";
