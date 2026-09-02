@@ -291,14 +291,14 @@
     };
     const EFFICIENCY_POSSESSION_THRESHOLD = 10;
     // Equips del club que fan servir aquesta calculadora. Cada equip té el
-    // seu propi node a Firebase i el seu propi esborrany/llista local, per
-    // no barrejar dades entre equips en el mateix navegador.
+    // seu propi esborrany/llista local i es filtra a Firebase amb teamKey,
+    // per no barrejar dades entre equips en el mateix navegador.
     // Claus opaques (no lligades al nom de l'equip) per no facilitar
     // l'accés directe a la calculadora d'un altre equip només mirant la URL.
     const TEAMS = {
-      lgf1vqte4cb7: { teamName: "JBF", category: "1er Any Pref.", firebasePath: "fourFactorsGames/jbf-1er-any-pref" },
-      "41zgmppra86l": { teamName: "JAM", category: "Preferent", firebasePath: "fourFactorsGames/jam-preferent" },
-      "2j9sj0ah5guu": { teamName: "PCM", category: "Nivell B", firebasePath: "fourFactorsGames/pcm-nivell-b" }
+      lgf1vqte4cb7: { teamName: "JBF", category: "1er Any Pref." },
+      "41zgmppra86l": { teamName: "JAM", category: "Preferent" },
+      "2j9sj0ah5guu": { teamName: "PCM", category: "Nivell B" }
     };
     const DEFAULT_TEAM_KEY = "lgf1vqte4cb7";
     const params = new URLSearchParams(window.location.search);
@@ -315,7 +315,9 @@
       opp: { fg: 16, fga: 42, tp: 4, fta: 18, ft: 11, orb: 9, drb: 21, tov: 16 }
     };
     const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
-    const FIREBASE_GAMES_PATH = TEAM.firebasePath;
+    // Les regles actuals de Firebase només permeten escriure en aquest node.
+    // Separem els equips dins el node compartit amb teamKey.
+    const FIREBASE_GAMES_PATH = "fourFactorsGames/jbf-1er-any-pref";
     const DEFAULT_MATCH_TEAM_NAME = TEAM.teamName;
     const DEFAULT_MATCH_CATEGORY = TEAM.category;
     let currentGameId = null;
@@ -657,8 +659,15 @@
     }
     function normalizeRemoteGames(data){
       if(!data) return [];
-      if(Array.isArray(data)) return data.filter(Boolean);
-      return Object.entries(data).map(([id, game]) => Object.assign({ id }, game || {}));
+      const games = Array.isArray(data)
+        ? data.filter(Boolean)
+        : Object.entries(data).map(([id, game]) => Object.assign({ id }, game || {}));
+      return games.filter(gameBelongsToCurrentTeam);
+    }
+    function gameBelongsToCurrentTeam(game){
+      if(!game) return false;
+      if(game.teamKey) return game.teamKey === TEAM_KEY;
+      return TEAM_KEY === DEFAULT_TEAM_KEY;
     }
     function mergeSavedGames(...lists){
       const byId = new Map();
@@ -677,10 +686,11 @@
       return normalizeRemoteGames(await response.json());
     }
     async function saveFirebaseGame(game){
+      const payload = Object.assign({}, game, { teamKey: TEAM_KEY });
       const response = await fetch(firebaseGamesUrl(game.id), {
         method:"PUT",
         headers:{ "Content-Type":"application/json" },
-        body:JSON.stringify(game)
+        body:JSON.stringify(payload)
       });
       if(!response.ok) throw new Error("Firebase write failed");
     }
@@ -719,6 +729,7 @@
       const now = new Date().toISOString();
       return {
         id: existing ? existing.id : gameId(),
+        teamKey: TEAM_KEY,
         savedAt: existing ? existing.savedAt : now,
         updatedAt: now,
         meta: {
