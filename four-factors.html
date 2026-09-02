@@ -32,10 +32,9 @@
       cursor:pointer; }
     .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
     .btn.danger { color:var(--bad); }
-    .match-panel { display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:18px; margin:0 0 16px; padding:12px; border:1px solid var(--line);
+    .match-panel { display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px; margin:0 0 16px; padding:12px; border:1px solid var(--line);
       border-radius:12px; background:#fff; box-shadow:var(--shadow); }
-    .match-column { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; align-items:end; min-width:0; }
     .match-panel label { text-align:left; min-width:0; overflow:hidden; }
     .match-panel input[type="date"] { display:block; width:100%; max-width:100%; min-width:0;
       appearance:none; -webkit-appearance:none; }
@@ -147,7 +146,6 @@
       .btn { padding:8px 10px; font-size:0.8rem; border-radius:8px; }
       .match-panel { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:11px; padding:9px;
         border-radius:10px; box-shadow:none; }
-      .match-column { grid-template-columns:1fr; gap:7px; }
       .match-panel label { font-size:0.66rem; }
       .match-panel input[type="date"] { font-size:0.78rem; padding:6px 3px; }
       .match-value { font-size:0.9rem; }
@@ -200,22 +198,18 @@
     </div>
 
     <section class="match-panel" aria-label="Dades del partit">
-      <div class="match-column">
-        <label class="date-field">Data
-          <input id="gameDate" type="date" />
-        </label>
-        <label>Nom de l'equip
-          <span class="match-value" id="matchTeamName">JBF</span>
-        </label>
-      </div>
-      <div class="match-column">
-        <label>Partit
-          <span class="match-value" id="matchNumber">1</span>
-        </label>
-        <label>Categoria
-          <span class="match-value" id="matchCategory">1er Any Pref.</span>
-        </label>
-      </div>
+      <label class="date-field">Data
+        <input id="gameDate" type="date" />
+      </label>
+      <label>Nom de l'equip
+        <span class="match-value" id="matchTeamName">JBF</span>
+      </label>
+      <label>Categoria
+        <span class="match-value" id="matchCategory">1er Any Pref.</span>
+      </label>
+      <label>Partit
+        <span class="match-value" id="matchNumber">1</span>
+      </label>
     </section>
 
     <section class="scoreboard-grid">
