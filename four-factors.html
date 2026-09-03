@@ -86,6 +86,13 @@
     .summary-item span { color:rgba(255,255,255,0.78); font-size:0.68rem; font-weight:800;
       text-transform:uppercase; letter-spacing:0.03em; text-align:center; }
     .summary-item strong { font-size:1.05rem; font-weight:900; font-variant-numeric:tabular-nums; }
+    .formula-summary { margin-top:4px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.22);
+      color:rgba(255,255,255,0.86); font-size:0.72rem; line-height:1.35; }
+    .formula-summary h3 { margin:0 0 6px; color:#fff; font-size:0.76rem; text-transform:uppercase;
+      letter-spacing:0.04em; }
+    .formula-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:5px 10px; }
+    .formula-grid div { min-width:0; }
+    .formula-grid strong { color:#fff; }
     label { display:flex; flex-direction:column; gap:4px; min-width:0; font-size:0.72rem;
       text-transform:uppercase; letter-spacing:0.04em; color:#62666c; font-weight:800; text-align:center; }
     .counter { display:grid; grid-template-columns:38px minmax(0,1fr) 38px; align-items:stretch; }
@@ -184,6 +191,8 @@
       .summary-item { gap:2px; }
       .summary-item span { font-size:0.66rem; }
       .summary-item strong { font-size:1.04rem; }
+      .formula-summary { font-size:0.66rem; padding-top:8px; }
+      .formula-grid { grid-template-columns:1fr; gap:4px; }
       .saved-summary-row { grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; }
       .saved-summary-row.secondary { grid-template-columns:repeat(auto-fit,minmax(70px,1fr)); }
       .saved-nav .btn { width:30px; height:30px; }
@@ -487,7 +496,26 @@
       ];
       document.getElementById(summaryId).innerHTML =
         '<div class="summary-row">' + summaryItemsHtml(primaryItems, "summary-item") + '</div>' +
-        '<div class="summary-row secondary">' + summaryItemsHtml(secondaryItems, "summary-item") + '</div>';
+        '<div class="summary-row secondary">' + summaryItemsHtml(secondaryItems, "summary-item") + '</div>' +
+        formulasSummaryHtml();
+    }
+    function formulasSummaryHtml(){
+      const formulas = [
+        ["Possessions", "((2PA + 3PA + 0,44×FTA + TO − OREB) + possessions rival) / 2"],
+        ["OER", "Punts / Possessions × 100"],
+        ["DER", "OER del rival"],
+        ["eFG%", "(2PM + 3PM + 0,5×3PM) / (2PA + 3PA)"],
+        ["TOV%", "TO / Possessions"],
+        ["REB%", "OREB / (OREB + DREB rival)"],
+        ["FTR%", "FTM / (2PA + 3PA)"],
+        ["PPT2", "2 × 2PM / 2PA"],
+        ["PPT3", "3 × 3PM / 3PA"],
+        ["PPT", "(2×2PM + 3×3PM) / (2PA + 3PA)"],
+        ["% TC AST", "AST / (2PM + 3PM)"]
+      ];
+      return '<div class="formula-summary"><h3>Fórmules</h3><div class="formula-grid">' +
+        formulas.map(([label, formula]) => '<div><strong>' + label + ':</strong> ' + formula + '</div>').join("") +
+        '</div></div>';
     }
     function controlHtml(side, key){
       const label = fieldLabels[key];
