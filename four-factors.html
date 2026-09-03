@@ -65,9 +65,7 @@
       gap:14px; align-items:center; padding:22px 0; border-bottom:1px dashed var(--line); }
     .factor-section:first-child { padding-top:4px; }
     .factor-section:last-child { border-bottom:0; padding-bottom:0; }
-    .factor-section.no-results { grid-template-columns:minmax(0,1fr); }
     .team-card.visitor .factor-section { grid-template-columns:minmax(88px,0.85fr) minmax(0,1.15fr); }
-    .team-card.visitor .factor-section.no-results { grid-template-columns:minmax(0,1fr); }
     .control-stack { display:grid; gap:12px; }
     .factor-results { display:grid; gap:9px; }
     .factor-result { display:flex; flex-direction:column; gap:2px; align-items:flex-start; color:#2c4054; }
@@ -89,10 +87,6 @@
     .summary-item strong { font-size:1.05rem; font-weight:900; font-variant-numeric:tabular-nums; }
     label { display:flex; flex-direction:column; gap:4px; min-width:0; font-size:0.72rem;
       text-transform:uppercase; letter-spacing:0.04em; color:#62666c; font-weight:800; text-align:center; }
-    .field-label-row { display:flex; justify-content:center; align-items:center; gap:6px; flex-wrap:wrap; }
-    .inline-factor { color:var(--muted); font-size:0.7rem; font-weight:900; letter-spacing:0; text-transform:none; }
-    .inline-factor.good { color:#22b66f; }
-    .inline-factor.bad { color:#ef4438; }
     .counter { display:grid; grid-template-columns:38px minmax(0,1fr) 38px; align-items:stretch; }
     .stepper { border:1px solid var(--line); font:inherit; font-size:1.15rem; font-weight:900;
       cursor:pointer; width:38px; height:38px; border-radius:9px; align-self:center;
@@ -168,13 +162,10 @@
       .score-value { font-size:1.28rem; }
       .factor-section { grid-template-columns:minmax(0,1fr) 60px; gap:7px; padding:11px 0; }
       .factor-section:first-child { padding-top:7px; }
-      .factor-section.no-results { grid-template-columns:minmax(0,1fr); }
       .team-card.visitor .factor-section { grid-template-columns:60px minmax(0,1fr); }
-      .team-card.visitor .factor-section.no-results { grid-template-columns:minmax(0,1fr); }
       .team-card.visitor .factor-result { align-items:flex-start; }
       .control-stack { gap:7px; }
       label { gap:3px; font-size:0.66rem; line-height:1.18; }
-      .inline-factor { font-size:0.64rem; }
       .counter { grid-template-columns:31px minmax(0,1fr) 31px; }
       .stepper { width:31px; height:31px; border-radius:8px; font-size:1.12rem; }
       .counter-value { min-height:31px; padding:3px 4px; font-size:1rem; border-radius:8px; }
@@ -282,7 +273,7 @@
     const fieldLabels = Object.fromEntries(fields);
     const factorGroups = [
       { keys:["efg", "ppt2", "ppt3"], fields:["fg", "t2i", "tp", "t3i"] },
-      { fields:["ast", "tov"] },
+      { key:"tov", fields:["ast", "tov"] },
       { key:"reb", fields:["orb", "drb"] },
       { key:"ftfga", fields:["ft", "fta"] }
     ];
@@ -399,8 +390,6 @@
       updateScore("opp", "visitorScore");
       updateFactors("team", team, opp);
       updateFactors("opp", opp, team);
-      updateInlineFactors("team", team, opp);
-      updateInlineFactors("opp", opp, team);
       updateSummary("team", "opp", "teamSummary");
       updateDateEditability();
     }
@@ -497,8 +486,7 @@
     }
     function controlHtml(side, key){
       const label = fieldLabels[key];
-      const inlineFactor = key === "tov" ? '<span class="inline-factor" id="' + side + '-inline-tov">TOV% -</span>' : "";
-      return '<label for="' + inputId(side, key) + '"><span class="field-label-row">' + label + inlineFactor + '</span><span class="counter">' +
+      return '<label for="' + inputId(side, key) + '">' + label + '<span class="counter">' +
           '<button class="stepper minus" type="button" data-target="' + inputId(side, key) +
           '" data-delta="-1" aria-label="Decrementa ' + label + '">−</button>' +
           '<span class="counter-value" id="' + inputId(side, key) + '" data-value="0">0</span>' +
@@ -523,9 +511,7 @@
           const controls = '<div class="control-stack">' +
             group.fields.map(key => controlHtml(side, key)).join("") + '</div>';
           const factor = groupFactorsHtml(side, group);
-          const keys = group.keys || (group.key ? [group.key] : []);
-          const noResults = keys.length ? "" : " no-results";
-          return '<section class="factor-section' + noResults + '">' +
+          return '<section class="factor-section">' +
             (mirrored ? factor + controls : controls + factor) + '</section>';
         }).join("");
       });
@@ -544,13 +530,6 @@
           el.querySelector("strong").textContent = factorFormatter(key)(values[key]);
         });
       });
-    }
-    function updateInlineFactors(side, values, otherValues){
-      const tov = document.getElementById(side + "-inline-tov");
-      if(tov) {
-        tov.className = "inline-factor" + factorTone("tov", values, otherValues);
-        tov.textContent = "TOV% " + pct(values.tov);
-      }
     }
     function setCounterValue(id, value){
       const el = document.getElementById(id);
