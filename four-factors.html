@@ -948,6 +948,8 @@
       const items = [
         ["Win Rate", wholePct(summary.winRate)],
         ["Possessions", whole(summary.possessions)],
+        ["PPT2", ppp(summary.formulas && summary.formulas.ppt2)],
+        ["PPT3", ppp(summary.formulas && summary.formulas.ppt3)],
         ["PPT", ppp(summary.formulas && summary.formulas.ppt)],
         ["% TC AST", pct(summary.formulas && summary.formulas.assistedFieldGoalPct)],
         ["% Pèrdues", pct(summary.formulas && summary.formulas.turnoverPct)],
