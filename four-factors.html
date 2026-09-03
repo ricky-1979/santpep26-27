@@ -77,8 +77,10 @@
     .factor-result.sub-factor strong { font-size:1rem; }
     .factor-result.good strong { color:#22b66f; }
     .factor-result.bad strong { color:#ef4438; }
-    .team-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(92px,1fr)); gap:8px;
+    .team-summary { display:grid; gap:8px;
       margin-top:18px; padding:14px; border-radius:12px; background:var(--brand-dark); color:#fff; }
+    .summary-row { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+    .summary-row.secondary { grid-template-columns:repeat(auto-fit,minmax(92px,1fr)); }
     .summary-item { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; }
     .summary-item span { color:rgba(255,255,255,0.78); font-size:0.68rem; font-weight:800;
       text-transform:uppercase; letter-spacing:0.03em; text-align:center; }
@@ -173,8 +175,9 @@
       .factor-result strong { font-size:1.14rem; }
       .factor-result.sub-factor span { font-size:0.66rem; }
       .factor-result.sub-factor strong { font-size:0.88rem; }
-      .team-summary { grid-template-columns:repeat(auto-fit,minmax(74px,1fr)); gap:4px;
-        margin-top:12px; padding:12px 8px; border-radius:10px; }
+      .team-summary { gap:4px; margin-top:12px; padding:12px 8px; border-radius:10px; }
+      .summary-row { grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; }
+      .summary-row.secondary { grid-template-columns:repeat(auto-fit,minmax(74px,1fr)); }
       .summary-item { gap:2px; }
       .summary-item span { font-size:0.66rem; }
       .summary-item strong { font-size:1.04rem; }
@@ -464,17 +467,22 @@
       const ownFactors = calc(side, other);
       const otherFactors = calc(other, side);
       const win = winRate(side, other, ownFactors, otherFactors);
-      const items = [
+      const primaryItems = [
         ["Win Rate", wholePct(win)],
         ["Possessions", whole(poss)],
+        ["OER", decimal(oer)],
+        ["DER", decimal(der)]
+      ];
+      const secondaryItems = [
         ["PPT2", ppp(ownFactors.ppt2)],
         ["PPT3", ppp(ownFactors.ppt3)],
         ["PPT", ppp(ownFactors.ppt)],
         ["% TC AST", pct(ownFactors.astPct)],
-        ["% Pèrdues", pct(ownFactors.tov)],
-        ...efficiencySummaryItems(poss, oer, der)
+        ["% Pèrdues", pct(ownFactors.tov)]
       ];
-      document.getElementById(summaryId).innerHTML = summaryItemsHtml(items, "summary-item");
+      document.getElementById(summaryId).innerHTML =
+        '<div class="summary-row">' + summaryItemsHtml(primaryItems, "summary-item") + '</div>' +
+        '<div class="summary-row secondary">' + summaryItemsHtml(secondaryItems, "summary-item") + '</div>';
     }
     function controlHtml(side, key){
       const label = fieldLabels[key];
