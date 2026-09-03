@@ -86,8 +86,8 @@
     .summary-item span { color:rgba(255,255,255,0.78); font-size:0.68rem; font-weight:800;
       text-transform:uppercase; letter-spacing:0.03em; text-align:center; }
     .summary-item strong { font-size:1.05rem; font-weight:900; font-variant-numeric:tabular-nums; }
-    .formula-summary { margin-top:4px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.22);
-      color:rgba(255,255,255,0.86); font-size:0.72rem; line-height:1.35; }
+    .formula-summary { margin-top:18px; padding:12px; border-radius:12px; background:var(--brand-dark);
+      color:rgba(255,255,255,0.86); font-size:0.72rem; line-height:1.35; box-shadow:var(--shadow); }
     .formula-summary h3 { margin:0 0 6px; color:#fff; font-size:0.76rem; text-transform:uppercase;
       letter-spacing:0.04em; }
     .formula-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:5px 10px; }
@@ -266,6 +266,7 @@
       <div class="saved-list" id="savedGamesList"></div>
       <div class="status-line" id="saveStatus" role="status" aria-live="polite"></div>
     </section>
+    <section class="formula-summary" id="formulasSummary" aria-label="Fórmules utilitzades"></section>
 
   </main>
   <footer>CB Sant Josep de Badalona · 4 Factors</footer>
@@ -496,8 +497,7 @@
       ];
       document.getElementById(summaryId).innerHTML =
         '<div class="summary-row">' + summaryItemsHtml(primaryItems, "summary-item") + '</div>' +
-        '<div class="summary-row secondary">' + summaryItemsHtml(secondaryItems, "summary-item") + '</div>' +
-        formulasSummaryHtml();
+        '<div class="summary-row secondary">' + summaryItemsHtml(secondaryItems, "summary-item") + '</div>';
     }
     function formulasSummaryHtml(){
       const formulas = [
@@ -513,9 +513,9 @@
         ["PPT", "(2×2PM + 3×3PM) / (2PA + 3PA)"],
         ["% TC AST", "AST / (2PM + 3PM)"]
       ];
-      return '<div class="formula-summary"><h3>Fórmules</h3><div class="formula-grid">' +
+      return '<h3>Fórmules</h3><div class="formula-grid">' +
         formulas.map(([label, formula]) => '<div><strong>' + label + ':</strong> ' + formula + '</div>').join("") +
-        '</div></div>';
+        '</div>';
     }
     function controlHtml(side, key){
       const label = fieldLabels[key];
@@ -1102,6 +1102,7 @@
     document.title = "Calculadora 4 Factors · " + TEAM.teamName + " · CB Sant Josep";
     resetMatchDefaults();
     buildInputs();
+    document.getElementById("formulasSummary").innerHTML = formulasSummaryHtml();
     restoreDraft();
     render();
     renderSavedGames();
