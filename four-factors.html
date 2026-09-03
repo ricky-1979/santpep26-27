@@ -77,7 +77,7 @@
     .factor-result.sub-factor strong { font-size:1rem; }
     .factor-result.good strong { color:#22b66f; }
     .factor-result.bad strong { color:#ef4438; }
-    .team-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px;
+    .team-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(92px,1fr)); gap:8px;
       margin-top:18px; padding:14px; border-radius:12px; background:var(--brand-dark); color:#fff; }
     .summary-item { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; }
     .summary-item span { color:rgba(255,255,255,0.78); font-size:0.68rem; font-weight:800;
@@ -128,7 +128,7 @@
       padding:0; color:var(--brand-dark); }
     .saved-actions .btn svg { width:16px; height:16px; stroke:currentColor; }
     .saved-actions .btn.danger { color:var(--bad); }
-    .saved-summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+    .saved-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(72px,1fr)); gap:6px; }
     .saved-summary-item { border:1px solid var(--line); border-radius:8px; padding:5px 6px;
       background:#faf9fc; text-align:center; min-width:0; }
     .saved-summary-item span { display:block; color:var(--muted); font-size:0.62rem;
@@ -173,12 +173,12 @@
       .factor-result strong { font-size:1.14rem; }
       .factor-result.sub-factor span { font-size:0.66rem; }
       .factor-result.sub-factor strong { font-size:0.88rem; }
-      .team-summary { grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px;
+      .team-summary { grid-template-columns:repeat(auto-fit,minmax(74px,1fr)); gap:4px;
         margin-top:12px; padding:12px 8px; border-radius:10px; }
       .summary-item { gap:2px; }
       .summary-item span { font-size:0.66rem; }
       .summary-item strong { font-size:1.04rem; }
-      .saved-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .saved-summary { grid-template-columns:repeat(auto-fit,minmax(70px,1fr)); }
       .saved-nav .btn { width:30px; height:30px; }
     }
   </style>
@@ -257,8 +257,10 @@
   <script>
     const fields = [
       ["fg", "2PM"],
-      ["fga", "FGA"],
+      ["t2i", "2PA"],
       ["tp", "3PM"],
+      ["t3i", "3PA"],
+      ["ast", "AST"],
       ["fta", "FTA"],
       ["ft", "FTM"],
       ["orb", "OREB"],
@@ -267,7 +269,7 @@
     ];
     const fieldLabels = Object.fromEntries(fields);
     const factorGroups = [
-      { key:"efg", fields:["fg", "fga", "tp"] },
+      { keys:["efg", "ppt2", "ppt3", "ppt", "astPct"], fields:["fg", "t2i", "tp", "t3i", "ast"] },
       { key:"tov", fields:["tov"] },
       { key:"reb", fields:["orb", "drb"] },
       { key:"ftfga", fields:["ft", "fta"] }
@@ -278,7 +280,11 @@
       reb: "REB%",
       orb: "ORB%",
       drb: "DRB%",
-      ftfga: "FTR%"
+      ftfga: "FTR%",
+      ppt2: "PPT2",
+      ppt3: "PPT3",
+      ppt: "PPT",
+      astPct: "% TC assistit"
     };
     const factorWeights = {
       efg: 0.40,
@@ -310,8 +316,8 @@
       date: "2026-09-19",
       localName: "PCM",
       visitorName: "Rival exemple",
-      team: { fg: 18, fga: 39, tp: 6, fta: 15, ft: 10, orb: 11, drb: 24, tov: 13 },
-      opp: { fg: 16, fga: 42, tp: 4, fta: 18, ft: 11, orb: 9, drb: 21, tov: 16 }
+      team: { fg: 18, t2i: 39, tp: 6, t3i: 18, ast: 15, fta: 15, ft: 10, orb: 11, drb: 24, tov: 13 },
+      opp: { fg: 16, t2i: 42, tp: 4, t3i: 16, ast: 11, fta: 18, ft: 11, orb: 9, drb: 21, tov: 16 }
     };
     const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
     // Les regles actuals de Firebase només permeten escriure en aquest node.
@@ -335,7 +341,7 @@
     function decimal(value){ return Number.isFinite(value) ? value.toFixed(1) : "-"; }
     function whole(value){ return Number.isFinite(value) ? Math.round(value) : "-"; }
     function safeDiv(a, b){ return b > 0 ? a / b : NaN; }
-    function factorFormatter(key){ return pct; }
+    function factorFormatter(key){ return key === "ppt2" || key === "ppt3" || key === "ppt" ? ppp : pct; }
     function factorTone(key, own, other){
       const ownValue = own[key];
       const otherValue = other[key];
@@ -345,10 +351,13 @@
     }
     function calc(side, other){
       const fg = n(side, "fg");
-      const fga = n(side, "fga");
+      const fga = fieldGoalAttempts(side);
       const tp = n(side, "tp");
+      const t2i = n(side, "t2i");
+      const t3i = n(side, "t3i");
       const fta = n(side, "fta");
       const ft = n(side, "ft");
+      const ast = n(side, "ast");
       const orb = n(side, "orb");
       const drb = n(side, "drb");
       const tov = n(side, "tov");
@@ -362,7 +371,11 @@
         reb: reboundRate,
         orb: orbRate,
         drb: drbRate,
-        ftfga: safeDiv(ft, fga)
+        ftfga: safeDiv(ft, fga),
+        ppt2: safeDiv(2 * fg, t2i),
+        ppt3: safeDiv(3 * tp, t3i),
+        ppt: safeDiv((2 * fg) + (3 * tp), t2i + t3i),
+        astPct: safeDiv(ast, fieldGoalsMade(side))
       };
     }
     function render(){
@@ -383,11 +396,14 @@
     function fieldGoalsMade(side){
       return n(side, "fg") + n(side, "tp");
     }
+    function fieldGoalAttempts(side){
+      return n(side, "t2i") + n(side, "t3i");
+    }
     function totalPlays(side){
-      return n(side, "fga") + 0.44 * n(side, "fta") + n(side, "tov");
+      return fieldGoalAttempts(side) + 0.44 * n(side, "fta") + n(side, "tov");
     }
     function teamPossessionEstimate(side){
-      return n(side, "fga") + 0.44 * n(side, "fta") + n(side, "tov") - n(side, "orb");
+      return fieldGoalAttempts(side) + 0.44 * n(side, "fta") + n(side, "tov") - n(side, "orb");
     }
     function possessions(side, other){
       return (teamPossessionEstimate(side) + teamPossessionEstimate(other)) / 2;
@@ -451,6 +467,11 @@
       const items = [
         ["Win Rate", wholePct(win)],
         ["Possessions", whole(poss)],
+        ["PPT2", ppp(ownFactors.ppt2)],
+        ["PPT3", ppp(ownFactors.ppt3)],
+        ["PPT", ppp(ownFactors.ppt)],
+        ["% TC AST", pct(ownFactors.astPct)],
+        ["% Pèrdues", pct(ownFactors.tov)],
         ...efficiencySummaryItems(poss, oer, der)
       ];
       document.getElementById(summaryId).innerHTML = summaryItemsHtml(items, "summary-item");
@@ -509,7 +530,8 @@
       el.textContent = String(next);
     }
     function enforceAttemptMinimums(side){
-      setCounterValue(inputId(side, "fga"), Math.max(n(side, "fga"), n(side, "fg") + n(side, "tp")));
+      setCounterValue(inputId(side, "t2i"), Math.max(n(side, "t2i"), n(side, "fg")));
+      setCounterValue(inputId(side, "t3i"), Math.max(n(side, "t3i"), n(side, "tp")));
       setCounterValue(inputId(side, "fta"), Math.max(n(side, "fta"), n(side, "ft")));
     }
     function adjustInput(id, delta){
@@ -519,8 +541,11 @@
       const current = Number(el.dataset.value) || 0;
       const next = Math.max(0, current + delta);
       setCounterValue(id, next);
-      if((key === "fg" || key === "tp") && delta !== 0) {
-        setCounterValue(inputId(side, "fga"), n(side, "fga") + (next - current));
+      if(key === "fg" && delta !== 0) {
+        setCounterValue(inputId(side, "t2i"), n(side, "t2i") + (next - current));
+      }
+      if(key === "tp" && delta !== 0) {
+        setCounterValue(inputId(side, "t3i"), n(side, "t3i") + (next - current));
       }
       if(key === "ft" && delta !== 0) {
         setCounterValue(inputId(side, "fta"), n(side, "fta") + (next - current));
@@ -714,12 +739,23 @@
     function collectCounters(side){
       return Object.fromEntries(fields.map(([key]) => [key, n(side, key)]));
     }
+    function shootingFormulaValues(side, other){
+      const factors = calc(side, other);
+      return {
+        ppt2: factors.ppt2,
+        ppt3: factors.ppt3,
+        ppt: factors.ppt,
+        assistedFieldGoalPct: factors.astPct,
+        turnoverPct: factors.tov
+      };
+    }
     function summaryValues(side, other, ownFactors, otherFactors){
       return {
         winRate: winRate(side, other, ownFactors, otherFactors),
         possessions: possessions(side, other),
         oer: offensiveEfficiency(side, other),
-        der: defensiveEfficiency(side, other)
+        der: defensiveEfficiency(side, other),
+        formulas: shootingFormulaValues(side, other)
       };
     }
     function buildGamePayload(existing, games){
@@ -742,13 +778,15 @@
             name: teamNameText("localName", "Local"),
             score: points("team"),
             counters: collectCounters("team"),
-            factors: teamFactors
+            factors: teamFactors,
+            formulas: shootingFormulaValues("team", "opp")
           },
           opp: {
             name: teamNameText("visitorName", "Visitant"),
             score: points("opp"),
             counters: collectCounters("opp"),
-            factors: oppFactors
+            factors: oppFactors,
+            formulas: shootingFormulaValues("opp", "team")
           }
         },
         summary: summaryValues("team", "opp", teamFactors, oppFactors)
@@ -784,9 +822,16 @@
       }
     }
     function setCounters(side, counters){
+      const values = Object.assign({}, counters || {});
+      if(values.fga !== undefined && values.t2i === undefined && values.t3i === undefined) {
+        const oldFga = Number(values.fga) || 0;
+        values.t3i = Math.max(Number(values.tp) || 0, 0);
+        values.t2i = Math.max(oldFga - values.t3i, Number(values.fg) || 0);
+      }
       fields.forEach(([key]) => {
-        setCounterValue(inputId(side, key), counters && counters[key] !== undefined ? counters[key] : 0);
+        setCounterValue(inputId(side, key), values[key] !== undefined ? values[key] : 0);
       });
+      enforceAttemptMinimums(side);
     }
     async function loadGame(id){
       const games = await readSyncedSavedGames();
@@ -873,6 +918,9 @@
       const items = [
         ["Win Rate", wholePct(summary.winRate)],
         ["Possessions", whole(summary.possessions)],
+        ["PPT", ppp(summary.formulas && summary.formulas.ppt)],
+        ["% TC AST", pct(summary.formulas && summary.formulas.assistedFieldGoalPct)],
+        ["% Pèrdues", pct(summary.formulas && summary.formulas.turnoverPct)],
         ...efficiencySummaryItems(summary.possessions, summary.oer, summary.der)
       ];
       return '<div class="saved-summary">' + summaryItemsHtml(items, "saved-summary-item") + '</div>';
