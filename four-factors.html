@@ -130,7 +130,9 @@
       padding:0; color:var(--brand-dark); }
     .saved-actions .btn svg { width:16px; height:16px; stroke:currentColor; }
     .saved-actions .btn.danger { color:var(--bad); }
-    .saved-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(72px,1fr)); gap:6px; }
+    .saved-summary { display:grid; gap:6px; }
+    .saved-summary-row { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+    .saved-summary-row.secondary { grid-template-columns:repeat(auto-fit,minmax(72px,1fr)); }
     .saved-summary-item { border:1px solid var(--line); border-radius:8px; padding:5px 6px;
       background:#faf9fc; text-align:center; min-width:0; }
     .saved-summary-item span { display:block; color:var(--muted); font-size:0.62rem;
@@ -181,7 +183,8 @@
       .summary-item { gap:2px; }
       .summary-item span { font-size:0.66rem; }
       .summary-item strong { font-size:1.04rem; }
-      .saved-summary { grid-template-columns:repeat(auto-fit,minmax(70px,1fr)); }
+      .saved-summary-row { grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; }
+      .saved-summary-row.secondary { grid-template-columns:repeat(auto-fit,minmax(70px,1fr)); }
       .saved-nav .btn { width:30px; height:30px; }
     }
   </style>
@@ -924,17 +927,23 @@
     }
     function savedSummaryHtml(game){
       const summary = game.summary || {};
-      const items = [
+      const primaryItems = [
         ["Win Rate", wholePct(summary.winRate)],
         ["Possessions", whole(summary.possessions)],
+        ["OER", decimal(summary.oer)],
+        ["DER", decimal(summary.der)]
+      ];
+      const secondaryItems = [
         ["PPT2", ppp(summary.formulas && summary.formulas.ppt2)],
         ["PPT3", ppp(summary.formulas && summary.formulas.ppt3)],
         ["PPT", ppp(summary.formulas && summary.formulas.ppt)],
         ["% TC AST", pct(summary.formulas && summary.formulas.assistedFieldGoalPct)],
-        ["% Pèrdues", pct(summary.formulas && summary.formulas.turnoverPct)],
-        ...efficiencySummaryItems(summary.possessions, summary.oer, summary.der)
+        ["% Pèrdues", pct(summary.formulas && summary.formulas.turnoverPct)]
       ];
-      return '<div class="saved-summary">' + summaryItemsHtml(items, "saved-summary-item") + '</div>';
+      return '<div class="saved-summary">' +
+        '<div class="saved-summary-row">' + summaryItemsHtml(primaryItems, "saved-summary-item") + '</div>' +
+        '<div class="saved-summary-row secondary">' + summaryItemsHtml(secondaryItems, "saved-summary-item") + '</div>' +
+        '</div>';
     }
     function clampSavedGamesViewIndex(total){
       savedGamesViewIndex = Math.max(0, Math.min(savedGamesViewIndex, Math.max(0, total - 1)));
