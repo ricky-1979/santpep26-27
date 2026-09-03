@@ -375,7 +375,7 @@
       const reboundRate = safeDiv(orb, orb + otherDrb);
       return {
         efg: safeDiv(fieldGoalsMade(side) + 0.5 * tp, fga),
-        tov: safeDiv(tov, totalPlays(side)),
+        tov: safeDiv(tov, possessions(side, other)),
         reb: reboundRate,
         orb: orbRate,
         drb: drbRate,
