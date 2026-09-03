@@ -75,6 +75,7 @@
     .factor-result strong { font-size:1.4rem; line-height:1.1; color:#62666c; }
     .factor-result.sub-factor span { font-size:0.78rem; color:var(--muted); }
     .factor-result.sub-factor strong { font-size:1rem; }
+    .factor-result.close strong { color:#f59e0b; }
     .factor-result.good strong { color:#22b66f; }
     .factor-result.bad strong { color:#ef4438; }
     .team-summary { display:grid; gap:8px;
@@ -352,6 +353,7 @@
       const ownValue = own[key];
       const otherValue = other[key];
       if(!Number.isFinite(ownValue) || !Number.isFinite(otherValue) || ownValue === otherValue) return "";
+      if(["efg", "tov", "reb", "ftfga"].includes(key) && Math.abs(ownValue - otherValue) < 0.05) return " close";
       const ownIsBetter = key === "tov" ? ownValue < otherValue : ownValue > otherValue;
       return ownIsBetter ? " good" : " bad";
     }
