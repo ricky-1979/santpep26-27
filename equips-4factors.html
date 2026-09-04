@@ -34,6 +34,9 @@
     .card-icon { font-size:2rem; line-height:1; }
     .card h3 { margin:0; font-size:1.1rem; color:var(--brand-dark); font-weight:700; }
     .card p { margin:0; font-size:0.85rem; color:var(--muted); }
+    .saved-games-count { display:inline-flex; align-items:center; width:max-content; margin-top:2px;
+      border-radius:999px; background:#f4edf8; color:var(--brand-dark); padding:4px 9px;
+      font-size:0.78rem; font-weight:800; }
     .card .go { margin-top:4px; font-size:0.82rem; font-weight:700; color:var(--brand);
       display:inline-flex; align-items:center; gap:5px; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
@@ -57,32 +60,71 @@
       <p>Calculadora de 4 Factors per equip</p>
     </div>
     <div class="cards">
-      <a class="card" href="four-factors.html?t=lgf1vqte4cb7">
+      <a class="card" href="four-factors.html?t=lgf1vqte4cb7" data-team-key="lgf1vqte4cb7">
         <span class="card-icon">4F</span>
         <h3>JBF</h3>
         <p>Júnior B femení · 1er Any Pref.</p>
+        <span class="saved-games-count" data-games-count>Carregant partits…</span>
         <span class="go">Obrir calculadora →</span>
       </a>
-      <a class="card" href="four-factors.html?t=ibm26p7k4r2s">
+      <a class="card" href="four-factors.html?t=ibm26p7k4r2s" data-team-key="ibm26p7k4r2s">
         <span class="card-icon">4F</span>
         <h3>IBM</h3>
         <p>Infantil B masculí · 1er Any Pref.</p>
+        <span class="saved-games-count" data-games-count>Carregant partits…</span>
         <span class="go">Obrir calculadora →</span>
       </a>
-      <a class="card" href="four-factors.html?t=41zgmppra86l">
+      <a class="card" href="four-factors.html?t=41zgmppra86l" data-team-key="41zgmppra86l">
         <span class="card-icon">4F</span>
         <h3>JAM</h3>
         <p>Júnior A masculí · Preferent</p>
+        <span class="saved-games-count" data-games-count>Carregant partits…</span>
         <span class="go">Obrir calculadora →</span>
       </a>
-      <a class="card" href="four-factors.html?t=2j9sj0ah5guu">
+      <a class="card" href="four-factors.html?t=2j9sj0ah5guu" data-team-key="2j9sj0ah5guu">
         <span class="card-icon">4F</span>
         <h3>PCM</h3>
         <p>Nivell B</p>
+        <span class="saved-games-count" data-games-count>Carregant partits…</span>
         <span class="go">Obrir calculadora →</span>
       </a>
     </div>
   </main>
   <footer>CB Sant Josep de Badalona · Tecnificació 26-27</footer>
+  <script>
+    const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
+    const FIREBASE_GAMES_PATH = "fourFactorsGames/jbf-1er-any-pref";
+
+    function gamesCountText(count){
+      return count === 1 ? "1 partit guardat" : count + " partits guardats";
+    }
+    function setCardCounts(counts){
+      document.querySelectorAll("[data-team-key]").forEach(card => {
+        const teamKey = card.dataset.teamKey;
+        const count = counts[teamKey] || 0;
+        const badge = card.querySelector("[data-games-count]");
+        if(badge) badge.textContent = gamesCountText(count);
+      });
+    }
+    async function updateSavedGamesCounts(){
+      try {
+        const response = await fetch(FIREBASE_DB_URL + "/" + FIREBASE_GAMES_PATH + ".json");
+        if(!response.ok) throw new Error("Firebase read failed");
+        const data = await response.json();
+        const games = data && typeof data === "object" ? Object.values(data) : [];
+        const counts = {};
+        games.forEach(game => {
+          if(!game || !game.teamKey) return;
+          counts[game.teamKey] = (counts[game.teamKey] || 0) + 1;
+        });
+        setCardCounts(counts);
+      } catch(error) {
+        document.querySelectorAll("[data-games-count]").forEach(badge => {
+          badge.textContent = "Partits no disponibles";
+        });
+      }
+    }
+    updateSavedGamesCounts();
+  </script>
 </body>
 </html>
