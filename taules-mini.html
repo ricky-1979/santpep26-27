@@ -79,6 +79,7 @@
     select { width:100%; min-height:42px; border:1px solid var(--line); border-radius:12px; background:#fff; color:var(--ink);
       font:inherit; font-size:0.92rem; font-weight:750; padding:8px 10px; box-shadow:inset 0 1px 2px rgba(60,40,90,0.06); }
     select:focus { outline:2px solid rgba(113,63,151,0.18); border-color:var(--brand); }
+    select:disabled { background:#f3f0f6; color:var(--muted); opacity:1; cursor:not-allowed; }
     .empty { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
       padding:26px 18px; color:var(--muted); text-align:center; font-weight:750; }
     @media (max-width:720px) {
@@ -284,6 +285,16 @@
       return game.home || loc.includes("la-colina") || loc.includes("montigala") || loc.includes("bufala") || loc.includes("pomar");
     }
 
+    function todayIso(){
+      const now = new Date();
+      const offsetMs = now.getTimezoneOffset() * 60000;
+      return new Date(now.getTime() - offsetMs).toISOString().slice(0, 10);
+    }
+
+    function isPastGame(game){
+      return String(game.date || "") < todayIso();
+    }
+
     async function loadGames(){
       const response = await fetch("partits.html", { cache:"no-store" });
       if (!response.ok) throw new Error("No s'ha pogut carregar partits.html");
@@ -341,6 +352,8 @@
       const select = document.createElement("select");
       select.dataset.gameId = game.id;
       select.dataset.slot = slot;
+      select.disabled = isPastGame(game);
+      if (select.disabled) select.title = "Aquest partit ja s'ha jugat i no es pot modificar.";
       PEOPLE.forEach(person => {
         const option = document.createElement("option");
         option.value = person;
