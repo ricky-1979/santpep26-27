@@ -272,6 +272,7 @@
     function normalizeSheetTime(value){
       return normalizeSheetText(value)
         .replace(".", ":")
+        .replace(/^(\d{1,2}:\d{2}):(\d{1,2})$/, "$1-$2:00")
         .replace(/^(\d{1,2}:\d{2}):(\d{1,2}:\d{2})$/, "$1-$2");
     }
 
@@ -304,6 +305,15 @@
       return hasTraining ? "" : normalizeSheetVenue(first);
     }
 
+    function inferredEnricBorrasCategory(venueName, dayIndex, time){
+      if(!/ENRIC BORRAS/i.test(venueName)) return "";
+      if(dayIndex === 2 && time === "18:00-19:30") return "MINI A MASC";
+      if(dayIndex === 3 && time === "17:00-18:00") return "TECNIFICACIÓ";
+      if(dayIndex === 3 && time === "18:00-19:30") return "MINI FEM";
+      if(dayIndex === 4 && time === "18:00-19:30") return "MINI B MASC";
+      return "";
+    }
+
     function parseSeasonFromGoogleTable(table){
       const dayStarts = [1,4,7,10,13];
       const venues = [];
@@ -320,7 +330,8 @@
           dayStarts.forEach((start, dayIndex) => {
             const time = normalizeSheetTime(tableValue(row, start));
             const court = normalizeSheetText(tableValue(row, start + 1));
-            const cat = normalizeSheetCategory(tableValue(row, start + 2));
+            const explicitCat = normalizeSheetCategory(tableValue(row, start + 2));
+            const cat = explicitCat || inferredEnricBorrasCategory(current.name, dayIndex, time);
             if(!time || !cat || /^DISPONIBLE$/i.test(cat)) return;
             current.days[dayIndex].push({ time, court, cat });
           });
