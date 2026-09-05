@@ -240,8 +240,24 @@
         : '';
     }
 
+    function canonicalPlace(loc){
+      const raw=String(loc||'').trim();
+      if(!raw) return '';
+      const normalized=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/\s+/g,' ').toUpperCase();
+      if(/LA COLINA|GRAN BRETANYA/.test(normalized)) return 'PAVELLO LA COLINA';
+      if(/MONTIGALA/.test(normalized)) return 'PAVELLO DE MONTIGALA';
+      if(/BUFALA/.test(normalized)) return 'BUFALA';
+      if(/POMAR/.test(normalized)) return 'POLIESPORTIU DE POMAR';
+      if(/AUSIAS MARCH/.test(normalized)) return 'PAVELLO AUSIAS MARCH';
+      if(/ENRIC BORRAS/.test(normalized)) return 'PISTA ENRIC BORRAS';
+      if(/LA GABIA/.test(normalized)) return 'PISTA LA GABIA';
+      return normalized;
+    }
+
     function placeTimeKey(g){
-      return [g.date,g.time,String(g.loc||'').trim().replace(/\s+/g,' ').toUpperCase()].join('|');
+      const place=canonicalPlace(g.loc);
+      return place ? [g.date,g.time,place].join('|') : '';
     }
 
     const conflictKeys=new Set();
@@ -249,6 +265,7 @@
     DATA.weeks.forEach(function(wk){
       wk.games.forEach(function(g){
         const key=placeTimeKey(g);
+        if(!key) return;
         if(!gamesByPlaceTime.has(key)) gamesByPlaceTime.set(key,[]);
         gamesByPlaceTime.get(key).push(g);
       });
@@ -258,8 +275,9 @@
     });
 
     function conflictMark(g){
-      return conflictKeys.has(placeTimeKey(g))
-        ? ' <span class="conflict-mark" title="Possible conflicte: mateix horari i pista">!</span>'
+      const key=placeTimeKey(g);
+      return key && conflictKeys.has(key)
+        ? ' <span class="conflict-mark" title="Possible conflicte: mateix dia, hora i lloc">!</span>'
         : '';
     }
 
