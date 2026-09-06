@@ -27,8 +27,8 @@ const OWN = {
   // Masculí
   IAM: { team: "Infantil A", fam: "INFANTIL", sex: "M" },
   IBM: { team: "Infantil B", fam: "INFANTIL", sex: "M" },
-  PBM: { team: "Premini B",  fam: "MINI",     sex: "M" },
-  PAM: { team: "Premini A",  fam: "MINI",     sex: "M" },
+  PBM: { team: "Premini B",  fam: "PREMINI",  sex: "M" },
+  PAM: { team: "Premini A",  fam: "PREMINI",  sex: "M" },
   MAM: { team: "Mini A",     fam: "MINI",     sex: "M" },
   MBM: { team: "Mini B",     fam: "MINI",     sex: "M" },
   CAM: { team: "Cadet A",    fam: "CADET",    sex: "M" },
@@ -71,6 +71,8 @@ const FRIENDLY_COSTS = {
   "JAM|MANRESA": 17,
   "JAM|LLUISOS": 14.5,
   "JBM|CN TERRASSA": 25,
+  "PAM|AB PREMIA": 15,
+  "PAM|ALELLLA": 15,
   "SAM|CERDANYOLA": 23.5,
   "SAM|MONTCADA": 21,
   "IAM|GRUP BARNA": 11.5,
@@ -87,9 +89,13 @@ function fetchText(url) {
         if (res.statusCode !== 200) {
           return reject(new Error("HTTP " + res.statusCode + " en baixar l'ICS"));
         }
-        let data = "";
-        res.on("data", (c) => (data += c));
-        res.on("end", () => resolve(data));
+        const chunks = [];
+        res.on("data", (chunk) => chunks.push(chunk));
+        res.on("end", () => {
+          const body = Buffer.concat(chunks);
+          const utf8 = body.toString("utf8");
+          resolve(utf8.includes("\uFFFD") ? body.toString("latin1") : utf8);
+        });
       })
       .on("error", reject);
   });
@@ -241,6 +247,13 @@ function normalizeHistoryText(value) {
     .toUpperCase();
 }
 
+function isLocationSimplification(oldLoc, newLoc) {
+  const oldText = normalizeHistoryText(oldLoc);
+  const newText = normalizeHistoryText(newLoc);
+  if (!oldText || !newText || oldText === newText) return true;
+  return oldText.startsWith(newText + ",") || oldText.startsWith(newText + " |");
+}
+
 function friendlyCost(sigla, rival) {
   const exact = FRIENDLY_COSTS[sigla + "|" + normalizeHistoryText(rival)];
   if (exact != null) return exact;
@@ -281,7 +294,9 @@ function changedFields(oldGame, newGame) {
   const fields = [];
   if (oldGame.date !== newGame.date) fields.push({ label: "Data", from: oldGame.date, to: newGame.date });
   if (oldGame.time !== newGame.time) fields.push({ label: "Hora", from: oldGame.time, to: newGame.time });
-  if ((oldGame.loc || "") !== (newGame.loc || "")) fields.push({ label: "Lloc", from: oldGame.loc || "sense lloc", to: newGame.loc || "sense lloc" });
+  if ((oldGame.loc || "") !== (newGame.loc || "") && !isLocationSimplification(oldGame.loc, newGame.loc)) {
+    fields.push({ label: "Lloc", from: oldGame.loc || "sense lloc", to: newGame.loc || "sense lloc" });
+  }
   if (!!oldGame.home !== !!newGame.home) fields.push({ label: "Casa/fora", from: oldGame.home ? "casa" : "fora", to: newGame.home ? "casa" : "fora" });
   if (!!oldGame.friendly !== !!newGame.friendly) fields.push({ label: "Tipus", from: oldGame.friendly ? "amistós" : "oficial", to: newGame.friendly ? "amistós" : "oficial" });
   return fields;
@@ -350,6 +365,44 @@ function hasEncodingNoise(change) {
     .some((value) => String(value || "").includes("\uFFFD"));
 }
 
+function collapseAddedRemovedPairs(changes) {
+  const result = [];
+  const used = new Set();
+
+  changes.forEach((change, index) => {
+    if (used.has(index)) return;
+    if (change.type !== "added") {
+      result.push(change);
+      return;
+    }
+
+    const addedGame = change.game || {};
+    const removedIndex = changes.findIndex((candidate, candidateIndex) => {
+      if (candidateIndex <= index || used.has(candidateIndex) || candidate.type !== "removed") return false;
+      return identityKey(candidate.game || {}) === identityKey(addedGame);
+    });
+
+    if (removedIndex === -1) {
+      result.push(change);
+      return;
+    }
+
+    const removed = changes[removedIndex];
+    const fields = changedFields(removed.game || {}, addedGame);
+    used.add(removedIndex);
+    if (fields.length) {
+      result.push({
+        type: "changed",
+        game: gameSnapshot(addedGame),
+        fields,
+        importedAt: change.importedAt || removed.importedAt,
+      });
+    }
+  });
+
+  return result;
+}
+
 function looseGameKey(change) {
   const game = change.game || {};
   return [
@@ -365,12 +418,21 @@ function looseGameKey(change) {
 }
 
 function mergeChangeHistory(oldData, newChanges, importedAt) {
+  const previousImportedAt = oldData.latestChanges?.importedAt || importedAt;
   const previousChanges = Array.isArray(oldData.latestChanges?.changes)
-    ? oldData.latestChanges.changes
+    ? oldData.latestChanges.changes.map((change) => ({
+        ...change,
+        importedAt: change.importedAt || previousImportedAt,
+      }))
     : [];
   if (!newChanges.length && !previousChanges.length) return null;
 
-  const combined = [...newChanges, ...previousChanges].filter((change) => !hasEncodingNoise(change));
+  const stampedNewChanges = newChanges.map((change) => ({
+    ...change,
+    importedAt,
+  }));
+  const combined = collapseAddedRemovedPairs([...stampedNewChanges, ...previousChanges])
+    .filter((change) => !hasEncodingNoise(change));
   const looseAdded = new Map();
   const looseRemoved = new Map();
   combined.forEach((change) => {
