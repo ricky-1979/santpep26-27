@@ -30,9 +30,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Decideix si cal executar: sempre en dispar manual; en cron, només si a
-  # Badalona són les 00:00. Així el run que no toca acaba en "success" net,
-  # sense generar notificacions de fallida.
+  # Decideix si cal executar: sempre en dispar manual. En cron, no mirem l'hora
+  # real d'arrencada perquè GitHub pot iniciar el workflow amb retard; mirem quin
+  # cron l'ha disparat i l'offset actual de Badalona.
   gate:
     runs-on: ubuntu-latest
     outputs:
@@ -45,13 +45,16 @@ jobs:
             echo "run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          H=$(TZ="Europe/Madrid" date +%H)
-          echo "Hora local a Badalona: ${H}h"
-          if [ "$H" = "00" ]; then
-            echo "És mitjanit a Badalona: s'executa."
+          OFFSET=$(TZ="Europe/Madrid" date +%z)
+          SCHEDULE="${{ github.event.schedule }}"
+          echo "Offset local a Badalona: ${OFFSET}"
+          echo "Cron disparat: ${SCHEDULE}"
+          if { [ "$OFFSET" = "+0200" ] && [ "$SCHEDULE" = "0 22 * * *" ]; } || \
+             { [ "$OFFSET" = "+0100" ] && [ "$SCHEDULE" = "0 23 * * *" ]; }; then
+            echo "Cron corresponent a mitjanit local: s'executa."
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "No és mitjanit local: es descarta aquesta execució."
+            echo "Cron duplicat per cobrir canvi horari: es descarta aquesta execució."
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
 
