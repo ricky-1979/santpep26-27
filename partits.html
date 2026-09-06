@@ -291,7 +291,7 @@
       conflicts.sort(function(a,b){ return a.key.localeCompare(b.key); });
       const items=conflicts.map(function(c){
         const first=c.games[0];
-        const loc=first.loc || 'Sense lloc';
+        const loc=shortLocation(first.loc) || 'Sense lloc';
         const teams=c.games.map(function(g){
           return '<div class="change-detail">' + g.team + ' ' + (g.sex==='F'?'F':'M') + ' vs ' + g.rival + '</div>';
         }).join('');
@@ -324,7 +324,7 @@
         ? '<div class="game-vs"><span class="lbl">vs</span> ' + g.rival + '</div>'
         : '<div class="game-vs"><span class="lbl">l\'equip rival és</span> ' + g.rival + '</div>';
       const showLoc = !!g.loc;
-      const loc = showLoc ? '<div class="game-loc">📍 ' + g.loc + '</div>' : '';
+      const loc = showLoc ? '<div class="game-loc">📍 ' + shortLocation(g.loc) + '</div>' : '';
       const cost = g.cost != null ? '<div class="game-cost">Cost: ' + formatCost(g.cost) + '</div>' : '';
       // Partit amistós: icona 🤝 amb tooltip.
       const fr = g.friendly ? ' <span class="friendly" title="Partit amistós">🤝</span>' : '';
@@ -336,12 +336,32 @@
         vs + loc + cost + '</div>';
     }
 
+    function shortLocation(loc){
+      if(!loc) return 'Pista';
+      const text=String(loc).trim().replace(/\s+/g,' ');
+      const normalized=text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+      if(/LA COLINA|GRAN BRETANYA/.test(normalized)) return 'La Colina';
+      if(/MONTIGALA/.test(normalized)) return 'Montigalà';
+      if(/BUFALA/.test(normalized)) return 'Bufalà';
+      if(/POMAR/.test(normalized)) return 'Pomar';
+      if(/AUSIAS MARCH/.test(normalized)) return 'Ausiàs March';
+      if(/ENRIC BORRAS/.test(normalized)) return 'Enric Borràs';
+      if(/LA GABIA/.test(normalized)) return 'La Gàbia';
+      if(/SERRALLO/.test(normalized)) return 'Pavelló del Serrallo';
+      if(/VIRREI AMAT/.test(normalized)) return 'Virrei Amat';
+      if(/AGNES GREGORI/.test(normalized)) return 'Pavelló Agnès Gregori';
+      if(/LA BORDETA/.test(normalized)) return 'Centre Esportiu La Bordeta';
+      if(/JOSEP MORA/.test(normalized)) return 'Palau Josep Mora';
+      if(/PAVELLO ALMEDA/.test(normalized)) return 'Pavelló Almeda';
+      if(/EUSEBI MILLAN/.test(normalized)) return 'Poliesportiu Eusebi Millan';
+      if(/MUNICIPAL SANT CUGAT/.test(normalized)) return 'Pavelló Municipal Sant Cugat';
+      if(/ARGENTONA/.test(normalized)) return "Pavelló d'Argentona";
+      return text.split(',')[0].trim();
+    }
+
     // Nom curt de pavelló per a les capçaleres de fila de la graella de casa.
     function venueName(loc){
-      if(!loc) return 'Pista';
-      if(/LA COLINA/i.test(loc)) return 'La Colina';
-      if(/MONTIGAL/i.test(loc)) return 'Montigalà';
-      return loc;
+      return shortLocation(loc);
     }
 
     // Targeta compacta per a les cel·les de la graella de casa.
@@ -467,7 +487,7 @@
     function changeGameLine(g){
       const sex=g.sex==='F'?'F':'M';
       const where=g.home?'casa':'fora';
-      const loc=g.loc ? ' · ' + g.loc : '';
+      const loc=g.loc ? ' · ' + shortLocation(g.loc) : '';
       const fr=g.friendly ? ' · amistós' : '';
       return fmtDateNumeric(g.date) + ' ' + g.time + ' · ' + g.team + ' ' + sex + ' vs ' + g.rival + ' · ' + where + loc + fr;
     }
