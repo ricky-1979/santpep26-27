@@ -251,7 +251,10 @@ function isLocationSimplification(oldLoc, newLoc) {
   const oldText = normalizeHistoryText(oldLoc);
   const newText = normalizeHistoryText(newLoc);
   if (!oldText || !newText || oldText === newText) return true;
-  return oldText.startsWith(newText + ",") || oldText.startsWith(newText + " |");
+  if (oldText.startsWith(newText + ",") || oldText.startsWith(newText + " |")) return true;
+  if (newText.startsWith(oldText + ",") || newText.startsWith(oldText + " |")) return true;
+  if (oldText.includes("MONTIGALA") && newText.includes("MONTIGALA")) return true;
+  return false;
 }
 
 function friendlyCost(sigla, rival) {
