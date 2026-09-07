@@ -524,9 +524,9 @@
     }
 
     function whatsappChangeTitle(type){
-      if(type==='added') return '🆕 Partit afegit';
-      if(type==='removed') return '🗑️ Partit eliminat';
-      return '🔄 Partit modificat';
+      if(type==='added') return '\u{1F195} Partit afegit';
+      if(type==='removed') return '\u{1F5D1} Partit eliminat';
+      return '\u{1F504} Partit modificat';
     }
 
     function whatsappFieldValue(c,label,currentValue){
@@ -544,14 +544,14 @@
       const timeText=g.time || 'Pendent';
       const locText=g.loc ? shortLocation(g.loc) : 'Pendent';
       const lines=[
-        "🏀 *Canvi al calendari de l'equip " + teamLabel + "*",
+        "\u{1F3C0} *Canvi al calendari de l'equip " + teamLabel + "*",
         '',
         '*' + whatsappChangeTitle(c.type) + '*',
         '',
-        '🆚 Partit: ' + rivalText,
-        '📅 Data: ' + whatsappFieldValue(c, 'Data', dateText),
-        '🕒 Hora: ' + whatsappFieldValue(c, 'Hora', timeText),
-        '📍 Lloc: ' + whatsappFieldValue(c, 'Lloc', locText)
+        '\u{1F19A} Partit: ' + rivalText,
+        '\u{1F4C5} Data: ' + whatsappFieldValue(c, 'Data', dateText),
+        '\u{1F552} Hora: ' + whatsappFieldValue(c, 'Hora', timeText),
+        '\u{1F4CD} Lloc: ' + whatsappFieldValue(c, 'Lloc', locText)
       ];
       return lines.join('\n');
     }
