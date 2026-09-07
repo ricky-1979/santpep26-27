@@ -225,6 +225,8 @@
     }
 
     function periodKey(game){
+      const [year, month] = String(game.date || "").split("-");
+      if (year === "2026" && month === "08") return "2026-08-31";
       const date = parseLocalDate(game.date);
       return date ? isoDate(mondayOf(date)) : String(game.date || "");
     }
@@ -236,12 +238,13 @@
       saturday.setDate(saturday.getDate() + 5);
       const sunday = new Date(monday);
       sunday.setDate(sunday.getDate() + 6);
+      const prefix = key === "2026-08-31" ? "Agost i " : "";
       const sameMonth = saturday.getMonth() === sunday.getMonth() && saturday.getFullYear() === sunday.getFullYear();
       const satDay = saturday.toLocaleDateString("ca-ES", { day:"numeric" });
       const sunLabel = sunday.toLocaleDateString("ca-ES", sameMonth
         ? { day:"numeric", month:"long", year:"numeric" }
         : { day:"numeric", month:"long", year:"numeric" });
-      return `Cap de setmana ${satDay}-${sunLabel}`;
+      return `${prefix}Cap de setmana ${satDay}-${sunLabel}`;
     }
 
     function periodSortValue(key){
