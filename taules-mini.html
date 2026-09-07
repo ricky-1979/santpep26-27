@@ -48,6 +48,8 @@
     .cost-title { margin:0 0 8px; color:var(--muted); font-size:0.72rem; font-weight:900;
       letter-spacing:0.08em; text-transform:uppercase; }
     .cost-list { display:grid; gap:10px; }
+    .cost-section { display:grid; gap:10px; }
+    .cost-section-title { margin:4px 0 -2px; color:var(--brand-dark); font-size:0.82rem; font-weight:900; }
     .cost-group { border:1px solid var(--line); border-radius:14px; background:#faf8fc; padding:10px; }
     .cost-group-head { display:flex; justify-content:space-between; gap:10px; align-items:baseline; color:var(--brand-dark); font-weight:900; }
     .cost-group-total { color:var(--ink); white-space:nowrap; }
@@ -441,15 +443,39 @@
 
     function renderCosts(){
       const costKey = activeCostPeriodKey();
-      const visibleCostGames = costKey ? costGames.filter(game => costPeriodKey(game) === costKey) : [];
+      const monthlyCostGames = costKey ? costGames.filter(game => costPeriodKey(game) === costKey) : [];
+      const period = periods[activePeriodIndex];
+      const weeklyCostGames = period ? costGames.filter(game => periodKey(game) === period.key) : [];
       els.costSummary.innerHTML = "";
-      if (!visibleCostGames.length) {
+      if (!monthlyCostGames.length && !weeklyCostGames.length) {
         const empty = document.createElement("span");
         empty.className = "cost-chip";
         empty.textContent = "Sense costos";
         els.costSummary.appendChild(empty);
         return;
       }
+
+      appendCostSection("Mes", monthlyCostGames);
+      appendCostSection("Setmana", weeklyCostGames);
+    }
+
+    function appendCostSection(title, visibleCostGames){
+      const section = document.createElement("div");
+      section.className = "cost-section";
+      const sectionTitle = document.createElement("h3");
+      sectionTitle.className = "cost-section-title";
+      sectionTitle.textContent = title;
+      section.appendChild(sectionTitle);
+
+      if (!visibleCostGames.length) {
+        const empty = document.createElement("span");
+        empty.className = "cost-chip";
+        empty.textContent = "Sense costos";
+        section.appendChild(empty);
+        els.costSummary.appendChild(section);
+        return;
+      }
+
       const teamCosts = new Map();
       visibleCostGames.forEach(game => {
         const key = `${game.team} ${game.sex}`;
@@ -490,12 +516,13 @@
               detail.appendChild(row);
             });
           group.append(head, coach, detail);
-          els.costSummary.appendChild(group);
+          section.appendChild(group);
         });
       const totalChip = document.createElement("span");
       totalChip.className = "cost-chip total";
       totalChip.textContent = `Total: ${formatCost(total)}`;
-      els.costSummary.appendChild(totalChip);
+      section.appendChild(totalChip);
+      els.costSummary.appendChild(section);
     }
 
     function render(){
