@@ -532,7 +532,6 @@
     function whatsappMessageForChange(c){
       const g=c.game || {};
       const sex=g.sex==='F'?'F':'M';
-      const where=g.home?'casa':'fora';
       const lines=[
         '*Canvi al calendari de partits*',
         '',
@@ -542,8 +541,7 @@
         'Partit: ' + (g.rival ? 'vs ' + g.rival : 'Rival pendent'),
         'Data: ' + (g.date ? fmtDateNumeric(g.date) : 'Pendent'),
         'Hora: ' + (g.time || 'Pendent'),
-        'Lloc: ' + (g.loc ? shortLocation(g.loc) : 'Pendent'),
-        'Condició: ' + where
+        'Lloc: ' + (g.loc ? shortLocation(g.loc) : 'Pendent')
       ];
       (c.fields || []).forEach(function(f,index){
         if(index === 0) lines.push('', '*Detall del canvi*');
