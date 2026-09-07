@@ -219,20 +219,32 @@
       return date.toLocaleDateString("ca-ES", { month:"long", year:"numeric" });
     }
 
+    function isoDate(date){
+      const offsetMs = date.getTimezoneOffset() * 60000;
+      return new Date(date.getTime() - offsetMs).toISOString().slice(0, 10);
+    }
+
     function periodKey(game){
-      const [year, month] = String(game.date).split("-");
-      if (year === "2026" && (month === "08" || month === "09")) return "2026-08-09";
-      return `${year}-${month}`;
+      const date = parseLocalDate(game.date);
+      return date ? isoDate(mondayOf(date)) : String(game.date || "");
     }
 
     function periodLabel(key){
-      if (key === "2026-08-09") return "Agost i setembre 2026";
-      const [year, month] = key.split("-");
-      return monthLabel(`${year}-${month}-01`).replace(/^./, chr => chr.toUpperCase());
+      const monday = parseLocalDate(key);
+      if (!monday) return "Cap de setmana";
+      const saturday = new Date(monday);
+      saturday.setDate(saturday.getDate() + 5);
+      const sunday = new Date(monday);
+      sunday.setDate(sunday.getDate() + 6);
+      const sameMonth = saturday.getMonth() === sunday.getMonth() && saturday.getFullYear() === sunday.getFullYear();
+      const satDay = saturday.toLocaleDateString("ca-ES", { day:"numeric" });
+      const sunLabel = sunday.toLocaleDateString("ca-ES", sameMonth
+        ? { day:"numeric", month:"long", year:"numeric" }
+        : { day:"numeric", month:"long", year:"numeric" });
+      return `Cap de setmana ${satDay}-${sunLabel}`;
     }
 
     function periodSortValue(key){
-      if (key === "2026-08-09") return "2026-08";
       return key;
     }
 
@@ -240,10 +252,7 @@
       periods = [...new Set([...games, ...costGames].map(periodKey))]
         .sort((a, b) => periodSortValue(a).localeCompare(periodSortValue(b)))
         .map(key => ({ key, label: periodLabel(key) }));
-      const today = new Date();
-      const currentKey = today.getFullYear() === 2026 && (today.getMonth() + 1 === 8 || today.getMonth() + 1 === 9)
-        ? "2026-08-09"
-        : `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+      const currentKey = isoDate(mondayOf(new Date()));
       activePeriodIndex = Math.max(0, periods.findIndex(period => period.key === currentKey));
       if (activePeriodIndex < 0) activePeriodIndex = 0;
     }
