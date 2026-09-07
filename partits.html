@@ -529,24 +529,30 @@
       return '🔄 Partit modificat';
     }
 
+    function whatsappFieldValue(c,label,currentValue){
+      const field=(c.fields || []).find(function(f){ return f.label === label; });
+      if(!field) return currentValue;
+      return fmtChangeValue(label, field.from) + ' → ' + fmtChangeValue(label, field.to);
+    }
+
     function whatsappMessageForChange(c){
       const g=c.game || {};
       const sex=g.sex==='F'?'F':'M';
       const teamLabel=(g.team || 'equip') + (g.sex ? ' ' + sex : '');
+      const rivalText=g.rival ? 'vs ' + g.rival : 'Rival pendent';
+      const dateText=g.date ? fmtDateNumeric(g.date) : 'Pendent';
+      const timeText=g.time || 'Pendent';
+      const locText=g.loc ? shortLocation(g.loc) : 'Pendent';
       const lines=[
         "🏀 *Canvi al calendari de l'equip " + teamLabel + "*",
         '',
         '*' + whatsappChangeTitle(c.type) + '*',
         '',
-        '🆚 Partit: ' + (g.rival ? 'vs ' + g.rival : 'Rival pendent'),
-        '📅 Data: ' + (g.date ? fmtDateNumeric(g.date) : 'Pendent'),
-        '🕒 Hora: ' + (g.time || 'Pendent'),
-        '📍 Lloc: ' + (g.loc ? shortLocation(g.loc) : 'Pendent')
+        '🆚 Partit: ' + rivalText,
+        '📅 Data: ' + whatsappFieldValue(c, 'Data', dateText),
+        '🕒 Hora: ' + whatsappFieldValue(c, 'Hora', timeText),
+        '📍 Lloc: ' + whatsappFieldValue(c, 'Lloc', locText)
       ];
-      (c.fields || []).forEach(function(f,index){
-        if(index === 0) lines.push('', '✏️ *Detall del canvi*');
-        lines.push('- ' + f.label + ': ' + fmtChangeValue(f.label, f.from) + ' → ' + fmtChangeValue(f.label, f.to));
-      });
       return lines.join('\n');
     }
 
