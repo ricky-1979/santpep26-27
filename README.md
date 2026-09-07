@@ -21,6 +21,14 @@ Secrets necessaris a GitHub Actions:
 - `TWILIO_WHATSAPP_FROM` amb format `whatsapp:+14155238886` o `+14155238886`
 - `WHATSAPP_RECIPIENTS` com a JSON (`["+34600111222"]`) o llista separada per
   comes/salts de linia
+- `WHATSAPP_TEST_RECIPIENT` opcional, per fer proves enviant només a un número
+  concret. Si existeix, té prioritat sobre `WHATSAPP_RECIPIENTS`.
 
 Per provar amb el sandbox de Twilio, cada destinatari ha d'haver fet abans
 l'alta al sandbox seguint les instruccions de Twilio.
+
+Prova manual:
+
+1. Configura els secrets de Twilio i `WHATSAPP_TEST_RECIPIENT`.
+2. Executa el workflow `Actualitza partits` amb l'opció `test_whatsapp=true`.
+3. El missatge de prova s'envia només a `WHATSAPP_TEST_RECIPIENT`.

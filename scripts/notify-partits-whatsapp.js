@@ -101,6 +101,16 @@ function buildMessage(summary) {
   return lines.join("\n");
 }
 
+function buildTestMessage() {
+  return [
+    "Prova d'avisos WhatsApp del calendari de partits.",
+    "",
+    "Si reps aquest missatge, la connexió amb Twilio funciona correctament.",
+    "",
+    PAGE_URL,
+  ].join("\n");
+}
+
 function parseRecipients(raw) {
   if (!raw) return [];
   try {
@@ -147,6 +157,8 @@ function twilioRequest({ sid, token, from, to, body }) {
 }
 
 async function main() {
+  const forceTest = /^(1|true|yes|si|sí)$/i.test(requiredEnv("WHATSAPP_FORCE_TEST"));
+
   let hasDiff = true;
   try {
     execFileSync("git", ["diff", "--quiet", "--", "partits.html"], { stdio: "ignore" });
@@ -154,32 +166,37 @@ async function main() {
   } catch (_) {
     hasDiff = true;
   }
-  if (!hasDiff) {
+  if (!hasDiff && !forceTest) {
     console.log("Sense canvis als partits: no s'envia WhatsApp.");
     return;
   }
 
-  let oldHtml;
-  try {
-    oldHtml = execFileSync("git", ["show", "HEAD:partits.html"], { encoding: "utf8" });
-  } catch (err) {
-    throw new Error("No s'ha pogut llegir partits.html de HEAD");
-  }
+  let message;
+  if (forceTest) {
+    message = buildTestMessage();
+  } else {
+    let oldHtml;
+    try {
+      oldHtml = execFileSync("git", ["show", "HEAD:partits.html"], { encoding: "utf8" });
+    } catch (err) {
+      throw new Error("No s'ha pogut llegir partits.html de HEAD");
+    }
 
-  const currentHtml = fs.readFileSync("partits.html", "utf8");
-  const summary = buildSummary(allGames(extractData(oldHtml)), allGames(extractData(currentHtml)));
-  const hasChanges = summary.added.length || summary.removed.length || summary.changed.length;
-  if (!hasChanges) {
-    console.log("No hi ha canvis de partits per notificar.");
-    return;
+    const currentHtml = fs.readFileSync("partits.html", "utf8");
+    const summary = buildSummary(allGames(extractData(oldHtml)), allGames(extractData(currentHtml)));
+    const hasChanges = summary.added.length || summary.removed.length || summary.changed.length;
+    if (!hasChanges) {
+      console.log("No hi ha canvis de partits per notificar.");
+      return;
+    }
+    message = buildMessage(summary);
   }
 
   const sid = requiredEnv("TWILIO_ACCOUNT_SID");
   const token = requiredEnv("TWILIO_AUTH_TOKEN");
   const fromRaw = requiredEnv("TWILIO_WHATSAPP_FROM");
-  const recipients = parseRecipients(requiredEnv("WHATSAPP_RECIPIENTS"));
-
-  const message = buildMessage(summary);
+  const testRecipient = requiredEnv("WHATSAPP_TEST_RECIPIENT");
+  const recipients = testRecipient ? [testRecipient] : parseRecipients(requiredEnv("WHATSAPP_RECIPIENTS"));
   console.log(message);
 
   if (!sid || !token || !fromRaw || recipients.length === 0) {
