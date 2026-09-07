@@ -475,21 +475,14 @@
     }
 
     function appendCostSection(title, visibleCostGames){
+      if (!visibleCostGames.length) return;
+
       const section = document.createElement("div");
       section.className = "cost-section";
       const sectionTitle = document.createElement("h3");
       sectionTitle.className = "cost-section-title";
       sectionTitle.textContent = title;
       section.appendChild(sectionTitle);
-
-      if (!visibleCostGames.length) {
-        const empty = document.createElement("span");
-        empty.className = "cost-chip";
-        empty.textContent = "Sense costos";
-        section.appendChild(empty);
-        els.costSummary.appendChild(section);
-        return;
-      }
 
       const teamCosts = new Map();
       visibleCostGames.forEach(game => {
