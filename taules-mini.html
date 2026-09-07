@@ -284,12 +284,11 @@
     }
 
     function buildPeriods(){
-      periods = [...new Set([...games, ...costGames].map(periodKey))]
+      const currentKey = isoDate(mondayOf(new Date()));
+      periods = [...new Set([...games, ...costGames].map(periodKey).concat(currentKey))]
         .sort((a, b) => periodSortValue(a).localeCompare(periodSortValue(b)))
         .map(key => ({ key, label: periodLabel(key) }));
-      const currentKey = isoDate(mondayOf(new Date()));
-      activePeriodIndex = Math.max(0, periods.findIndex(period => period.key === currentKey));
-      if (activePeriodIndex < 0) activePeriodIndex = 0;
+      activePeriodIndex = periods.findIndex(period => period.key === currentKey);
     }
 
     function gameSnapshot(game){
