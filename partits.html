@@ -523,13 +523,30 @@
       return TEAM_WHATSAPP[(g.team || '') + '|' + (g.sex || '')] || DEFAULT_WHATSAPP_RECIPIENT;
     }
 
+    function whatsappChangeTitle(type){
+      if(type==='added') return 'Partit afegit';
+      if(type==='removed') return 'Partit eliminat';
+      return 'Partit modificat';
+    }
+
     function whatsappMessageForChange(c){
       const g=c.game || {};
-      const lines=['Hola, canvi al calendari del ' + (g.team || 'equip') + ' ' + (g.sex || '') + ':', '', changeGameLine(g)];
-      if(c.type==='added') lines.splice(1,0,'Partit afegit.');
-      else if(c.type==='removed') lines.splice(1,0,'Partit eliminat.');
-      else lines.splice(1,0,'Partit modificat.');
-      (c.fields || []).forEach(function(f){
+      const sex=g.sex==='F'?'F':'M';
+      const where=g.home?'casa':'fora';
+      const lines=[
+        '*Canvi al calendari de partits*',
+        '',
+        '*' + whatsappChangeTitle(c.type) + '*',
+        '',
+        'Equip: ' + (g.team || 'Pendent') + ' ' + sex,
+        'Partit: ' + (g.rival ? 'vs ' + g.rival : 'Rival pendent'),
+        'Data: ' + (g.date ? fmtDateNumeric(g.date) : 'Pendent'),
+        'Hora: ' + (g.time || 'Pendent'),
+        'Lloc: ' + (g.loc ? shortLocation(g.loc) : 'Pendent'),
+        'Condició: ' + where
+      ];
+      (c.fields || []).forEach(function(f,index){
+        if(index === 0) lines.push('', '*Detall del canvi*');
         lines.push('- ' + f.label + ': ' + fmtChangeValue(f.label, f.from) + ' → ' + fmtChangeValue(f.label, f.to));
       });
       return lines.join('\n');
