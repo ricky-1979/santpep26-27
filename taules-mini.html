@@ -247,6 +247,20 @@
       return `${prefix}Cap de setmana ${satDay}-${sunLabel}`;
     }
 
+    function costPeriodKey(game){
+      const [year, month] = String(game.date || "").split("-");
+      if (year === "2026" && (month === "08" || month === "09")) return "2026-08-09";
+      return year && month ? `${year}-${month}` : String(game.date || "");
+    }
+
+    function activeCostPeriodKey(){
+      const active = periods[activePeriodIndex];
+      if (!active) return "";
+      if (active.key === "2026-08-31") return "2026-08-09";
+      const periodGame = [...games, ...costGames].find(game => periodKey(game) === active.key);
+      return periodGame ? costPeriodKey(periodGame) : "";
+    }
+
     function periodSortValue(key){
       return key;
     }
@@ -426,8 +440,8 @@
     }
 
     function renderCosts(){
-      const period = periods[activePeriodIndex];
-      const visibleCostGames = period ? costGames.filter(game => periodKey(game) === period.key) : [];
+      const costKey = activeCostPeriodKey();
+      const visibleCostGames = costKey ? costGames.filter(game => costPeriodKey(game) === costKey) : [];
       els.costSummary.innerHTML = "";
       if (!visibleCostGames.length) {
         const empty = document.createElement("span");
