@@ -263,6 +263,22 @@
       return periodGame ? costPeriodKey(periodGame) : "";
     }
 
+    function costKeyForPeriod(period){
+      if (!period) return "";
+      if (period.key === "2026-08-31") return "2026-08-09";
+      const periodGame = [...games, ...costGames].find(game => periodKey(game) === period.key);
+      return periodGame ? costPeriodKey(periodGame) : "";
+    }
+
+    function isLastCostPeriod(){
+      const active = periods[activePeriodIndex];
+      const activeCostKey = costKeyForPeriod(active);
+      if (!active || !activeCostKey) return false;
+      return !periods
+        .slice(activePeriodIndex + 1)
+        .some(period => costKeyForPeriod(period) === activeCostKey);
+    }
+
     function periodSortValue(key){
       return key;
     }
@@ -443,7 +459,8 @@
 
     function renderCosts(){
       const costKey = activeCostPeriodKey();
-      const monthlyCostGames = costKey ? costGames.filter(game => costPeriodKey(game) === costKey) : [];
+      const showMonthlyCosts = isLastCostPeriod();
+      const monthlyCostGames = showMonthlyCosts && costKey ? costGames.filter(game => costPeriodKey(game) === costKey) : [];
       const period = periods[activePeriodIndex];
       const weeklyCostGames = period ? costGames.filter(game => periodKey(game) === period.key) : [];
       els.costSummary.innerHTML = "";
@@ -455,7 +472,7 @@
         return;
       }
 
-      appendCostSection("Mes", monthlyCostGames);
+      if (showMonthlyCosts) appendCostSection("Mes", monthlyCostGames);
       appendCostSection("Setmana", weeklyCostGames);
     }
 
