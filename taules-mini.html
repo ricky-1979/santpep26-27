@@ -134,7 +134,7 @@
     </section>
 
     <section id="content"></section>
-    <section class="cost-panel" aria-label="Costos amistosos del període">
+    <section id="costPanel" class="cost-panel" aria-label="Costos amistosos del període">
       <h2 class="cost-title">Costos amistosos</h2>
       <div id="costSummary" class="cost-list"></div>
     </section>
@@ -170,6 +170,7 @@
       currentPeriod: document.getElementById("currentPeriod"),
       prevPeriod: document.getElementById("prevPeriod"),
       nextPeriod: document.getElementById("nextPeriod"),
+      costPanel: document.getElementById("costPanel"),
       costSummary: document.getElementById("costSummary")
     };
 
@@ -464,13 +465,11 @@
       const weeklyCostGames = period ? costGames.filter(game => periodKey(game) === period.key) : [];
       els.costSummary.innerHTML = "";
       if (!monthlyCostGames.length && !weeklyCostGames.length) {
-        const empty = document.createElement("span");
-        empty.className = "cost-chip";
-        empty.textContent = "Sense costos";
-        els.costSummary.appendChild(empty);
+        els.costPanel.hidden = true;
         return;
       }
 
+      els.costPanel.hidden = false;
       if (showMonthlyCosts) appendCostSection("Mes", monthlyCostGames);
       appendCostSection("Setmana", weeklyCostGames);
     }
