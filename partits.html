@@ -524,27 +524,27 @@
     }
 
     function whatsappChangeTitle(type){
-      if(type==='added') return 'Partit afegit';
-      if(type==='removed') return 'Partit eliminat';
-      return 'Partit modificat';
+      if(type==='added') return '🆕 Partit afegit';
+      if(type==='removed') return '🗑️ Partit eliminat';
+      return '🔄 Partit modificat';
     }
 
     function whatsappMessageForChange(c){
       const g=c.game || {};
       const sex=g.sex==='F'?'F':'M';
       const lines=[
-        '*Canvi al calendari de partits*',
+        '🏀 *Canvi al calendari de partits*',
         '',
         '*' + whatsappChangeTitle(c.type) + '*',
         '',
-        'Equip: ' + (g.team || 'Pendent') + ' ' + sex,
-        'Partit: ' + (g.rival ? 'vs ' + g.rival : 'Rival pendent'),
-        'Data: ' + (g.date ? fmtDateNumeric(g.date) : 'Pendent'),
-        'Hora: ' + (g.time || 'Pendent'),
-        'Lloc: ' + (g.loc ? shortLocation(g.loc) : 'Pendent')
+        '👥 Equip: ' + (g.team || 'Pendent') + ' ' + sex,
+        '🆚 Partit: ' + (g.rival ? 'vs ' + g.rival : 'Rival pendent'),
+        '📅 Data: ' + (g.date ? fmtDateNumeric(g.date) : 'Pendent'),
+        '🕒 Hora: ' + (g.time || 'Pendent'),
+        '📍 Lloc: ' + (g.loc ? shortLocation(g.loc) : 'Pendent')
       ];
       (c.fields || []).forEach(function(f,index){
-        if(index === 0) lines.push('', '*Detall del canvi*');
+        if(index === 0) lines.push('', '✏️ *Detall del canvi*');
         lines.push('- ' + f.label + ': ' + fmtChangeValue(f.label, f.from) + ' → ' + fmtChangeValue(f.label, f.to));
       });
       return lines.join('\n');
