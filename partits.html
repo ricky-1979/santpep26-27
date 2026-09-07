@@ -200,6 +200,7 @@
     const content = document.getElementById('content');
     const CHANGES_PER_PAGE = 3;
     let changesPage = 0;
+    const DEFAULT_WHATSAPP_RECIPIENT = "34661219535"; // Ricard Fusté, destinatari de prova
     const TEAM_WHATSAPP = {
       // Format: "Equip|Sexe": "34XXXXXXXXX"
       // Exemple: "Cadet|F": "34600111222"
@@ -503,7 +504,7 @@
     }
 
     function whatsappNumberForGame(g){
-      return TEAM_WHATSAPP[(g.team || '') + '|' + (g.sex || '')] || '';
+      return TEAM_WHATSAPP[(g.team || '') + '|' + (g.sex || '')] || DEFAULT_WHATSAPP_RECIPIENT;
     }
 
     function whatsappMessageForChange(c){
