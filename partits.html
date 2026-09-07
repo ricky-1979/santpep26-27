@@ -148,6 +148,12 @@
     .change-kind { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
     .change-main { font-weight:700; font-size:0.9rem; }
     .change-detail { color:var(--muted); font-size:0.8rem; }
+    .change-actions { margin-top:7px; display:flex; flex-wrap:wrap; gap:6px; }
+    .whatsapp-link { display:inline-flex; align-items:center; gap:5px; border:1px solid #25d366;
+      border-radius:999px; background:#e9fbf1; color:#075e54; padding:5px 10px;
+      font-size:0.76rem; font-weight:800; text-decoration:none; }
+    .whatsapp-link:hover { background:#d8f6e5; }
+    .whatsapp-link.disabled { border-color:var(--line); background:#f7f5fa; color:var(--muted); pointer-events:none; }
     .empty-filter { color:var(--muted); font-style:italic; text-align:center; padding:40px 0; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
     @media (max-width:520px){ .games { grid-template-columns:1fr; } }
@@ -194,6 +200,10 @@
     const content = document.getElementById('content');
     const CHANGES_PER_PAGE = 3;
     let changesPage = 0;
+    const TEAM_WHATSAPP = {
+      // Format: "Equip|Sexe": "34XXXXXXXXX"
+      // Exemple: "Cadet|F": "34600111222"
+    };
 
     const MONTHS = ['gener','febrer','març','abril','maig','juny','juliol','agost','setembre','octubre','novembre','desembre'];
     function fmtDate(iso){
@@ -492,6 +502,32 @@
       return fmtDateNumeric(g.date) + ' ' + g.time + ' · ' + g.team + ' ' + sex + ' vs ' + g.rival + ' · ' + where + loc + fr;
     }
 
+    function whatsappNumberForGame(g){
+      return TEAM_WHATSAPP[(g.team || '') + '|' + (g.sex || '')] || '';
+    }
+
+    function whatsappMessageForChange(c){
+      const g=c.game || {};
+      const lines=['Hola, canvi al calendari del ' + (g.team || 'equip') + ' ' + (g.sex || '') + ':', '', changeGameLine(g)];
+      if(c.type==='added') lines.splice(1,0,'Partit afegit.');
+      else if(c.type==='removed') lines.splice(1,0,'Partit eliminat.');
+      else lines.splice(1,0,'Partit modificat.');
+      (c.fields || []).forEach(function(f){
+        lines.push('- ' + f.label + ': ' + fmtChangeValue(f.label, f.from) + ' → ' + fmtChangeValue(f.label, f.to));
+      });
+      lines.push('', 'Calendari: https://ricky-1979.github.io/santpep26-27/partits.html');
+      return lines.join('\n');
+    }
+
+    function whatsappAction(c){
+      const number=whatsappNumberForGame(c.game || {});
+      if(!number) return '';
+      const clean=String(number).replace(/[^\d]/g,'');
+      if(!clean) return '';
+      return '<div class="change-actions"><a class="whatsapp-link" target="_blank" rel="noopener" href="https://wa.me/' +
+        clean + '?text=' + encodeURIComponent(whatsappMessageForChange(c)) + '">Enviar WhatsApp</a></div>';
+    }
+
     function changeIcon(name){
       if(name === 'prev'){
         return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -553,7 +589,7 @@
             fmtChangeValue(f.label, f.from) + ' → ' + fmtChangeValue(f.label, f.to) + '</div>';
         }).join('');
         return '<li class="change-item ' + c.type + '"><div class="change-kind">' + changeTypeLabel(c.type) + '</div>' +
-          '<div class="change-main">' + changeGameLine(c.game) + '</div>' + details + '</li>';
+          '<div class="change-main">' + changeGameLine(c.game) + '</div>' + details + whatsappAction(c) + '</li>';
       }).join('');
       const nav=total > CHANGES_PER_PAGE
         ? '<div class="changes-nav">' +
