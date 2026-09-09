@@ -77,6 +77,7 @@ const FRIENDLY_COSTS = {
   "SAM|MONTCADA": 21,
   "IAM|GRUP BARNA": 11.5,
   "JAF|LLUISOS": 14.5,
+  "JBF|LLUISOS": 18,
 };
 
 function fetchText(url) {
