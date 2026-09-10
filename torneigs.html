@@ -66,7 +66,7 @@
     <section class="summary" aria-label="Resum de torneigs">
       <div class="summary-item"><span class="summary-label">Torneigs</span><span id="totalGroups" class="summary-value">0</span></div>
       <div class="summary-item"><span class="summary-label">Equips</span><span id="totalTeams" class="summary-value">0</span></div>
-      <div class="summary-item"><span class="summary-label">Import total</span><span id="totalCost" class="summary-value">0€</span></div>
+      <div class="summary-item"><span class="summary-label">Pestanyes</span><span id="totalTabs" class="summary-value">0</span></div>
     </section>
 
     <div id="filters" class="filters"></div>
@@ -75,7 +75,15 @@
   <footer>Font: Google Sheet de torneigs de la temporada</footer>
 
   <script>
-    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1PSum1wV8wQIS1yA9O5JwEVKKqL7TBI3B1_EJ7avkUR0/export?format=csv';
+    const SHEET_ID = '1PSum1wV8wQIS1yA9O5JwEVKKqL7TBI3B1_EJ7avkUR0';
+    const SHEETS = [
+      { name:'Vilafant', gid:'0' },
+      { name:'Winners', gid:'2110928289' },
+      { name:'Franqueses', gid:'2046561052' },
+      { name:'Stage Aro Mini', gid:'308938320' },
+      { name:'Copa Maresme', gid:'1834090561' },
+      { name:'Mataró', gid:'850501082' }
+    ];
     const FAMILY_ORDER = ['SÈNIOR','JÚNIOR','CADET','INFANTIL','MINI','PREMINI'];
     const TEAM_META = {
       IBM:{ team:'Infantil B', fam:'INFANTIL', sex:'M' }, IAM:{ team:'Infantil A', fam:'INFANTIL', sex:'M' }, IF:{ team:'Infantil', fam:'INFANTIL', sex:'F' },
@@ -117,67 +125,72 @@
       for(const row of rows) for(const cell of row) if(/^https?:\/\//.test(cell)) return cell;
       return '';
     }
-    function parseMoney(value){
-      const raw = String(value || '').replace(/\./g,'').replace(',', '.').replace(/[^\d.-]/g, '');
-      const n = Number(raw);
-      return Number.isFinite(n) ? n : null;
+    function isIgnoredMeta(cell){
+      return !cell || /^TORNEIG/i.test(cell) || /^DIES:?$/i.test(cell) || /^DIAS:?$/i.test(cell) ||
+        /^https?:\/\//.test(cell) || /^\d{4}$/.test(cell) || /^PREU/i.test(cell) || /^PRECIO/i.test(cell) ||
+        /^TOTAL/i.test(cell) || /^COST/i.test(cell) || /^JUGADORS/i.test(cell) || /^COMISSIÓ/i.test(cell);
     }
-    function inferTeam(block){
-      for(const row of block){
-        for(const cell of row){
-          const code = cell.toUpperCase().replace(/\s+/g,'');
-          if(TEAM_META[code]) return { code, ...TEAM_META[code] };
+    function findTitle(rows, fallback){
+      const flat = rows.flat().filter(Boolean);
+      return flat.find(cell => /^TORNEIG/i.test(cell) || /^STAGE/i.test(cell) || /^COPA/i.test(cell)) || fallback;
+    }
+    function findDates(rows){
+      for(const row of rows){
+        for(let idx = 0; idx < row.length; idx++){
+          const cell = row[idx];
+          if(/^DIES:?$/i.test(cell) || /^DIAS:?/i.test(cell)){
+            const inline = cell.split(':').slice(1).join(':').trim();
+            return inline || row.slice(idx + 1).find(Boolean) || '';
+          }
         }
       }
-      return { code:'', team:'Equip pendent', fam:'', sex:'' };
+      return '';
     }
-    function inferCategory(block){
-      const candidates = [];
-      block.slice(0, 10).forEach(row => row.forEach(cell => {
-        if(cell && !/^TORNEIG/i.test(cell) && !/^DIES$/i.test(cell) && !/^https?:\/\//.test(cell) && !/^\d{4}$/.test(cell) && !TEAM_META[cell.toUpperCase().replace(/\s+/g,'')]){
-          candidates.push(cell);
+    function categoryFor(rows, rowIndex, colIndex){
+      for(let r = rowIndex - 1; r >= Math.max(0, rowIndex - 5); r--){
+        for(const c of [colIndex, colIndex - 1, colIndex + 1]){
+          const cell = rows[r] && rows[r][c] ? rows[r][c].trim() : '';
+          if(cell && !isIgnoredMeta(cell) && !TEAM_META[cell.toUpperCase().replace(/\s+/g,'')]){
+            return cell;
+          }
         }
-      }));
-      return candidates.find(cell => /CAT|INTER|ANY|PREF|PROM|NIVELL/i.test(cell)) || '';
+      }
+      return '';
     }
-    function parseTournament(block, index){
-      const flat = block.flat().filter(Boolean);
-      const title = flat.find(cell => /^TORNEIG/i.test(cell)) || `Torneig ${index + 1}`;
-      let dates = '';
-      block.forEach(row => {
-        row.forEach((cell, idx) => {
-          if(/^DIES$/i.test(cell)) dates = row.slice(idx + 1).find(Boolean) || dates;
+    function yearFor(rows, rowIndex, colIndex){
+      for(let r = rowIndex + 1; r <= Math.min(rows.length - 1, rowIndex + 3); r++){
+        for(const c of [colIndex, colIndex - 1, colIndex + 1]){
+          const cell = rows[r] && rows[r][c] ? rows[r][c].trim() : '';
+          if(/^\d{4}$/.test(cell)) return cell;
+        }
+      }
+      return '';
+    }
+    function parseTournamentsFromSheet(text, sheet){
+      const rows = parseCsv(text);
+      const title = findTitle(rows, sheet.name);
+      const dates = findDates(rows);
+      const link = firstUrl(rows);
+      const found = [];
+      rows.forEach((row, r) => {
+        row.forEach((cell, c) => {
+          const code = cell.toUpperCase().replace(/\s+/g,'');
+          if(TEAM_META[code]){
+            found.push({
+              id: `${sheet.gid}-${code}-${r}-${c}`,
+              sheet: sheet.name,
+              title,
+              dates,
+              link,
+              category: categoryFor(rows, r, c),
+              year: yearFor(rows, r, c),
+              code,
+              ...TEAM_META[code]
+            });
+          }
         });
       });
-      const team = inferTeam(block);
-      const year = flat.find(cell => /^\d{4}$/.test(cell)) || '';
-      const notes = [];
-      block.forEach(row => {
-        const label = row[5] || '';
-        const amount = parseMoney(row[6]);
-        if(label || amount != null) notes.push({ label, amount });
-      });
-      return {
-        id: String(index),
-        title,
-        dates,
-        link: firstUrl(block),
-        category: inferCategory(block),
-        year,
-        notes,
-        ...team
-      };
-    }
-    function parseTournaments(text){
-      const rows = parseCsv(text);
-      const starts = [];
-      rows.forEach((row, idx) => {
-        if(row.some(cell => /^TORNEIG/i.test(cell))) starts.push(idx);
-      });
-      return starts.map((start, idx) => {
-        const end = starts[idx + 1] == null ? rows.length : starts[idx + 1];
-        return parseTournament(rows.slice(start, end), idx);
-      });
+      return found;
     }
     function passes(tournament){
       return (!activeFamilies.size || activeFamilies.has(tournament.fam)) &&
@@ -211,10 +224,10 @@
       syncFilterState();
       const filtered = tournaments.filter(passes);
       const teams = new Set(filtered.map(t => t.team + ' ' + t.sex));
-      const cost = filtered.reduce((sum, t) => sum + t.notes.reduce((s, note) => s + (note.amount || 0), 0), 0);
+      const tabs = new Set(filtered.map(t => t.sheet));
       document.getElementById('totalGroups').textContent = filtered.length;
       document.getElementById('totalTeams').textContent = teams.size;
-      document.getElementById('totalCost').textContent = cost ? cost.toLocaleString('ca-ES', { maximumFractionDigits:1 }) + '€' : '0€';
+      document.getElementById('totalTabs').textContent = tabs.size;
 
       const content = document.getElementById('content');
       if(!filtered.length){
@@ -226,32 +239,35 @@
           <tr>
             <th>Equip</th>
             <th>Categoria</th>
+            <th>Any</th>
             <th>Torneig</th>
             <th>Dies</th>
-            <th>Import</th>
             <th>Document</th>
           </tr>
         </thead>
         <tbody>${filtered.map(tournament => {
-        const total = tournament.notes.reduce((sum, note) => sum + (note.amount || 0), 0);
         return `
           <tr class="${tournament.sex === 'F' ? 'fem' : 'masc'}">
             <td><div class="team">${esc(tournament.team)} ${esc(tournament.sex)}</div>${tournament.code ? `<div class="muted">${esc(tournament.code)}</div>` : ''}</td>
-            <td>${tournament.category ? esc(tournament.category) : '<span class="muted">—</span>'}${tournament.year ? `<div class="muted">${esc(tournament.year)}</div>` : ''}</td>
+            <td>${tournament.category ? esc(tournament.category) : '<span class="muted">—</span>'}</td>
+            <td>${tournament.year ? esc(tournament.year) : '<span class="muted">—</span>'}</td>
             <td><strong>${esc(tournament.title)}</strong></td>
             <td>${esc(tournament.dates || 'Dates pendents')}</td>
-            <td class="amount">${total ? total.toLocaleString('ca-ES', { maximumFractionDigits:1 }) + '€' : '—'}</td>
             <td>${tournament.link ? `<a class="doc-link" href="${esc(tournament.link)}" target="_blank" rel="noopener">Obrir →</a>` : '<span class="muted">—</span>'}</td>
           </tr>`;
       }).join('')}</tbody></table></div>`;
     }
     async function load(){
       try {
-        const csv = await fetch(SHEET_CSV_URL, { cache:'no-store' }).then(res => {
-          if(!res.ok) throw new Error('HTTP ' + res.status);
-          return res.text();
-        });
-        const tournaments = parseTournaments(csv);
+        const csvs = await Promise.all(SHEETS.map(sheet =>
+          fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${sheet.gid}`, { cache:'no-store' })
+            .then(res => {
+              if(!res.ok) throw new Error('HTTP ' + res.status + ' ' + sheet.name);
+              return res.text();
+            })
+            .then(text => ({ sheet, text }))
+        ));
+        const tournaments = csvs.flatMap(({ sheet, text }) => parseTournamentsFromSheet(text, sheet));
         document.getElementById('status').textContent = 'Actualitzat des del Google Sheet';
         renderFilters(tournaments);
         render(tournaments);
