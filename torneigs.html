@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>Torneigs · CB Sant Josep</title>
+  <style>
+    :root {
+      --brand:#713f97; --brand-dark:#5a2f7d; --accent:#fcdb20;
+      --bg:#f5f3f8; --card:#ffffff; --ink:#2a2233; --muted:#7a7085;
+      --line:#e6e0ee; --shadow:0 1px 3px rgba(60,40,90,0.08),0 4px 16px rgba(60,40,90,0.06); --radius:16px;
+      --masc:#1565c0; --fem:#c2185b;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); min-height:100vh;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.45; -webkit-font-smoothing:antialiased; }
+    header { display:flex; align-items:center; gap:14px; padding:16px 20px;
+      background:var(--brand); color:#fff; box-shadow:var(--shadow); }
+    .htext h1 { margin:0; font-size:1.05rem; font-weight:700; letter-spacing:-0.01em; }
+    .htext h1 .club { display:block; font-size:0.72rem; font-weight:500; opacity:0.85; letter-spacing:0.04em; text-transform:uppercase; }
+    .htext p { margin:2px 0 0; font-size:0.8rem; opacity:0.9; }
+    main { max-width:1080px; margin:0 auto; padding:22px 16px 60px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+    .back { display:inline-flex; align-items:center; gap:6px; color:var(--brand); text-decoration:none; font-weight:700; font-size:0.88rem; }
+    .status { color:var(--muted); font-size:0.82rem; text-align:right; }
+    .summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:18px; }
+    .summary-item { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 16px; }
+    .summary-label { display:block; color:var(--muted); font-size:0.74rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:800; }
+    .summary-value { display:block; color:var(--brand-dark); font-size:1.45rem; font-weight:900; margin-top:2px; }
+    .filters { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
+    .chip { border:1px solid var(--line); background:#fff; color:var(--brand-dark); border-radius:999px;
+      padding:7px 11px; font-weight:800; font-size:0.78rem; cursor:pointer; }
+    .chip.active { background:var(--brand); color:#fff; border-color:var(--brand); }
+    .section-title { color:var(--brand-dark); font-size:1rem; margin:24px 0 10px; }
+    .tournament-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
+    .tournament { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; }
+    .tournament-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:10px; }
+    .tournament-title { margin:0; color:var(--brand-dark); font-size:1rem; line-height:1.2; }
+    .tournament-meta { margin:4px 0 0; color:var(--muted); font-size:0.78rem; }
+    .count { flex:0 0 auto; background:var(--accent); color:var(--brand-dark); border-radius:999px; padding:4px 9px; font-size:0.74rem; font-weight:900; }
+    .games { display:flex; flex-direction:column; gap:8px; }
+    .game { border:1px solid var(--line); border-radius:12px; padding:9px 10px; background:#fff; }
+    .game.masc { border-left:5px solid var(--masc); background:#f2f8fe; }
+    .game.fem { border-left:5px solid var(--fem); background:#fdf3f7; }
+    .game-top { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+    .time { color:var(--brand-dark); font-weight:900; font-size:0.86rem; }
+    .team { font-weight:900; font-size:0.88rem; }
+    .badge { font-size:0.66rem; font-weight:900; padding:2px 7px; border-radius:6px; text-transform:uppercase; letter-spacing:0.03em; background:#ede7f6; color:#4527a0; }
+    .rival { margin-top:3px; font-size:0.82rem; }
+    .rival .lbl, .cost-label { color:var(--muted); font-size:0.74rem; }
+    .cost { margin-top:3px; color:var(--brand-dark); font-size:0.78rem; font-weight:900; }
+    .empty { background:var(--card); border:1px dashed var(--line); border-radius:var(--radius); padding:24px; color:var(--muted); text-align:center; }
+    footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="htext">
+      <h1><span class="club">CB Sant Josep de Badalona</span> Torneigs</h1>
+      <p>Temporada 26-27</p>
+    </div>
+  </header>
+  <main>
+    <div class="topbar">
+      <a class="back" href="index.html">← Tornar</a>
+      <div id="status" class="status">Carregant dades…</div>
+    </div>
+
+    <section class="summary" aria-label="Resum de torneigs">
+      <div class="summary-item"><span class="summary-label">Torneigs / blocs</span><span id="totalGroups" class="summary-value">0</span></div>
+      <div class="summary-item"><span class="summary-label">Partits</span><span id="totalGames" class="summary-value">0</span></div>
+      <div class="summary-item"><span class="summary-label">Equips</span><span id="totalTeams" class="summary-value">0</span></div>
+      <div class="summary-item"><span class="summary-label">Cost conegut</span><span id="totalCost" class="summary-value">0€</span></div>
+    </section>
+
+    <div id="filters" class="filters"></div>
+    <div id="content"></div>
+  </main>
+  <footer>Font: calendari de partits · es mostren els partits marcats com a amistosos</footer>
+
+  <script>
+    const MONTHS = ['gener','febrer','març','abril','maig','juny','juliol','agost','setembre','octubre','novembre','desembre'];
+    const FAMILY_ORDER = ['SÈNIOR','JÚNIOR','CADET','INFANTIL','MINI','PREMINI'];
+    const activeFamilies = new Set();
+    const activeSex = new Set();
+
+    function esc(value){
+      return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+    function parseDate(iso){
+      const p = iso.split('-').map(Number);
+      return new Date(Date.UTC(p[0], p[1] - 1, p[2]));
+    }
+    function fmtDate(iso){
+      const p = iso.split('-').map(Number);
+      return String(p[2]).padStart(2,'0') + '/' + String(p[1]).padStart(2,'0') + '/' + p[0];
+    }
+    function fmtDateLong(iso){
+      const p = iso.split('-').map(Number);
+      return p[2] + ' ' + MONTHS[p[1] - 1] + ' ' + p[0];
+    }
+    function normalizeLoc(loc){
+      return String(loc || 'Sense lloc').trim().replace(/\s+/g, ' ');
+    }
+    function groupKey(game){
+      const dt = parseDate(game.date);
+      const monday = new Date(dt);
+      const day = (dt.getUTCDay() + 6) % 7;
+      monday.setUTCDate(dt.getUTCDate() - day);
+      const mondayIso = monday.toISOString().slice(0,10);
+      return mondayIso + '|' + normalizeLoc(game.loc);
+    }
+    function passes(game){
+      return (!activeFamilies.size || activeFamilies.has(game.fam)) &&
+        (!activeSex.size || activeSex.has(game.sex));
+    }
+    function sortGames(a,b){
+      return (a.date + a.time + a.team + a.sex).localeCompare(b.date + b.time + b.team + b.sex, 'ca');
+    }
+    function buildGroups(games){
+      const map = new Map();
+      games.forEach(game => {
+        const key = groupKey(game);
+        if(!map.has(key)){
+          map.set(key, { key, monday:key.split('|')[0], loc:normalizeLoc(game.loc), games:[] });
+        }
+        map.get(key).games.push(game);
+      });
+      return [...map.values()]
+        .map(group => ({ ...group, games:group.games.sort(sortGames) }))
+        .sort((a,b) => (a.monday + a.loc).localeCompare(b.monday + b.loc, 'ca'));
+    }
+    function renderFilters(games){
+      const filters = document.getElementById('filters');
+      const families = FAMILY_ORDER.filter(fam => games.some(game => game.fam === fam));
+      const buttons = [];
+      families.forEach(fam => buttons.push(`<button class="chip" data-kind="fam" data-value="${esc(fam)}">${esc(fam)}</button>`));
+      [['M','Masculí'],['F','Femení']].forEach(([value,label]) => {
+        if(games.some(game => game.sex === value)) buttons.push(`<button class="chip" data-kind="sex" data-value="${value}">${label}</button>`);
+      });
+      filters.innerHTML = buttons.join('');
+      filters.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', () => {
+          const set = button.dataset.kind === 'fam' ? activeFamilies : activeSex;
+          const value = button.dataset.value;
+          if(set.has(value)) set.delete(value); else set.add(value);
+          render(games);
+        });
+      });
+    }
+    function syncFilterState(){
+      document.querySelectorAll('.chip').forEach(button => {
+        const set = button.dataset.kind === 'fam' ? activeFamilies : activeSex;
+        button.classList.toggle('active', set.has(button.dataset.value));
+      });
+    }
+    function render(games){
+      syncFilterState();
+      const filtered = games.filter(passes);
+      const groups = buildGroups(filtered);
+      const teams = new Set(filtered.map(game => game.team + ' ' + game.sex));
+      const cost = filtered.reduce((sum, game) => sum + (Number.isFinite(Number(game.cost)) ? Number(game.cost) : 0), 0);
+      document.getElementById('totalGroups').textContent = groups.length;
+      document.getElementById('totalGames').textContent = filtered.length;
+      document.getElementById('totalTeams').textContent = teams.size;
+      document.getElementById('totalCost').textContent = cost ? cost.toLocaleString('ca-ES', { maximumFractionDigits:1 }) + '€' : '0€';
+
+      const content = document.getElementById('content');
+      if(!groups.length){
+        content.innerHTML = '<div class="empty">No hi ha torneigs amb aquests filtres.</div>';
+        return;
+      }
+      content.innerHTML = groups.map(group => {
+        const dates = [...new Set(group.games.map(game => game.date))];
+        const title = dates.length === 1 ? fmtDateLong(dates[0]) : fmtDateLong(dates[0]) + ' – ' + fmtDateLong(dates[dates.length - 1]);
+        const groupTeams = new Set(group.games.map(game => game.team + ' ' + game.sex));
+        const groupCost = group.games.reduce((sum, game) => sum + (Number.isFinite(Number(game.cost)) ? Number(game.cost) : 0), 0);
+        const gamesHtml = group.games.map(game => `
+          <article class="game ${game.sex === 'F' ? 'fem' : 'masc'}">
+            <div class="game-top">
+              <span class="time">${fmtDate(game.date)} · ${esc(game.time)}</span>
+              <span class="team">${esc(game.team)} ${esc(game.sex)}</span>
+              <span class="badge">${game.home ? 'casa' : 'fora'}</span>
+            </div>
+            <div class="rival"><span class="lbl">vs</span> ${esc(game.rival)}</div>
+            ${game.cost != null ? `<div class="cost"><span class="cost-label">Cost</span> ${esc(game.cost)}€</div>` : ''}
+          </article>`).join('');
+        return `
+          <section class="tournament">
+            <div class="tournament-head">
+              <div>
+                <h2 class="tournament-title">${esc(group.loc)}</h2>
+                <p class="tournament-meta">${title} · ${groupTeams.size} equip${groupTeams.size === 1 ? '' : 's'}${groupCost ? ' · ' + groupCost.toLocaleString('ca-ES', { maximumFractionDigits:1 }) + '€' : ''}</p>
+              </div>
+              <span class="count">${group.games.length}</span>
+            </div>
+            <div class="games">${gamesHtml}</div>
+          </section>`;
+      }).join('');
+    }
+    async function load(){
+      try {
+        const html = await fetch('partits.html', { cache:'no-store' }).then(res => {
+          if(!res.ok) throw new Error('HTTP ' + res.status);
+          return res.text();
+        });
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const dataNode = doc.getElementById('partitsData');
+        if(!dataNode) throw new Error('No s’ha trobat partitsData');
+        const data = JSON.parse(dataNode.textContent);
+        const games = data.weeks.flatMap(week => week.games || []).filter(game => game.friendly);
+        document.getElementById('status').textContent = 'Actualitzat des del calendari de partits';
+        renderFilters(games);
+        render(games);
+      } catch (error) {
+        document.getElementById('status').textContent = 'Error carregant dades';
+        document.getElementById('content').innerHTML = '<div class="empty">No s’han pogut carregar les dades de partits.</div>';
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
