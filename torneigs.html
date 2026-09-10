@@ -80,7 +80,7 @@
       { name:'Vilafant', gid:'0' },
       { name:'Winners', gid:'2110928289' },
       { name:'Franqueses', gid:'2046561052', dates:"28, 29 i 30 d'agost 2026" },
-      { name:'Copa Maresme', gid:'1834090561' },
+      { name:'Copa Maresme', gid:'1834090561', dates:'5, 6 i 7 de desembre', excludeTeams:['PAM'] },
       { name:'Mataró', gid:'850501082' }
     ];
     const FAMILY_ORDER = ['SÈNIOR','JÚNIOR','CADET','INFANTIL','MINI','PREMINI'];
@@ -174,7 +174,7 @@
       rows.forEach((row, r) => {
         row.forEach((cell, c) => {
           const code = cell.toUpperCase().replace(/\s+/g,'');
-          if(TEAM_META[code]){
+          if(TEAM_META[code] && !(sheet.excludeTeams || []).includes(code)){
             found.push({
               id: `${sheet.gid}-${code}-${r}-${c}`,
               sheet: sheet.name,
