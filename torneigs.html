@@ -33,28 +33,19 @@
     .chip { border:1px solid var(--line); background:#fff; color:var(--brand-dark); border-radius:999px;
       padding:7px 11px; font-weight:800; font-size:0.78rem; cursor:pointer; }
     .chip.active { background:var(--brand); color:#fff; border-color:var(--brand); }
-    .section-title { color:var(--brand-dark); font-size:1rem; margin:24px 0 10px; }
-    .tournament-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
-    .tournament { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; }
-    .tournament-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:10px; }
-    .tournament-title { margin:0; color:var(--brand-dark); font-size:1rem; line-height:1.2; }
-    .tournament-meta { margin:4px 0 0; color:var(--muted); font-size:0.78rem; }
-    .count { flex:0 0 auto; background:var(--accent); color:var(--brand-dark); border-radius:999px; padding:4px 9px; font-size:0.74rem; font-weight:900; }
-    .games { display:flex; flex-direction:column; gap:8px; }
-    .game { border:1px solid var(--line); border-radius:12px; padding:9px 10px; background:#fff; }
-    .game.masc { border-left:5px solid var(--masc); background:#f2f8fe; }
-    .game.fem { border-left:5px solid var(--fem); background:#fdf3f7; }
-    .game-top { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
-    .time { color:var(--brand-dark); font-weight:900; font-size:0.86rem; }
-    .team { font-weight:900; font-size:0.88rem; }
+    .table-wrap { overflow:auto; background:var(--card); border:1px solid var(--line);
+      border-radius:var(--radius); box-shadow:var(--shadow); }
+    table { width:100%; border-collapse:collapse; min-width:760px; }
+    th, td { padding:12px 14px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { background:#faf8fd; color:var(--brand-dark); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; }
+    tbody tr:last-child td { border-bottom:0; }
+    tbody tr.masc td:first-child { border-left:5px solid var(--masc); }
+    tbody tr.fem td:first-child { border-left:5px solid var(--fem); }
+    .team { font-weight:900; font-size:0.9rem; color:var(--ink); }
+    .muted { color:var(--muted); font-size:0.78rem; }
     .badge { font-size:0.66rem; font-weight:900; padding:2px 7px; border-radius:6px; text-transform:uppercase; letter-spacing:0.03em; background:#ede7f6; color:#4527a0; }
-    .rival { margin-top:3px; font-size:0.82rem; }
-    .rival .lbl, .cost-label { color:var(--muted); font-size:0.74rem; }
-    .cost { margin-top:3px; color:var(--brand-dark); font-size:0.78rem; font-weight:900; }
-    .doc-link { display:inline-flex; margin-top:8px; color:var(--brand); font-size:0.78rem; font-weight:900; text-decoration:none; }
-    .notes { display:flex; flex-direction:column; gap:5px; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
-    .note { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:0.78rem; }
-    .note strong { color:var(--brand-dark); }
+    .doc-link { color:var(--brand); font-size:0.78rem; font-weight:900; text-decoration:none; }
+    .amount { color:var(--brand-dark); font-weight:900; white-space:nowrap; }
     .empty { background:var(--card); border:1px dashed var(--line); border-radius:var(--radius); padding:24px; color:var(--muted); text-align:center; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
   </style>
@@ -74,7 +65,6 @@
 
     <section class="summary" aria-label="Resum de torneigs">
       <div class="summary-item"><span class="summary-label">Torneigs</span><span id="totalGroups" class="summary-value">0</span></div>
-      <div class="summary-item"><span class="summary-label">Participants</span><span id="totalGames" class="summary-value">0</span></div>
       <div class="summary-item"><span class="summary-label">Equips</span><span id="totalTeams" class="summary-value">0</span></div>
       <div class="summary-item"><span class="summary-label">Import total</span><span id="totalCost" class="summary-value">0€</span></div>
     </section>
@@ -161,12 +151,8 @@
       });
       const team = inferTeam(block);
       const year = flat.find(cell => /^\d{4}$/.test(cell)) || '';
-      const participants = [];
       const notes = [];
       block.forEach(row => {
-        if(/^\d+$/.test(row[1] || '') && row[3]){
-          participants.push({ order:row[1], number:row[2] || '', name:row[3] });
-        }
         const label = row[5] || '';
         const amount = parseMoney(row[6]);
         if(label || amount != null) notes.push({ label, amount });
@@ -178,7 +164,6 @@
         link: firstUrl(block),
         category: inferCategory(block),
         year,
-        participants,
         notes,
         ...team
       };
@@ -228,7 +213,6 @@
       const teams = new Set(filtered.map(t => t.team + ' ' + t.sex));
       const cost = filtered.reduce((sum, t) => sum + t.notes.reduce((s, note) => s + (note.amount || 0), 0), 0);
       document.getElementById('totalGroups').textContent = filtered.length;
-      document.getElementById('totalGames').textContent = filtered.reduce((sum, t) => sum + t.participants.length, 0);
       document.getElementById('totalTeams').textContent = teams.size;
       document.getElementById('totalCost').textContent = cost ? cost.toLocaleString('ca-ES', { maximumFractionDigits:1 }) + '€' : '0€';
 
@@ -237,31 +221,29 @@
         content.innerHTML = '<div class="empty">No hi ha torneigs amb aquests filtres.</div>';
         return;
       }
-      content.innerHTML = `<div class="tournament-grid">${filtered.map(tournament => {
+      content.innerHTML = `<div class="table-wrap"><table>
+        <thead>
+          <tr>
+            <th>Equip</th>
+            <th>Categoria</th>
+            <th>Torneig</th>
+            <th>Dies</th>
+            <th>Import</th>
+            <th>Document</th>
+          </tr>
+        </thead>
+        <tbody>${filtered.map(tournament => {
         const total = tournament.notes.reduce((sum, note) => sum + (note.amount || 0), 0);
-        const peopleHtml = tournament.participants.slice(0, 14).map(person => `
-          <article class="game ${tournament.sex === 'F' ? 'fem' : 'masc'}">
-            <div class="game-top">
-              ${person.number ? `<span class="time">#${esc(person.number)}</span>` : ''}
-              <span class="team">${esc(person.name)}</span>
-            </div>
-          </article>`).join('');
-        const notesHtml = tournament.notes.length ? `<div class="notes">${tournament.notes.map(note => `
-          <div class="note"><span>${esc(note.label || 'Import')}</span>${note.amount != null ? `<strong>${note.amount.toLocaleString('ca-ES', { maximumFractionDigits:2 })}€</strong>` : ''}</div>`).join('')}</div>` : '';
         return `
-          <section class="tournament">
-            <div class="tournament-head">
-              <div>
-                <h2 class="tournament-title">${esc(tournament.title)}</h2>
-                <p class="tournament-meta">${esc(tournament.dates || 'Dates pendents')} · ${esc(tournament.team)} ${esc(tournament.sex)}${tournament.category ? ' · ' + esc(tournament.category) : ''}${tournament.year ? ' · ' + esc(tournament.year) : ''}${total ? ' · ' + total.toLocaleString('ca-ES', { maximumFractionDigits:1 }) + '€' : ''}</p>
-                ${tournament.link ? `<a class="doc-link" href="${esc(tournament.link)}" target="_blank" rel="noopener">Veure document del torneig →</a>` : ''}
-              </div>
-              <span class="count">${tournament.participants.length}</span>
-            </div>
-            <div class="games">${peopleHtml}</div>
-            ${notesHtml}
-          </section>`;
-      }).join('')}</div>`;
+          <tr class="${tournament.sex === 'F' ? 'fem' : 'masc'}">
+            <td><div class="team">${esc(tournament.team)} ${esc(tournament.sex)}</div>${tournament.code ? `<div class="muted">${esc(tournament.code)}</div>` : ''}</td>
+            <td>${tournament.category ? esc(tournament.category) : '<span class="muted">—</span>'}${tournament.year ? `<div class="muted">${esc(tournament.year)}</div>` : ''}</td>
+            <td><strong>${esc(tournament.title)}</strong></td>
+            <td>${esc(tournament.dates || 'Dates pendents')}</td>
+            <td class="amount">${total ? total.toLocaleString('ca-ES', { maximumFractionDigits:1 }) + '€' : '—'}</td>
+            <td>${tournament.link ? `<a class="doc-link" href="${esc(tournament.link)}" target="_blank" rel="noopener">Obrir →</a>` : '<span class="muted">—</span>'}</td>
+          </tr>`;
+      }).join('')}</tbody></table></div>`;
     }
     async function load(){
       try {
