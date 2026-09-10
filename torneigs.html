@@ -79,8 +79,7 @@
     const SHEETS = [
       { name:'Vilafant', gid:'0' },
       { name:'Winners', gid:'2110928289' },
-      { name:'Franqueses', gid:'2046561052' },
-      { name:'Stage Aro Mini', gid:'308938320' },
+      { name:'Franqueses', gid:'2046561052', dates:"28, 29 i 30 d'agost 2026" },
       { name:'Copa Maresme', gid:'1834090561' },
       { name:'Mataró', gid:'850501082' }
     ];
@@ -169,7 +168,7 @@
     function parseTournamentsFromSheet(text, sheet){
       const rows = parseCsv(text);
       const title = findTitle(rows, sheet.name);
-      const dates = findDates(rows);
+      const dates = sheet.dates || findDates(rows);
       const link = firstUrl(rows);
       const found = [];
       rows.forEach((row, r) => {
