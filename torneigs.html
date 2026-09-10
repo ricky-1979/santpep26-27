@@ -222,7 +222,8 @@
       syncFilterState();
       const filtered = tournaments.filter(passes);
       const teams = new Set(filtered.map(t => t.team + ' ' + t.sex));
-      document.getElementById('totalGroups').textContent = filtered.length;
+      const tournamentsCount = new Set(filtered.map(t => t.sheet)).size;
+      document.getElementById('totalGroups').textContent = tournamentsCount;
       document.getElementById('totalTeams').textContent = teams.size;
 
       const content = document.getElementById('content');
