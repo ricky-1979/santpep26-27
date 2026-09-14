@@ -683,7 +683,7 @@
           setStatus("Firebase no deixa carregar assignacions.", "error");
         }
         render();
-        if (!els.status.textContent) setStatus("");
+        if (els.status.textContent === "Carregant...") setStatus("");
       } catch (error) {
         console.error(error);
         setStatus(error.message, "error");
