@@ -11,12 +11,8 @@ name: Actualitza partits
 
 on:
   schedule:
-    # Mitjanit hora de Badalona tot l'any. GitHub cron és sempre UTC i Badalona
-    # canvia entre CEST (UTC+2, estiu) i CET (UTC+1, hivern), així que disparem
-    # a les dues hores possibles; el job "gate" deixa passar només el que a
-    # Badalona són les 00:00 i cancel·la l'altre (que allà és la 01:00).
-    - cron: "0 22 * * *" # 00:00 a Badalona a l'estiu (CEST, UTC+2)
-    - cron: "0 23 * * *" # 00:00 a Badalona a l'hivern (CET, UTC+1)
+    # Cada hora. GitHub cron és sempre UTC.
+    - cron: "0 * * * *"
   workflow_dispatch:
     inputs:
       test_whatsapp:
@@ -39,37 +35,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Decideix si cal executar: sempre en dispar manual. En cron, no mirem l'hora
-  # real d'arrencada perquè GitHub pot iniciar el workflow amb retard; mirem quin
-  # cron l'ha disparat i l'offset actual de Badalona.
-  gate:
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.check.outputs.run }}
-    steps:
-      - id: check
-        run: |
-          if [ "${{ github.event_name }}" != "schedule" ]; then
-            echo "Dispar manual: s'executa."
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          OFFSET=$(TZ="Europe/Madrid" date +%z)
-          SCHEDULE="${{ github.event.schedule }}"
-          echo "Offset local a Badalona: ${OFFSET}"
-          echo "Cron disparat: ${SCHEDULE}"
-          if { [ "$OFFSET" = "+0200" ] && [ "$SCHEDULE" = "0 22 * * *" ]; } || \
-             { [ "$OFFSET" = "+0100" ] && [ "$SCHEDULE" = "0 23 * * *" ]; }; then
-            echo "Cron corresponent a mitjanit local: s'executa."
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Cron duplicat per cobrir canvi horari: es descarta aquesta execució."
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
-
   update:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
