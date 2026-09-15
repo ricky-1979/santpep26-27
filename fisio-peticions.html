@@ -47,7 +47,9 @@
     .team.male { background:#e3f2fd; color:#0d47a1; }
     .team.female { background:#fce4ec; color:#880e4f; }
     .today-icon { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; margin-right:6px; border-radius:999px; background:var(--accent); color:#4a3800; font-size:0.72rem; font-weight:900; vertical-align:middle; }
-    .whatsapp-link { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; background:#25d366; color:#083b1c; text-decoration:none; padding:6px 10px; font-size:0.78rem; font-weight:900; white-space:nowrap; }
+    .whatsapp-link { color:#0b7f36; font-weight:900; text-decoration:none; white-space:nowrap; }
+    .whatsapp-link::before { content:"💬 "; }
+    .whatsapp-link:hover { text-decoration:underline; }
     .whatsapp-link.empty { background:#f1eef5; color:var(--muted); pointer-events:none; }
     .desc { max-width:280px; color:var(--muted); }
     .pagination { display:flex; justify-content:flex-end; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px; color:var(--muted); font-size:0.82rem; }
@@ -309,16 +311,18 @@
       const start = (currentPage - 1) * PAGE_SIZE;
       const pageRows = visible.slice(start, start + PAGE_SIZE);
       const today = new Date();
-      const privateHead = isPrivateView ? '<th>Pare/mare</th><th>Email</th><th>Telèfon</th><th>WhatsApp</th>' : '';
+      const privateHead = isPrivateView ? '<th>Pare/mare</th><th>Email</th><th>Telèfon</th>' : '';
       tableWrap.innerHTML = '<table><thead><tr><th>Data sol·licitud</th><th>Jugador/a</th><th>Equip</th><th>Data lesió</th>' + privateHead + '<th>Descripció</th></tr></thead><tbody>' +
         pageRows.map(row => {
           const isToday = isSameDay(row.createdAt, today);
           const whatsapp = whatsappLink(row);
+          const phoneCell = whatsapp
+            ? '<a class="whatsapp-link" href="' + escapeHtml(whatsapp) + '" target="_blank" rel="noopener">' + escapeHtml(row.phone || "—") + '</a>'
+            : '<span class="whatsapp-link empty">—</span>';
           const privateCells = isPrivateView ?
             '<td>' + escapeHtml(row.guardianName || "—") + '</td>' +
             '<td>' + escapeHtml(row.email || "—") + '</td>' +
-            '<td>' + escapeHtml(row.phone || "—") + '</td>' +
-            '<td>' + (whatsapp ? '<a class="whatsapp-link" href="' + escapeHtml(whatsapp) + '" target="_blank" rel="noopener">WhatsApp</a>' : '<span class="whatsapp-link empty">—</span>') + '</td>' : '';
+            '<td>' + phoneCell + '</td>' : '';
           return '<tr class="' + (isToday ? 'today' : '') + '">' +
           '<td>' + (isToday ? '<span class="today-icon" title="Petició d’avui" aria-label="Petició d’avui">●</span>' : '') + escapeHtml(formatDate(row.createdAt, true)) + '</td>' +
           '<td>' + escapeHtml(row.player || "—") + '</td>' +
