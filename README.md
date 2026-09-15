@@ -32,3 +32,26 @@ Prova manual:
 1. Configura els secrets de Twilio i `WHATSAPP_TEST_RECIPIENT`.
 2. Executa el workflow `Actualitza partits` amb l'opció `test_whatsapp=true`.
 3. El missatge de prova s'envia només a `WHATSAPP_TEST_RECIPIENT`.
+
+## Avisos email de noves peticions de fisioteràpia
+
+Les peticions de `fisio.html` es guarden a Firebase RTDB:
+
+- `physioRequestsPublic/season-26-27`: dades públiques.
+- `physioRequestsPrivate/season-26-27`: dades completes.
+
+La Cloud Function `notifyPhysioRequestCreated` envia un email quan es crea una
+nova petició al node privat. Fa servir SendGrid; no hi ha cap clau al frontend.
+
+Configuració necessària:
+
+```bash
+cd /workspaces/coord
+npm --prefix functions install
+firebase functions:secrets:set SENDGRID_API_KEY
+firebase deploy --only functions:notifyPhysioRequestCreated
+```
+
+Durant el deploy, Firebase demanarà els paràmetres `PHYSIO_EMAIL_FROM` i
+`PHYSIO_EMAIL_TO`. Alternativament, crea `functions/.env` a partir de
+`functions/.env.example`.
