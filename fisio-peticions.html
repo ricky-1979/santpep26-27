@@ -22,6 +22,13 @@
     .kpi { display:grid; place-items:center; min-width:112px; border:1px solid var(--line); border-radius:14px; padding:8px 12px; background:#faf8fd; }
     .kpi strong { color:var(--brand-dark); font-size:1.4rem; line-height:1; }
     .kpi span { color:var(--muted); font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; }
+    .auth-bar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin:0 0 14px; padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:#faf8fd; }
+    .auth-bar strong { display:block; color:var(--brand-dark); font-size:0.9rem; }
+    .auth-bar span { display:block; color:var(--muted); font-size:0.78rem; }
+    .auth-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .auth-button { border:0; border-radius:999px; background:var(--brand); color:#fff; padding:8px 12px; font-weight:800; font-size:0.82rem; cursor:pointer; }
+    .auth-button.secondary { background:#fff; color:var(--brand); border:1px solid var(--line); }
+    .auth-button:disabled { opacity:0.55; cursor:not-allowed; }
     .filters { display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start; margin:0 0 14px; }
     .filter-group { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .filter-label { width:100%; color:var(--muted); font-size:0.72rem; font-weight:900; text-transform:uppercase; letter-spacing:0.05em; margin:2px 0 -2px; }
@@ -57,9 +64,19 @@
       <div class="head">
         <div>
           <h2>Peticions rebudes</h2>
-          <p>No es mostren correus ni telèfons. La descripció és una versió curta.</p>
+          <p id="privacyText">No es mostren correus ni telèfons. La descripció és una versió curta.</p>
         </div>
         <div class="kpi"><strong id="totalRequests">—</strong><span>Peticions</span></div>
+      </div>
+      <div class="auth-bar">
+        <div>
+          <strong id="authTitle">Vista pública</strong>
+          <span id="authText">Inicia sessió amb un compte autoritzat per veure totes les dades.</span>
+        </div>
+        <div class="auth-actions">
+          <button class="auth-button" id="loginButton" type="button">Entrar amb Google</button>
+          <button class="auth-button secondary" id="logoutButton" type="button" hidden>Sortir</button>
+        </div>
       </div>
       <div class="filters" id="filters"></div>
       <div class="status" id="status">Carregant peticions...</div>
@@ -67,7 +84,10 @@
     </section>
   </main>
   <footer>CB Sant Josep de Badalona · Tecnificació 26-27</footer>
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
     const REQUESTS = [
       { createdAt: "15/09/2026 17:56:19", player: "Oriol Piera", injuryDate: "09/09/2026", team: "INFANTIL", gender: "M", description: "Dolor i inflamació al genoll dret." },
       { createdAt: "14/09/2026 22:56:01", player: "Enzo Romero Agüera", injuryDate: "02/09/2026", team: "JÚNIOR", gender: "M", description: "Molèstia a l'isquio després d'un salt." },
@@ -84,12 +104,32 @@
     const tableWrap = document.getElementById("tableWrap");
     const totalEl = document.getElementById("totalRequests");
     const filtersEl = document.getElementById("filters");
+    const privacyText = document.getElementById("privacyText");
+    const authTitle = document.getElementById("authTitle");
+    const authText = document.getElementById("authText");
+    const loginButton = document.getElementById("loginButton");
+    const logoutButton = document.getElementById("logoutButton");
+    const AUTHORIZED_EMAILS = ["ricard.fuste@gmail.com"];
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyDge8IFez-I-HhyFDx0ch0Jr1-NYLHDWRU",
+      authDomain: "coord-fa09e.firebaseapp.com",
+      databaseURL: "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "coord-fa09e",
+      storageBucket: "coord-fa09e.firebasestorage.app",
+      messagingSenderId: "509431001997",
+      appId: "1:509431001997:web:561fa966029d873131c3c4",
+      measurementId: "G-ZD556SCF1T"
+    };
     const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
     const PUBLIC_REQUESTS_PATH = "physioRequestsPublic/season-26-27";
+    const PRIVATE_REQUESTS_PATH = "physioRequestsPrivate/season-26-27";
     let rows = [];
     let activeTeam = "TOTS";
     let activeGender = "TOTS";
     let statusMessage = "";
+    let auth = null;
+    let authReady = false;
+    let isPrivateView = false;
 
     function parseDateValue(value){
       const text = String(value || "");
@@ -129,14 +169,14 @@
         a.getDate() === b.getDate();
     }
 
-    function firebaseUrl(path){
+    function firebaseUrl(path, token){
       const base = FIREBASE_DB_URL.replace(/\/$/, "");
       const safePath = path.split("/").map(encodeURIComponent).join("/");
-      return base + "/" + safePath + ".json";
+      return base + "/" + safePath + ".json" + (token ? "?auth=" + encodeURIComponent(token) : "");
     }
 
-    async function fetchFirebaseRequests(){
-      const response = await fetch(firebaseUrl(PUBLIC_REQUESTS_PATH), { cache:"no-store" });
+    async function fetchFirebaseRequests(path, token){
+      const response = await fetch(firebaseUrl(path, token), { cache:"no-store" });
       if(!response.ok) throw new Error("Firebase read failed");
       const data = await response.json();
       if(!data) return [];
@@ -151,12 +191,33 @@
         team: row.team,
         gender: row.gender,
         player: row.player,
-        description: row.description
+        description: row.description,
+        email: row.email,
+        guardianName: row.guardianName,
+        phone: row.phone
       })).sort((a, b) => {
         const at = a.createdAt ? a.createdAt.getTime() : 0;
         const bt = b.createdAt ? b.createdAt.getTime() : 0;
         return bt - at;
       });
+    }
+
+    function setPublicMode(message){
+      isPrivateView = false;
+      authTitle.textContent = "Vista pública";
+      authText.textContent = message || "Inicia sessió amb un compte autoritzat per veure totes les dades.";
+      privacyText.textContent = "No es mostren correus ni telèfons. La descripció és una versió curta.";
+      loginButton.hidden = false;
+      logoutButton.hidden = true;
+    }
+
+    function setPrivateMode(user){
+      isPrivateView = true;
+      authTitle.textContent = "Vista completa";
+      authText.textContent = "Sessió iniciada com " + user.email + ".";
+      privacyText.textContent = "Es mostren totes les dades disponibles per al servei de fisioteràpia.";
+      loginButton.hidden = true;
+      logoutButton.hidden = false;
     }
 
     function renderFilters(){
@@ -204,29 +265,98 @@
         return;
       }
       const today = new Date();
-      tableWrap.innerHTML = '<table><thead><tr><th>Data sol·licitud</th><th>Jugador/a</th><th>Equip</th><th>Data lesió</th><th>Descripció curta</th></tr></thead><tbody>' +
+      const privateHead = isPrivateView ? '<th>Pare/mare</th><th>Email</th><th>Telèfon</th>' : '';
+      tableWrap.innerHTML = '<table><thead><tr><th>Data sol·licitud</th><th>Jugador/a</th><th>Equip</th><th>Data lesió</th>' + privateHead + '<th>Descripció</th></tr></thead><tbody>' +
         visible.map(row => {
           const isToday = isSameDay(row.createdAt, today);
+          const privateCells = isPrivateView ?
+            '<td>' + escapeHtml(row.guardianName || "—") + '</td>' +
+            '<td>' + escapeHtml(row.email || "—") + '</td>' +
+            '<td>' + escapeHtml(row.phone || "—") + '</td>' : '';
           return '<tr class="' + (isToday ? 'today' : '') + '">' +
           '<td>' + (isToday ? '<span class="today-icon" title="Petició d’avui" aria-label="Petició d’avui">●</span>' : '') + escapeHtml(formatDate(row.createdAt, true)) + '</td>' +
           '<td>' + escapeHtml(row.player || "—") + '</td>' +
           '<td><span class="team">' + escapeHtml(row.team || "—") + '</span></td>' +
           '<td>' + escapeHtml(formatDate(row.injuryDate, false)) + '</td>' +
+          privateCells +
           '<td class="desc">' + escapeHtml(row.description || "—") + '</td>' +
         '</tr>';
         }).join("") +
         '</tbody></table>';
     }
 
-    async function init(){
+    async function loadPublicRequests(message){
       try {
-        rows = normalizeRequests(await fetchFirebaseRequests());
+        rows = normalizeRequests(await fetchFirebaseRequests(PUBLIC_REQUESTS_PATH));
         if(!rows.length) rows = normalizeRequests(REQUESTS);
+        statusMessage = message || "";
       } catch(error) {
         rows = normalizeRequests(REQUESTS);
         statusMessage = "No s'ha pogut carregar Firebase. Es mostren les darreres dades locals.";
       }
       render();
+    }
+
+    async function loadPrivateRequests(user){
+      const email = String(user && user.email || "").toLowerCase();
+      if(!AUTHORIZED_EMAILS.includes(email)){
+        setPublicMode("Aquest compte no té accés a la vista completa.");
+        await loadPublicRequests("Aquest compte no té accés a la vista completa. Es mostra la vista pública.");
+        return;
+      }
+      try {
+        const token = await user.getIdToken();
+        rows = normalizeRequests(await fetchFirebaseRequests(PRIVATE_REQUESTS_PATH, token));
+        setPrivateMode(user);
+        statusMessage = "Dades completes carregades des de Firebase.";
+        render();
+      } catch(error) {
+        setPublicMode("No s'ha pogut carregar la vista completa. Revisa permisos de Firebase.");
+        await loadPublicRequests("No s'ha pogut carregar la vista completa. Es mostra la vista pública.");
+      }
+    }
+
+    function configureAuth(){
+      if(FIREBASE_CONFIG.apiKey === "TODO_FIREBASE_WEB_API_KEY"){
+        loginButton.disabled = true;
+        authText.textContent = "Falta configurar l'apiKey de Firebase per activar el login.";
+        return;
+      }
+      try {
+        const app = initializeApp(FIREBASE_CONFIG);
+        auth = getAuth(app);
+        authReady = true;
+        onAuthStateChanged(auth, user => {
+          if(user) loadPrivateRequests(user);
+          else {
+            setPublicMode();
+            loadPublicRequests();
+          }
+        });
+      } catch(error) {
+        loginButton.disabled = true;
+        authText.textContent = "No s'ha pogut inicialitzar Firebase Auth.";
+      }
+    }
+
+    loginButton.addEventListener("click", async () => {
+      if(!authReady || !auth) return;
+      try {
+        await signInWithPopup(auth, new GoogleAuthProvider());
+      } catch(error) {
+        statusMessage = "No s'ha pogut iniciar sessió amb Google.";
+        render();
+      }
+    });
+
+    logoutButton.addEventListener("click", async () => {
+      if(auth) await signOut(auth);
+    });
+
+    async function init(){
+      setPublicMode();
+      configureAuth();
+      if(!authReady) await loadPublicRequests();
     }
     init();
   </script>
