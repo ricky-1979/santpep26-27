@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>Peticions de fisioteràpia · CB Sant Josep</title>
+  <style>
+    :root { --brand:#713f97; --brand-dark:#5a2f7d; --accent:#fcdb20; --bg:#f5f3f8; --card:#fff; --ink:#2a2233; --muted:#7a7085; --line:#e6e0ee; --shadow:0 1px 3px rgba(60,40,90,0.08),0 4px 16px rgba(60,40,90,0.06); --radius:16px; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); min-height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.4; -webkit-font-smoothing:antialiased; }
+    header { display:flex; align-items:center; gap:14px; padding:16px 20px; background:var(--brand); color:#fff; box-shadow:var(--shadow); }
+    .logo-link { display:inline-grid; place-items:center; width:48px; height:48px; cursor:pointer; text-decoration:none; flex-shrink:0; background:#fff; color:var(--brand); border-radius:10px; font-size:1.55rem; font-weight:900; }
+    .htext h1 { margin:0; font-size:1.05rem; font-weight:700; letter-spacing:-0.01em; }
+    .htext h1 .club { display:block; font-size:0.72rem; font-weight:500; opacity:0.85; letter-spacing:0.04em; text-transform:uppercase; }
+    .htext p { margin:2px 0 0; font-size:0.8rem; opacity:0.9; }
+    main { max-width:920px; margin:0 auto; padding:22px 16px 60px; }
+    .back { display:inline-flex; margin:0 0 16px; color:var(--brand); font-weight:800; text-decoration:none; font-size:0.86rem; }
+    .panel { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; }
+    .head { display:flex; gap:12px; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; margin-bottom:14px; }
+    .head h2 { margin:0 0 6px; color:var(--brand-dark); font-size:1.24rem; }
+    .head p { margin:0; color:var(--muted); font-size:0.88rem; max-width:620px; }
+    .kpi { display:grid; place-items:center; min-width:112px; border:1px solid var(--line); border-radius:14px; padding:8px 12px; background:#faf8fd; }
+    .kpi strong { color:var(--brand-dark); font-size:1.4rem; line-height:1; }
+    .kpi span { color:var(--muted); font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; }
+    .filters { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
+    .chip { border:1px solid var(--line); background:#fff; color:var(--brand); border-radius:999px; padding:6px 12px; font-weight:800; font-size:0.78rem; cursor:pointer; }
+    .chip.active { background:var(--accent); color:#4a3800; border-color:var(--accent); }
+    .status { color:var(--muted); font-size:0.86rem; margin:8px 0; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:14px; }
+    table { width:100%; border-collapse:collapse; min-width:620px; background:#fff; }
+    th, td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { background:#faf8fd; color:var(--brand-dark); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; }
+    td { font-size:0.88rem; }
+    tr:last-child td { border-bottom:0; }
+    .code { font-weight:900; color:var(--brand-dark); }
+    .team { display:inline-flex; border-radius:999px; background:#ede7f6; color:#4527a0; padding:3px 8px; font-size:0.76rem; font-weight:900; }
+    .empty, .error { padding:18px; text-align:center; color:var(--muted); }
+    .error { color:#b71c1c; }
+    footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo-link" href="index.html" title="Inici" aria-label="Inici">✚</a>
+    <div class="htext">
+      <h1><span class="club">CB Sant Josep de Badalona</span> Peticions de fisioteràpia</h1>
+      <p>Vista anonimitzada</p>
+    </div>
+  </header>
+  <main>
+    <a class="back" href="index.html">← Tornar</a>
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h2>Peticions rebudes</h2>
+          <p>Consulta pública anonimitzada. No es mostren noms, correus, telèfons ni descripcions mèdiques.</p>
+        </div>
+        <div class="kpi"><strong id="totalRequests">—</strong><span>Peticions</span></div>
+      </div>
+      <div class="filters" id="filters"></div>
+      <div class="status" id="status">Carregant peticions...</div>
+      <div class="table-wrap" id="tableWrap"></div>
+    </section>
+  </main>
+  <footer>CB Sant Josep de Badalona · Tecnificació 26-27</footer>
+  <script>
+    const REQUESTS = [
+      { createdAt: "15/09/2026 17:56:19", injuryDate: "09/09/2026", team: "INFANTIL" },
+      { createdAt: "14/09/2026 22:56:01", injuryDate: "02/09/2026", team: "JÚNIOR" },
+      { createdAt: "14/09/2026 22:28:44", injuryDate: "02/09/2026", team: "JÚNIOR" },
+      { createdAt: "14/09/2026 17:10:16", injuryDate: "12/09/2026", team: "CADET" },
+      { createdAt: "09/09/2026 23:43:19", injuryDate: "07/09/2026", team: "SÉNIOR" },
+      { createdAt: "09/09/2026 20:47:41", injuryDate: "09/09/2026", team: "INFANTIL" },
+      { createdAt: "07/09/2026 23:02:16", injuryDate: "07/09/2026", team: "SÉNIOR" },
+      { createdAt: "01/09/2026 22:13:41", injuryDate: "29/08/2026", team: "JÚNIOR" },
+      { createdAt: "31/08/2026 15:59:26", injuryDate: "30/08/2026", team: "JÚNIOR" },
+      { createdAt: "31/08/2026 10:20:10", injuryDate: "30/08/2026", team: "JÚNIOR" }
+    ];
+    const statusEl = document.getElementById("status");
+    const tableWrap = document.getElementById("tableWrap");
+    const totalEl = document.getElementById("totalRequests");
+    const filtersEl = document.getElementById("filters");
+    let rows = [];
+    let activeTeam = "TOTS";
+
+    function parseDateValue(value){
+      const text = String(value || "");
+      const formatted = text.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/);
+      if(formatted){
+        return new Date(Number(formatted[3]), Number(formatted[2]) - 1, Number(formatted[1]), Number(formatted[4] || 0), Number(formatted[5] || 0), Number(formatted[6] || 0));
+      }
+      const m = text.match(/Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/);
+      if(!m) return null;
+      const d = new Date(Number(m[1]), Number(m[2]), Number(m[3]), Number(m[4] || 0), Number(m[5] || 0), Number(m[6] || 0));
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function formatDate(date, withTime){
+      if(!date) return "—";
+      const opts = { day:"2-digit", month:"2-digit", year:"numeric" };
+      if(withTime){ opts.hour = "2-digit"; opts.minute = "2-digit"; }
+      return new Intl.DateTimeFormat("ca-ES", opts).format(date);
+    }
+
+    function escapeHtml(value){
+      return String(value).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+    }
+
+    function requestCode(index){
+      return "PET-" + String(rows.length - index).padStart(3, "0");
+    }
+
+    function renderFilters(){
+      const teams = ["TOTS"].concat([...new Set(rows.map(r => r.team).filter(Boolean))].sort((a,b) => a.localeCompare(b, "ca-ES")));
+      filtersEl.innerHTML = teams.map(team =>
+        '<button class="chip ' + (team === activeTeam ? "active" : "") + '" type="button" data-team="' + escapeHtml(team) + '">' +
+        (team === "TOTS" ? "Tots" : escapeHtml(team)) + '</button>'
+      ).join("");
+      filtersEl.querySelectorAll(".chip").forEach(button => {
+        button.addEventListener("click", () => {
+          activeTeam = button.dataset.team;
+          render();
+        });
+      });
+    }
+
+    function render(){
+      const visible = activeTeam === "TOTS" ? rows : rows.filter(r => r.team === activeTeam);
+      totalEl.textContent = visible.length;
+      statusEl.textContent = rows.length ? "Dades anonimitzades actualitzades manualment des del full de respostes." : "No hi ha peticions.";
+      renderFilters();
+      if(!visible.length){
+        tableWrap.innerHTML = '<div class="empty">Cap petició amb aquest filtre.</div>';
+        return;
+      }
+      tableWrap.innerHTML = '<table><thead><tr><th>Codi</th><th>Data sol·licitud</th><th>Equip</th><th>Data lesió</th></tr></thead><tbody>' +
+        visible.map((row, index) => '<tr>' +
+          '<td class="code">' + requestCode(rows.indexOf(row)) + '</td>' +
+          '<td>' + escapeHtml(formatDate(row.createdAt, true)) + '</td>' +
+          '<td><span class="team">' + escapeHtml(row.team || "—") + '</span></td>' +
+          '<td>' + escapeHtml(formatDate(row.injuryDate, false)) + '</td>' +
+        '</tr>').join("") +
+        '</tbody></table>';
+    }
+
+    rows = REQUESTS.map(row => ({
+      createdAt: parseDateValue(row.createdAt),
+      injuryDate: parseDateValue(row.injuryDate),
+      team: row.team
+    }));
+    render();
+  </script>
+</body>
+</html>
