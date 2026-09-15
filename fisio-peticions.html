@@ -10,12 +10,11 @@
     * { box-sizing:border-box; }
     body { margin:0; background:var(--bg); color:var(--ink); min-height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.4; -webkit-font-smoothing:antialiased; }
     header { display:flex; align-items:center; gap:14px; padding:16px 20px; background:var(--brand); color:#fff; box-shadow:var(--shadow); }
-    .logo-link { display:inline-grid; place-items:center; width:48px; height:48px; cursor:pointer; text-decoration:none; flex-shrink:0; background:#fff; color:var(--brand); border-radius:10px; font-size:1.55rem; font-weight:900; }
+    .logo { display:inline-grid; place-items:center; width:48px; height:48px; text-decoration:none; flex-shrink:0; background:#fff; color:var(--brand); border-radius:10px; font-size:1.55rem; font-weight:900; }
     .htext h1 { margin:0; font-size:1.05rem; font-weight:700; letter-spacing:-0.01em; }
     .htext h1 .club { display:block; font-size:0.72rem; font-weight:500; opacity:0.85; letter-spacing:0.04em; text-transform:uppercase; }
     .htext p { margin:2px 0 0; font-size:0.8rem; opacity:0.9; }
     main { max-width:920px; margin:0 auto; padding:22px 16px 60px; }
-    .back { display:inline-flex; margin:0 0 16px; color:var(--brand); font-weight:800; text-decoration:none; font-size:0.86rem; }
     .panel { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; }
     .head { display:flex; gap:12px; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; margin-bottom:14px; }
     .head h2 { margin:0 0 6px; color:var(--brand-dark); font-size:1.24rem; }
@@ -28,6 +27,8 @@
     .full-access span { display:block; color:var(--muted); font-size:0.78rem; }
     .full-access a { display:inline-flex; border-radius:999px; background:var(--brand); color:#fff; text-decoration:none; padding:8px 12px; font-weight:800; font-size:0.82rem; }
     .filters { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
+    .filter-group { display:flex; gap:8px; flex-wrap:wrap; width:100%; }
+    .filter-label { width:100%; color:var(--muted); font-size:0.72rem; font-weight:900; text-transform:uppercase; letter-spacing:0.05em; margin:2px 0 -2px; }
     .chip { border:1px solid var(--line); background:#fff; color:var(--brand); border-radius:999px; padding:6px 12px; font-weight:800; font-size:0.78rem; cursor:pointer; }
     .chip.active { background:var(--accent); color:#4a3800; border-color:var(--accent); }
     .status { color:var(--muted); font-size:0.86rem; margin:8px 0; }
@@ -46,14 +47,13 @@
 </head>
 <body>
   <header>
-    <a class="logo-link" href="index.html" title="Inici" aria-label="Inici">✚</a>
+    <div class="logo" aria-hidden="true">✚</div>
     <div class="htext">
       <h1><span class="club">CB Sant Josep de Badalona</span> Peticions de fisioteràpia</h1>
       <p>Vista pública resumida</p>
     </div>
   </header>
   <main>
-    <a class="back" href="index.html">← Tornar</a>
     <section class="panel">
       <div class="head">
         <div>
@@ -77,16 +77,16 @@
   <footer>CB Sant Josep de Badalona · Tecnificació 26-27</footer>
   <script>
     const REQUESTS = [
-      { createdAt: "15/09/2026 17:56:19", player: "Oriol Piera", injuryDate: "09/09/2026", team: "INFANTIL", description: "Dolor i inflamació al genoll dret." },
-      { createdAt: "14/09/2026 22:56:01", player: "Enzo Romero Agüera", injuryDate: "02/09/2026", team: "JÚNIOR", description: "Molèstia a l'isquio després d'un salt." },
-      { createdAt: "14/09/2026 22:28:44", player: "Enzo Romero Agüera", injuryDate: "02/09/2026", team: "JÚNIOR", description: "Punxada a l'isquio al final d'un entrenament." },
-      { createdAt: "14/09/2026 17:10:16", player: "Aniol Abrisqueta López", injuryDate: "12/09/2026", team: "CADET", description: "Mal al genoll esquerre." },
-      { createdAt: "09/09/2026 23:43:19", player: "Laia González Raül", injuryDate: "07/09/2026", team: "SÉNIOR", description: "Seguiment de quàdriceps i tractament recomanat." },
-      { createdAt: "09/09/2026 20:47:41", player: "Yago Morales", injuryDate: "09/09/2026", team: "INFANTIL", description: "Possible esguinç de turmell." },
-      { createdAt: "07/09/2026 23:02:16", player: "Laia González Raül", injuryDate: "07/09/2026", team: "SÉNIOR", description: "Estrebada forta al quàdriceps dret." },
-      { createdAt: "01/09/2026 22:13:41", player: "Ainhoa Espinal López", injuryDate: "29/08/2026", team: "JÚNIOR", description: "Molèstia a la part baixa de l'esquena." },
-      { createdAt: "31/08/2026 15:59:26", player: "Carla Perramón Navarro", injuryDate: "30/08/2026", team: "JÚNIOR", description: "Recaiguda/molèsties al turmell esquerre." },
-      { createdAt: "31/08/2026 10:20:10", player: "Thaïs Sampera Cerdà", injuryDate: "30/08/2026", team: "JÚNIOR", description: "Molèstia al genoll esquerre després d'un cop." }
+      { createdAt: "15/09/2026 17:56:19", player: "Oriol Piera", injuryDate: "09/09/2026", team: "INFANTIL", gender: "M", description: "Dolor i inflamació al genoll dret." },
+      { createdAt: "14/09/2026 22:56:01", player: "Enzo Romero Agüera", injuryDate: "02/09/2026", team: "JÚNIOR", gender: "M", description: "Molèstia a l'isquio després d'un salt." },
+      { createdAt: "14/09/2026 22:28:44", player: "Enzo Romero Agüera", injuryDate: "02/09/2026", team: "JÚNIOR", gender: "M", description: "Punxada a l'isquio al final d'un entrenament." },
+      { createdAt: "14/09/2026 17:10:16", player: "Aniol Abrisqueta López", injuryDate: "12/09/2026", team: "CADET", gender: "M", description: "Mal al genoll esquerre." },
+      { createdAt: "09/09/2026 23:43:19", player: "Laia González Raül", injuryDate: "07/09/2026", team: "SÉNIOR", gender: "F", description: "Seguiment de quàdriceps i tractament recomanat." },
+      { createdAt: "09/09/2026 20:47:41", player: "Yago Morales", injuryDate: "09/09/2026", team: "INFANTIL", gender: "M", description: "Possible esguinç de turmell." },
+      { createdAt: "07/09/2026 23:02:16", player: "Laia González Raül", injuryDate: "07/09/2026", team: "SÉNIOR", gender: "F", description: "Estrebada forta al quàdriceps dret." },
+      { createdAt: "01/09/2026 22:13:41", player: "Ainhoa Espinal López", injuryDate: "29/08/2026", team: "JÚNIOR", gender: "F", description: "Molèstia a la part baixa de l'esquena." },
+      { createdAt: "31/08/2026 15:59:26", player: "Carla Perramón Navarro", injuryDate: "30/08/2026", team: "JÚNIOR", gender: "F", description: "Recaiguda/molèsties al turmell esquerre." },
+      { createdAt: "31/08/2026 10:20:10", player: "Thaïs Sampera Cerdà", injuryDate: "30/08/2026", team: "JÚNIOR", gender: "F", description: "Molèstia al genoll esquerre després d'un cop." }
     ];
     const statusEl = document.getElementById("status");
     const tableWrap = document.getElementById("tableWrap");
@@ -94,6 +94,7 @@
     const filtersEl = document.getElementById("filters");
     let rows = [];
     let activeTeam = "TOTS";
+    let activeGender = "TOTS";
 
     function parseDateValue(value){
       const text = String(value || "");
@@ -120,20 +121,41 @@
 
     function renderFilters(){
       const teams = ["TOTS"].concat([...new Set(rows.map(r => r.team).filter(Boolean))].sort((a,b) => a.localeCompare(b, "ca-ES")));
-      filtersEl.innerHTML = teams.map(team =>
+      const genders = [
+        { value: "TOTS", label: "Tots" },
+        { value: "M", label: "Masculins" },
+        { value: "F", label: "Femenins" }
+      ];
+      filtersEl.innerHTML =
+        '<div class="filter-group"><div class="filter-label">Gènere</div>' +
+        genders.map(gender =>
+          '<button class="chip ' + (gender.value === activeGender ? "active" : "") + '" type="button" data-gender="' + escapeHtml(gender.value) + '">' +
+          escapeHtml(gender.label) + '</button>'
+        ).join("") +
+        '</div><div class="filter-group"><div class="filter-label">Categoria</div>' +
+        teams.map(team =>
         '<button class="chip ' + (team === activeTeam ? "active" : "") + '" type="button" data-team="' + escapeHtml(team) + '">' +
         (team === "TOTS" ? "Tots" : escapeHtml(team)) + '</button>'
-      ).join("");
-      filtersEl.querySelectorAll(".chip").forEach(button => {
+      ).join("") + '</div>';
+      filtersEl.querySelectorAll("[data-team]").forEach(button => {
         button.addEventListener("click", () => {
           activeTeam = button.dataset.team;
+          render();
+        });
+      });
+      filtersEl.querySelectorAll("[data-gender]").forEach(button => {
+        button.addEventListener("click", () => {
+          activeGender = button.dataset.gender;
           render();
         });
       });
     }
 
     function render(){
-      const visible = activeTeam === "TOTS" ? rows : rows.filter(r => r.team === activeTeam);
+      const visible = rows.filter(r =>
+        (activeTeam === "TOTS" || r.team === activeTeam) &&
+        (activeGender === "TOTS" || r.gender === activeGender)
+      );
       totalEl.textContent = visible.length;
       statusEl.textContent = rows.length ? "Dades resumides actualitzades manualment des del full de respostes." : "No hi ha peticions.";
       renderFilters();
@@ -156,6 +178,7 @@
       createdAt: parseDateValue(row.createdAt),
       injuryDate: parseDateValue(row.injuryDate),
       team: row.team,
+      gender: row.gender,
       player: row.player,
       description: row.description
     }));
