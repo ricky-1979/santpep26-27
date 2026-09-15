@@ -391,7 +391,7 @@
         const token = await user.getIdToken();
         rows = normalizeRequests(await fetchFirebaseRequests(PRIVATE_REQUESTS_PATH, token));
         setPrivateMode(user);
-        statusMessage = "Dades completes carregades des de Firebase.";
+        statusMessage = "Dades completes carregades.";
         render();
       } catch(error) {
         setPublicMode("No s'ha pogut carregar la vista completa. Revisa permisos de Firebase.");
