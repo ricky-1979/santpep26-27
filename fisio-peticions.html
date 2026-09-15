@@ -350,16 +350,14 @@
     }
 
     function renderPagination(total, totalPages){
-      if(total <= PAGE_SIZE){
-        paginationEl.innerHTML = "";
-        return;
-      }
       const first = (currentPage - 1) * PAGE_SIZE + 1;
       const last = Math.min(total, currentPage * PAGE_SIZE);
       paginationEl.innerHTML =
         '<span class="page-info">Mostrant ' + first + '–' + last + ' de ' + total + '</span>' +
-        '<button class="page-button" type="button" data-page="prev" ' + (currentPage === 1 ? 'disabled' : '') + '>Anterior</button>' +
-        '<button class="page-button" type="button" data-page="next" ' + (currentPage === totalPages ? 'disabled' : '') + '>Següent</button>';
+        (totalPages > 1
+          ? '<button class="page-button" type="button" data-page="prev" ' + (currentPage === 1 ? 'disabled' : '') + '>Anterior</button>' +
+            '<button class="page-button" type="button" data-page="next" ' + (currentPage === totalPages ? 'disabled' : '') + '>Següent</button>'
+          : '');
       paginationEl.querySelectorAll("[data-page]").forEach(button => {
         button.addEventListener("click", () => {
           currentPage += button.dataset.page === "next" ? 1 : -1;
