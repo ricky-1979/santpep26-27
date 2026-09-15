@@ -43,7 +43,9 @@
     td { font-size:0.88rem; }
     tr:last-child td { border-bottom:0; }
     tr.today { background:#fff8d6; box-shadow:inset 4px 0 0 var(--accent); }
-    .team { display:inline-flex; border-radius:999px; background:#ede7f6; color:#4527a0; padding:3px 8px; font-size:0.76rem; font-weight:900; }
+    .team { display:inline-flex; border-radius:999px; padding:3px 8px; font-size:0.76rem; font-weight:900; }
+    .team.male { background:#e3f2fd; color:#0d47a1; }
+    .team.female { background:#fce4ec; color:#880e4f; }
     .today-icon { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; margin-right:6px; border-radius:999px; background:var(--accent); color:#4a3800; font-size:0.72rem; font-weight:900; vertical-align:middle; }
     .desc { max-width:280px; color:var(--muted); }
     .empty, .error { padding:18px; text-align:center; color:var(--muted); }
@@ -276,7 +278,7 @@
           return '<tr class="' + (isToday ? 'today' : '') + '">' +
           '<td>' + (isToday ? '<span class="today-icon" title="Petició d’avui" aria-label="Petició d’avui">●</span>' : '') + escapeHtml(formatDate(row.createdAt, true)) + '</td>' +
           '<td>' + escapeHtml(row.player || "—") + '</td>' +
-          '<td><span class="team">' + escapeHtml(row.team || "—") + '</span></td>' +
+          '<td><span class="team ' + (row.gender === "F" ? "female" : "male") + '">' + escapeHtml(row.team || "—") + '</span></td>' +
           '<td>' + escapeHtml(formatDate(row.injuryDate, false)) + '</td>' +
           privateCells +
           '<td class="desc">' + escapeHtml(row.description || "—") + '</td>' +
