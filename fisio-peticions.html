@@ -23,18 +23,23 @@
     .kpi { display:grid; place-items:center; min-width:112px; border:1px solid var(--line); border-radius:14px; padding:8px 12px; background:#faf8fd; }
     .kpi strong { color:var(--brand-dark); font-size:1.4rem; line-height:1; }
     .kpi span { color:var(--muted); font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; }
+    .full-access { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin:0 0 14px; padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:#faf8fd; }
+    .full-access strong { display:block; color:var(--brand-dark); font-size:0.9rem; }
+    .full-access span { display:block; color:var(--muted); font-size:0.78rem; }
+    .full-access a { display:inline-flex; border-radius:999px; background:var(--brand); color:#fff; text-decoration:none; padding:8px 12px; font-weight:800; font-size:0.82rem; }
     .filters { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
     .chip { border:1px solid var(--line); background:#fff; color:var(--brand); border-radius:999px; padding:6px 12px; font-weight:800; font-size:0.78rem; cursor:pointer; }
     .chip.active { background:var(--accent); color:#4a3800; border-color:var(--accent); }
     .status { color:var(--muted); font-size:0.86rem; margin:8px 0; }
     .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:14px; }
-    table { width:100%; border-collapse:collapse; min-width:620px; background:#fff; }
+    table { width:100%; border-collapse:collapse; min-width:820px; background:#fff; }
     th, td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
     th { background:#faf8fd; color:var(--brand-dark); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; }
     td { font-size:0.88rem; }
     tr:last-child td { border-bottom:0; }
     .code { font-weight:900; color:var(--brand-dark); }
     .team { display:inline-flex; border-radius:999px; background:#ede7f6; color:#4527a0; padding:3px 8px; font-size:0.76rem; font-weight:900; }
+    .desc { max-width:280px; color:var(--muted); }
     .empty, .error { padding:18px; text-align:center; color:var(--muted); }
     .error { color:#b71c1c; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
@@ -45,7 +50,7 @@
     <a class="logo-link" href="index.html" title="Inici" aria-label="Inici">✚</a>
     <div class="htext">
       <h1><span class="club">CB Sant Josep de Badalona</span> Peticions de fisioteràpia</h1>
-      <p>Vista anonimitzada</p>
+      <p>Vista pública resumida</p>
     </div>
   </header>
   <main>
@@ -54,9 +59,16 @@
       <div class="head">
         <div>
           <h2>Peticions rebudes</h2>
-          <p>Consulta pública anonimitzada. No es mostren noms, correus, telèfons ni descripcions mèdiques.</p>
+          <p>Consulta pública resumida. No es mostren correus ni telèfons. La descripció és una versió curta.</p>
         </div>
         <div class="kpi"><strong id="totalRequests">—</strong><span>Peticions</span></div>
+      </div>
+      <div class="full-access">
+        <div>
+          <strong>Versió completa</strong>
+          <span>Accés al full original amb permisos de Google.</span>
+        </div>
+        <a href="https://docs.google.com/spreadsheets/d/1EvSTJ3uxAngH5s6iRtv-bb1uFt-foRV6J2Y916pcMsw/edit?usp=sharing" target="_blank" rel="noopener">Obrir versió completa</a>
       </div>
       <div class="filters" id="filters"></div>
       <div class="status" id="status">Carregant peticions...</div>
@@ -66,16 +78,16 @@
   <footer>CB Sant Josep de Badalona · Tecnificació 26-27</footer>
   <script>
     const REQUESTS = [
-      { createdAt: "15/09/2026 17:56:19", injuryDate: "09/09/2026", team: "INFANTIL" },
-      { createdAt: "14/09/2026 22:56:01", injuryDate: "02/09/2026", team: "JÚNIOR" },
-      { createdAt: "14/09/2026 22:28:44", injuryDate: "02/09/2026", team: "JÚNIOR" },
-      { createdAt: "14/09/2026 17:10:16", injuryDate: "12/09/2026", team: "CADET" },
-      { createdAt: "09/09/2026 23:43:19", injuryDate: "07/09/2026", team: "SÉNIOR" },
-      { createdAt: "09/09/2026 20:47:41", injuryDate: "09/09/2026", team: "INFANTIL" },
-      { createdAt: "07/09/2026 23:02:16", injuryDate: "07/09/2026", team: "SÉNIOR" },
-      { createdAt: "01/09/2026 22:13:41", injuryDate: "29/08/2026", team: "JÚNIOR" },
-      { createdAt: "31/08/2026 15:59:26", injuryDate: "30/08/2026", team: "JÚNIOR" },
-      { createdAt: "31/08/2026 10:20:10", injuryDate: "30/08/2026", team: "JÚNIOR" }
+      { createdAt: "15/09/2026 17:56:19", player: "Oriol Piera", injuryDate: "09/09/2026", team: "INFANTIL", description: "Dolor i inflamació al genoll dret." },
+      { createdAt: "14/09/2026 22:56:01", player: "Enzo Romero Agüera", injuryDate: "02/09/2026", team: "JÚNIOR", description: "Molèstia a l'isquio després d'un salt." },
+      { createdAt: "14/09/2026 22:28:44", player: "Enzo Romero Agüera", injuryDate: "02/09/2026", team: "JÚNIOR", description: "Punxada a l'isquio al final d'un entrenament." },
+      { createdAt: "14/09/2026 17:10:16", player: "Aniol Abrisqueta López", injuryDate: "12/09/2026", team: "CADET", description: "Mal al genoll esquerre." },
+      { createdAt: "09/09/2026 23:43:19", player: "Laia González Raül", injuryDate: "07/09/2026", team: "SÉNIOR", description: "Seguiment de quàdriceps i tractament recomanat." },
+      { createdAt: "09/09/2026 20:47:41", player: "Yago Morales", injuryDate: "09/09/2026", team: "INFANTIL", description: "Possible esguinç de turmell." },
+      { createdAt: "07/09/2026 23:02:16", player: "Laia González Raül", injuryDate: "07/09/2026", team: "SÉNIOR", description: "Estrebada forta al quàdriceps dret." },
+      { createdAt: "01/09/2026 22:13:41", player: "Ainhoa Espinal López", injuryDate: "29/08/2026", team: "JÚNIOR", description: "Molèstia a la part baixa de l'esquena." },
+      { createdAt: "31/08/2026 15:59:26", player: "Carla Perramón Navarro", injuryDate: "30/08/2026", team: "JÚNIOR", description: "Recaiguda/molèsties al turmell esquerre." },
+      { createdAt: "31/08/2026 10:20:10", player: "Thaïs Sampera Cerdà", injuryDate: "30/08/2026", team: "JÚNIOR", description: "Molèstia al genoll esquerre després d'un cop." }
     ];
     const statusEl = document.getElementById("status");
     const tableWrap = document.getElementById("tableWrap");
@@ -128,18 +140,20 @@
     function render(){
       const visible = activeTeam === "TOTS" ? rows : rows.filter(r => r.team === activeTeam);
       totalEl.textContent = visible.length;
-      statusEl.textContent = rows.length ? "Dades anonimitzades actualitzades manualment des del full de respostes." : "No hi ha peticions.";
+      statusEl.textContent = rows.length ? "Dades resumides actualitzades manualment des del full de respostes." : "No hi ha peticions.";
       renderFilters();
       if(!visible.length){
         tableWrap.innerHTML = '<div class="empty">Cap petició amb aquest filtre.</div>';
         return;
       }
-      tableWrap.innerHTML = '<table><thead><tr><th>Codi</th><th>Data sol·licitud</th><th>Equip</th><th>Data lesió</th></tr></thead><tbody>' +
+      tableWrap.innerHTML = '<table><thead><tr><th>Codi</th><th>Data sol·licitud</th><th>Jugador/a</th><th>Equip</th><th>Data lesió</th><th>Descripció curta</th></tr></thead><tbody>' +
         visible.map((row, index) => '<tr>' +
           '<td class="code">' + requestCode(rows.indexOf(row)) + '</td>' +
           '<td>' + escapeHtml(formatDate(row.createdAt, true)) + '</td>' +
+          '<td>' + escapeHtml(row.player || "—") + '</td>' +
           '<td><span class="team">' + escapeHtml(row.team || "—") + '</span></td>' +
           '<td>' + escapeHtml(formatDate(row.injuryDate, false)) + '</td>' +
+          '<td class="desc">' + escapeHtml(row.description || "—") + '</td>' +
         '</tr>').join("") +
         '</tbody></table>';
     }
@@ -147,7 +161,9 @@
     rows = REQUESTS.map(row => ({
       createdAt: parseDateValue(row.createdAt),
       injuryDate: parseDateValue(row.injuryDate),
-      team: row.team
+      team: row.team,
+      player: row.player,
+      description: row.description
     }));
     render();
   </script>
