@@ -324,7 +324,7 @@
             '<td>' + escapeHtml(row.email || "—") + '</td>' +
             '<td>' + phoneCell + '</td>' : '';
           return '<tr class="' + (isToday ? 'today' : '') + '">' +
-          '<td>' + (isToday ? '<span class="today-icon" title="Petició d’avui" aria-label="Petició d’avui">●</span>' : '') + escapeHtml(formatDate(row.createdAt, true)) + '</td>' +
+          '<td>' + (isToday ? '<span class="today-icon" title="Petició d’avui" aria-label="Petició d’avui">●</span>' : '') + escapeHtml(formatDate(row.createdAt, false)) + '</td>' +
           '<td>' + escapeHtml(row.player || "—") + '</td>' +
           '<td><span class="team ' + (row.gender === "F" ? "female" : "male") + '">' + escapeHtml(row.team || "—") + '</span></td>' +
           '<td>' + escapeHtml(formatDate(row.injuryDate, false)) + '</td>' +
