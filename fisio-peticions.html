@@ -317,11 +317,6 @@
     }
 
     function configureAuth(){
-      if(FIREBASE_CONFIG.apiKey === "TODO_FIREBASE_WEB_API_KEY"){
-        loginButton.disabled = true;
-        authText.textContent = "Falta configurar l'apiKey de Firebase per activar el login.";
-        return;
-      }
       try {
         const app = initializeApp(FIREBASE_CONFIG);
         auth = getAuth(app);
