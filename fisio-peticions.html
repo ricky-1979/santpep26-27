@@ -22,10 +22,6 @@
     .kpi { display:grid; place-items:center; min-width:112px; border:1px solid var(--line); border-radius:14px; padding:8px 12px; background:#faf8fd; }
     .kpi strong { color:var(--brand-dark); font-size:1.4rem; line-height:1; }
     .kpi span { color:var(--muted); font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; }
-    .full-access { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin:0 0 14px; padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:#faf8fd; }
-    .full-access strong { display:block; color:var(--brand-dark); font-size:0.9rem; }
-    .full-access span { display:block; color:var(--muted); font-size:0.78rem; }
-    .full-access a { display:inline-flex; border-radius:999px; background:var(--brand); color:#fff; text-decoration:none; padding:8px 12px; font-weight:800; font-size:0.82rem; }
     .filters { display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start; margin:0 0 14px; }
     .filter-group { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .filter-label { width:100%; color:var(--muted); font-size:0.72rem; font-weight:900; text-transform:uppercase; letter-spacing:0.05em; margin:2px 0 -2px; }
@@ -64,13 +60,6 @@
           <p>Consulta pública resumida. No es mostren correus ni telèfons. La descripció és una versió curta.</p>
         </div>
         <div class="kpi"><strong id="totalRequests">—</strong><span>Peticions</span></div>
-      </div>
-      <div class="full-access">
-        <div>
-          <strong>Versió completa</strong>
-          <span>Accés al full original amb permisos de Google.</span>
-        </div>
-        <a href="https://docs.google.com/spreadsheets/d/1EvSTJ3uxAngH5s6iRtv-bb1uFt-foRV6J2Y916pcMsw/edit?usp=sharing" target="_blank" rel="noopener">Obrir versió completa</a>
       </div>
       <div class="filters" id="filters"></div>
       <div class="status" id="status">Carregant peticions...</div>
