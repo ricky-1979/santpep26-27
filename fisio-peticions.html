@@ -50,6 +50,10 @@
     .whatsapp-link { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; background:#25d366; color:#083b1c; text-decoration:none; padding:6px 10px; font-size:0.78rem; font-weight:900; white-space:nowrap; }
     .whatsapp-link.empty { background:#f1eef5; color:var(--muted); pointer-events:none; }
     .desc { max-width:280px; color:var(--muted); }
+    .pagination { display:flex; justify-content:flex-end; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px; color:var(--muted); font-size:0.82rem; }
+    .page-button { border:1px solid var(--line); border-radius:999px; background:#fff; color:var(--brand); padding:7px 11px; font-weight:900; cursor:pointer; }
+    .page-button:disabled { opacity:0.45; cursor:not-allowed; }
+    .page-info { font-weight:800; color:var(--brand-dark); }
     .empty, .error { padding:18px; text-align:center; color:var(--muted); }
     .error { color:#b71c1c; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
@@ -85,6 +89,7 @@
       <div class="filters" id="filters"></div>
       <div class="status" id="status">Carregant peticions...</div>
       <div class="table-wrap" id="tableWrap"></div>
+      <div class="pagination" id="pagination"></div>
     </section>
   </main>
   <footer>CB Sant Josep de Badalona · Tecnificació 26-27</footer>
@@ -106,6 +111,7 @@
     ];
     const statusEl = document.getElementById("status");
     const tableWrap = document.getElementById("tableWrap");
+    const paginationEl = document.getElementById("pagination");
     const totalEl = document.getElementById("totalRequests");
     const filtersEl = document.getElementById("filters");
     const privacyText = document.getElementById("privacyText");
@@ -127,9 +133,11 @@
     const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
     const PUBLIC_REQUESTS_PATH = "physioRequestsPublic/season-26-27";
     const PRIVATE_REQUESTS_PATH = "physioRequestsPrivate/season-26-27";
+    const PAGE_SIZE = 10;
     let rows = [];
     let activeTeam = "TOTS";
     let activeGender = "TOTS";
+    let currentPage = 1;
     let statusMessage = "";
     let auth = null;
     let authReady = false;
@@ -270,12 +278,14 @@
       filtersEl.querySelectorAll("[data-team]").forEach(button => {
         button.addEventListener("click", () => {
           activeTeam = button.dataset.team;
+          currentPage = 1;
           render();
         });
       });
       filtersEl.querySelectorAll("[data-gender]").forEach(button => {
         button.addEventListener("click", () => {
           activeGender = button.dataset.gender;
+          currentPage = 1;
           render();
         });
       });
@@ -291,12 +301,17 @@
       renderFilters();
       if(!visible.length){
         tableWrap.innerHTML = '<div class="empty">Cap petició amb aquest filtre.</div>';
+        paginationEl.innerHTML = "";
         return;
       }
+      const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+      currentPage = Math.min(Math.max(1, currentPage), totalPages);
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageRows = visible.slice(start, start + PAGE_SIZE);
       const today = new Date();
       const privateHead = isPrivateView ? '<th>Pare/mare</th><th>Email</th><th>Telèfon</th><th>WhatsApp</th>' : '';
       tableWrap.innerHTML = '<table><thead><tr><th>Data sol·licitud</th><th>Jugador/a</th><th>Equip</th><th>Data lesió</th>' + privateHead + '<th>Descripció</th></tr></thead><tbody>' +
-        visible.map(row => {
+        pageRows.map(row => {
           const isToday = isSameDay(row.createdAt, today);
           const whatsapp = whatsappLink(row);
           const privateCells = isPrivateView ?
@@ -314,6 +329,26 @@
         '</tr>';
         }).join("") +
         '</tbody></table>';
+      renderPagination(visible.length, totalPages);
+    }
+
+    function renderPagination(total, totalPages){
+      if(total <= PAGE_SIZE){
+        paginationEl.innerHTML = "";
+        return;
+      }
+      const first = (currentPage - 1) * PAGE_SIZE + 1;
+      const last = Math.min(total, currentPage * PAGE_SIZE);
+      paginationEl.innerHTML =
+        '<span class="page-info">Mostrant ' + first + '–' + last + ' de ' + total + '</span>' +
+        '<button class="page-button" type="button" data-page="prev" ' + (currentPage === 1 ? 'disabled' : '') + '>Anterior</button>' +
+        '<button class="page-button" type="button" data-page="next" ' + (currentPage === totalPages ? 'disabled' : '') + '>Següent</button>';
+      paginationEl.querySelectorAll("[data-page]").forEach(button => {
+        button.addEventListener("click", () => {
+          currentPage += button.dataset.page === "next" ? 1 : -1;
+          render();
+        });
+      });
     }
 
     async function loadPublicRequests(message){
