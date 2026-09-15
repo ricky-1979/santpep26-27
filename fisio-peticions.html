@@ -176,6 +176,12 @@
       return String(value).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
     }
 
+    function shortName(value){
+      const parts = String(value || "").trim().split(/\s+/).filter(Boolean);
+      if(parts.length <= 2) return parts.join(" ") || "—";
+      return parts.slice(0, 2).join(" ");
+    }
+
     function isSameDay(a, b){
       return a && b &&
         a.getFullYear() === b.getFullYear() &&
@@ -320,12 +326,12 @@
             ? '<a class="whatsapp-link" href="' + escapeHtml(whatsapp) + '" target="_blank" rel="noopener">' + escapeHtml(row.phone || "—") + '</a>'
             : '<span class="whatsapp-link empty">—</span>';
           const privateCells = isPrivateView ?
-            '<td>' + escapeHtml(row.guardianName || "—") + '</td>' +
+            '<td>' + escapeHtml(shortName(row.guardianName)) + '</td>' +
             '<td>' + escapeHtml(row.email || "—") + '</td>' +
             '<td>' + phoneCell + '</td>' : '';
           return '<tr class="' + (isToday ? 'today' : '') + '">' +
           '<td>' + (isToday ? '<span class="today-icon" title="Petició d’avui" aria-label="Petició d’avui">●</span>' : '') + escapeHtml(formatDate(row.createdAt, false)) + '</td>' +
-          '<td>' + escapeHtml(row.player || "—") + '</td>' +
+          '<td>' + escapeHtml(shortName(row.player)) + '</td>' +
           '<td><span class="team ' + (row.gender === "F" ? "female" : "male") + '">' + escapeHtml(row.team || "—") + '</span></td>' +
           '<td>' + escapeHtml(formatDate(row.injuryDate, false)) + '</td>' +
           privateCells +
