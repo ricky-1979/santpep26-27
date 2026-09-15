@@ -39,7 +39,9 @@
     th { background:#faf8fd; color:var(--brand-dark); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; }
     td { font-size:0.88rem; }
     tr:last-child td { border-bottom:0; }
+    tr.today { background:#fff8d6; box-shadow:inset 4px 0 0 var(--accent); }
     .team { display:inline-flex; border-radius:999px; background:#ede7f6; color:#4527a0; padding:3px 8px; font-size:0.76rem; font-weight:900; }
+    .today-badge { display:inline-flex; margin-left:6px; border-radius:999px; background:var(--accent); color:#4a3800; padding:2px 7px; font-size:0.68rem; font-weight:900; text-transform:uppercase; letter-spacing:0.04em; vertical-align:middle; }
     .desc { max-width:280px; color:var(--muted); }
     .empty, .error { padding:18px; text-align:center; color:var(--muted); }
     .error { color:#b71c1c; }
@@ -120,6 +122,13 @@
       return String(value).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
     }
 
+    function isSameDay(a, b){
+      return a && b &&
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate();
+    }
+
     function renderFilters(){
       const teams = ["TOTS"].concat([...new Set(rows.map(r => r.team).filter(Boolean))].sort((a,b) => a.localeCompare(b, "ca-ES")));
       const genders = [
@@ -164,14 +173,18 @@
         tableWrap.innerHTML = '<div class="empty">Cap petició amb aquest filtre.</div>';
         return;
       }
+      const today = new Date();
       tableWrap.innerHTML = '<table><thead><tr><th>Data sol·licitud</th><th>Jugador/a</th><th>Equip</th><th>Data lesió</th><th>Descripció curta</th></tr></thead><tbody>' +
-        visible.map(row => '<tr>' +
-          '<td>' + escapeHtml(formatDate(row.createdAt, true)) + '</td>' +
+        visible.map(row => {
+          const isToday = isSameDay(row.createdAt, today);
+          return '<tr class="' + (isToday ? 'today' : '') + '">' +
+          '<td>' + escapeHtml(formatDate(row.createdAt, true)) + (isToday ? '<span class="today-badge">Avui</span>' : '') + '</td>' +
           '<td>' + escapeHtml(row.player || "—") + '</td>' +
           '<td><span class="team">' + escapeHtml(row.team || "—") + '</span></td>' +
           '<td>' + escapeHtml(formatDate(row.injuryDate, false)) + '</td>' +
           '<td class="desc">' + escapeHtml(row.description || "—") + '</td>' +
-        '</tr>').join("") +
+        '</tr>';
+        }).join("") +
         '</tbody></table>';
     }
 
