@@ -15,7 +15,6 @@
     .htext h1 .club { display:block; font-size:0.72rem; font-weight:500; opacity:0.85; letter-spacing:0.04em; text-transform:uppercase; }
     .htext p { margin:2px 0 0; font-size:0.8rem; opacity:0.9; }
     main { max-width:720px; margin:0 auto; padding:22px 16px 60px; }
-    .back { display:inline-flex; margin:0 0 16px; color:var(--brand); font-weight:800; text-decoration:none; font-size:0.86rem; }
     .panel { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; }
     .intro { margin-bottom:18px; }
     .intro h2 { margin:0 0 8px; color:var(--brand-dark); font-size:1.28rem; }
@@ -33,20 +32,25 @@
     .status { display:none; border-radius:12px; padding:10px 12px; font-size:0.86rem; font-weight:700; }
     .status.ok { display:block; color:var(--ok); background:var(--ok-bg); border:1px solid #c8e6c9; }
     .status.err { display:block; color:var(--err); background:var(--err-bg); border:1px solid #ffcdd2; }
+    .success-view { display:none; text-align:center; padding:18px 0 4px; }
+    .success-view.show { display:block; }
+    .success-icon { display:inline-grid; place-items:center; width:56px; height:56px; margin:0 0 12px;
+      border-radius:50%; background:var(--ok-bg); color:var(--ok); font-size:1.7rem; font-weight:900; }
+    .success-view h2 { margin:0 0 8px; color:var(--brand-dark); font-size:1.28rem; }
+    .success-view p { margin:0 0 16px; color:var(--muted); font-size:0.92rem; }
     .note { color:var(--muted); font-size:0.8rem; margin:4px 0 0; }
     footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:20px; }
   </style>
 </head>
 <body>
   <header>
-    <a class="logo-link" href="index.html" title="Tornar a l'inici" aria-label="Tornar a l'inici">✚</a>
+    <a class="logo-link" href="index.html" title="Inici" aria-label="Inici">✚</a>
     <div class="htext">
       <h1><span class="club">CB Sant Josep de Badalona</span> Servei de fisioteràpia</h1>
       <p>Sol·licitud de visita</p>
     </div>
   </header>
   <main>
-    <a class="back" href="index.html">← Tornar</a>
     <section class="panel">
       <div class="intro">
         <h2>Visita servei de fisioteràpia</h2>
@@ -93,6 +97,12 @@
           <p class="note">Les dades s'enviaran al formulari oficial del club.</p>
         </div>
       </form>
+      <div id="successView" class="success-view" aria-live="polite">
+        <div class="success-icon">✓</div>
+        <h2>Sol·licitud enviada correctament</h2>
+        <p>Ens posarem en contacte amb vosaltres el més aviat possible.</p>
+        <button id="newRequestButton" type="button">Fer una nova petició</button>
+      </div>
       <iframe name="hiddenSubmitFrame" style="display:none" title="Enviament del formulari"></iframe>
     </section>
   </main>
@@ -105,6 +115,8 @@
     const yearEl = document.getElementById("injuryYear");
     const monthEl = document.getElementById("injuryMonth");
     const dayEl = document.getElementById("injuryDay");
+    const successView = document.getElementById("successView");
+    const newRequestButton = document.getElementById("newRequestButton");
     let submitted = false;
     function setStatus(type, text){
       statusEl.className = "status " + type;
@@ -129,7 +141,17 @@
       form.reset();
       submitted = false;
       submitButton.disabled = false;
-      setStatus("ok", "Sol·licitud enviada correctament. Ens posarem en contacte amb vosaltres el més aviat possible.");
+      statusEl.className = "status";
+      statusEl.textContent = "";
+      form.style.display = "none";
+      successView.classList.add("show");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    newRequestButton.addEventListener("click", function(){
+      successView.classList.remove("show");
+      form.style.display = "grid";
+      submitButton.disabled = false;
+      form.querySelector("input, select, textarea").focus();
     });
   </script>
 </body>
