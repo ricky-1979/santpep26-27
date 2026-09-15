@@ -37,10 +37,15 @@
     .chip.active { background:var(--accent); color:#4a3800; border-color:var(--accent); }
     .status { color:var(--muted); font-size:0.86rem; margin:8px 0; }
     .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:14px; }
-    table { width:100%; border-collapse:collapse; min-width:820px; background:#fff; }
+    table { width:100%; border-collapse:collapse; min-width:820px; background:#fff; table-layout:auto; }
     th, td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
     th { background:#faf8fd; color:var(--brand-dark); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; }
     td { font-size:0.88rem; }
+    .col-date { width:1%; white-space:nowrap; }
+    .col-name { width:1%; white-space:nowrap; }
+    .col-team { width:1%; white-space:nowrap; }
+    .col-email { width:1%; white-space:nowrap; }
+    .col-phone { width:1%; white-space:nowrap; }
     tr:last-child td { border-bottom:0; }
     tr.today { background:#fff8d6; box-shadow:inset 4px 0 0 var(--accent); }
     .team { display:inline-flex; border-radius:999px; padding:3px 8px; font-size:0.76rem; font-weight:900; }
@@ -51,7 +56,7 @@
     .whatsapp-link::before { content:"💬 "; }
     .whatsapp-link:hover { text-decoration:underline; }
     .whatsapp-link.empty { background:#f1eef5; color:var(--muted); pointer-events:none; }
-    .desc { max-width:280px; color:var(--muted); }
+    .desc { color:var(--muted); min-width:280px; }
     .pagination { display:flex; justify-content:flex-end; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px; color:var(--muted); font-size:0.82rem; }
     .page-button { border:1px solid var(--line); border-radius:999px; background:#fff; color:var(--brand); padding:7px 11px; font-weight:900; cursor:pointer; }
     .page-button:disabled { opacity:0.45; cursor:not-allowed; }
@@ -239,7 +244,8 @@
         description: row.description,
         email: row.email,
         guardianName: row.guardianName,
-        phone: row.phone
+        phone: row.phone,
+        fullDescription: row.fullDescription
       })).sort((a, b) => {
         const at = a.createdAt ? a.createdAt.getTime() : 0;
         const bt = b.createdAt ? b.createdAt.getTime() : 0;
@@ -317,8 +323,8 @@
       const start = (currentPage - 1) * PAGE_SIZE;
       const pageRows = visible.slice(start, start + PAGE_SIZE);
       const today = new Date();
-      const privateHead = isPrivateView ? '<th>Pare/mare</th><th>Email</th><th>Telèfon</th>' : '';
-      tableWrap.innerHTML = '<table><thead><tr><th>Data sol·licitud</th><th>Jugador/a</th><th>Equip</th><th>Data lesió</th>' + privateHead + '<th>Descripció</th></tr></thead><tbody>' +
+      const privateHead = isPrivateView ? '<th class="col-name">Pare/mare</th><th class="col-email">Email</th><th class="col-phone">Telèfon</th>' : '';
+      tableWrap.innerHTML = '<table><thead><tr><th class="col-date">Data sol·licitud</th><th class="col-name">Jugador/a</th><th class="col-team">Equip</th><th class="col-date">Data lesió</th>' + privateHead + '<th>Descripció</th></tr></thead><tbody>' +
         pageRows.map(row => {
           const isToday = isSameDay(row.createdAt, today);
           const whatsapp = whatsappLink(row);
@@ -326,16 +332,17 @@
             ? '<a class="whatsapp-link" href="' + escapeHtml(whatsapp) + '" target="_blank" rel="noopener">' + escapeHtml(row.phone || "—") + '</a>'
             : '<span class="whatsapp-link empty">—</span>';
           const privateCells = isPrivateView ?
-            '<td>' + escapeHtml(shortName(row.guardianName)) + '</td>' +
-            '<td>' + escapeHtml(row.email || "—") + '</td>' +
-            '<td>' + phoneCell + '</td>' : '';
+            '<td class="col-name">' + escapeHtml(shortName(row.guardianName)) + '</td>' +
+            '<td class="col-email">' + escapeHtml(row.email || "—") + '</td>' +
+            '<td class="col-phone">' + phoneCell + '</td>' : '';
+          const description = isPrivateView ? (row.fullDescription || row.description) : row.description;
           return '<tr class="' + (isToday ? 'today' : '') + '">' +
-          '<td>' + (isToday ? '<span class="today-icon" title="Petició d’avui" aria-label="Petició d’avui">●</span>' : '') + escapeHtml(formatDate(row.createdAt, false)) + '</td>' +
-          '<td>' + escapeHtml(shortName(row.player)) + '</td>' +
-          '<td><span class="team ' + (row.gender === "F" ? "female" : "male") + '">' + escapeHtml(row.team || "—") + '</span></td>' +
-          '<td>' + escapeHtml(formatDate(row.injuryDate, false)) + '</td>' +
+          '<td class="col-date">' + (isToday ? '<span class="today-icon" title="Petició d’avui" aria-label="Petició d’avui">●</span>' : '') + escapeHtml(formatDate(row.createdAt, false)) + '</td>' +
+          '<td class="col-name">' + escapeHtml(shortName(row.player)) + '</td>' +
+          '<td class="col-team"><span class="team ' + (row.gender === "F" ? "female" : "male") + '">' + escapeHtml(row.team || "—") + '</span></td>' +
+          '<td class="col-date">' + escapeHtml(formatDate(row.injuryDate, false)) + '</td>' +
           privateCells +
-          '<td class="desc">' + escapeHtml(row.description || "—") + '</td>' +
+          '<td class="desc">' + escapeHtml(description || "—") + '</td>' +
         '</tr>';
         }).join("") +
         '</tbody></table>';
