@@ -58,27 +58,24 @@
         <p>Si teniu qualsevol pregunta, escriviu a <strong>dtecnic@cbsantjosep.cat</strong>.</p>
         <span class="tag">#SantpepÉsÚnic 🟡🟣</span>
       </div>
-      <form id="fisioForm" action="https://docs.google.com/forms/d/e/1FAIpQLSeFjkbphlEKD1RHiGbdHiY8R9l_zsDdfpi4BTqel95hiiulLg/formResponse" method="POST" target="hiddenSubmitFrame">
+      <form id="fisioForm">
         <label>Correu electrònic <span class="required">*</span>
-          <input name="emailAddress" type="email" autocomplete="email" required />
+          <input id="email" type="email" autocomplete="email" required />
         </label>
         <label>Nom i cognoms pare/mare <span class="required">*</span>
-          <input name="entry.1627489455" type="text" autocomplete="name" required />
+          <input id="guardianName" type="text" autocomplete="name" required />
         </label>
         <label>Nom i cognoms jugador/a <span class="required">*</span>
-          <input name="entry.657595365" type="text" required />
+          <input id="playerName" type="text" required />
         </label>
         <label>Telèfon de contacte <span class="required">*</span>
-          <input name="entry.123407068" type="tel" inputmode="tel" autocomplete="tel" required />
+          <input id="phone" type="tel" inputmode="tel" autocomplete="tel" required />
         </label>
         <label>Data de la lesió <span class="required">*</span>
           <input id="injuryDate" type="date" required />
         </label>
-        <input id="injuryYear" name="entry.1651519234_year" type="hidden" />
-        <input id="injuryMonth" name="entry.1651519234_month" type="hidden" />
-        <input id="injuryDay" name="entry.1651519234_day" type="hidden" />
         <label>Equip <span class="required">*</span>
-          <select name="entry.1973973834" required>
+          <select id="team" required>
             <option value="">Selecciona equip</option>
             <option>PREMINI</option>
             <option>MINI</option>
@@ -88,13 +85,20 @@
             <option>SÉNIOR</option>
           </select>
         </label>
+        <label>Gènere <span class="required">*</span>
+          <select id="gender" required>
+            <option value="">Selecciona gènere</option>
+            <option value="M">Masculí</option>
+            <option value="F">Femení</option>
+          </select>
+        </label>
         <label>Petita descripció del per què es demana atendre al servei de fisioteràpia <span class="required">*</span>
-          <textarea name="entry.1622092416" required></textarea>
+          <textarea id="description" required></textarea>
         </label>
         <div id="status" class="status" role="status" aria-live="polite"></div>
         <div class="actions">
           <button id="submitButton" type="submit">Enviar sol·licitud</button>
-          <p class="note">Les dades s'enviaran al formulari oficial del club.</p>
+          <p class="note">Les dades es guardaran al sistema del club.</p>
         </div>
       </form>
       <div id="successView" class="success-view" aria-live="polite">
@@ -103,7 +107,6 @@
         <p>Ens posarem en contacte amb vosaltres el més aviat possible.</p>
         <button id="newRequestButton" type="button">Fer una nova petició</button>
       </div>
-      <iframe name="hiddenSubmitFrame" style="display:none" title="Enviament del formulari"></iframe>
     </section>
   </main>
   <footer>CB Sant Josep de Badalona · Tecnificació 26-27</footer>
@@ -112,40 +115,77 @@
     const statusEl = document.getElementById("status");
     const submitButton = document.getElementById("submitButton");
     const dateEl = document.getElementById("injuryDate");
-    const yearEl = document.getElementById("injuryYear");
-    const monthEl = document.getElementById("injuryMonth");
-    const dayEl = document.getElementById("injuryDay");
     const successView = document.getElementById("successView");
     const newRequestButton = document.getElementById("newRequestButton");
-    let submitted = false;
+    const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
+    const PRIVATE_REQUESTS_PATH = "physioRequestsPrivate/season-26-27";
+    const PUBLIC_REQUESTS_PATH = "physioRequestsPublic/season-26-27";
+
     function setStatus(type, text){
       statusEl.className = "status " + type;
       statusEl.textContent = text;
     }
-    form.addEventListener("submit", function(event){
+    function firebaseUrl(path, id){
+      const base = FIREBASE_DB_URL.replace(/\/$/, "");
+      const safePath = path.split("/").map(encodeURIComponent).join("/");
+      return base + "/" + safePath + (id ? "/" + encodeURIComponent(id) : "") + ".json";
+    }
+    function requestId(){
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+    function inputValue(id){
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : "";
+    }
+    async function saveRequest(path, id, payload){
+      const response = await fetch(firebaseUrl(path, id), {
+        method:"PUT",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(payload)
+      });
+      if(!response.ok) throw new Error("Firebase write failed");
+    }
+    form.addEventListener("submit", async function(event){
+      event.preventDefault();
       if(!dateEl.value){
-        event.preventDefault();
         setStatus("err", "Indica la data de la lesió.");
         return;
       }
-      const parts = dateEl.value.split("-");
-      yearEl.value = String(Number(parts[0]));
-      monthEl.value = String(Number(parts[1]));
-      dayEl.value = String(Number(parts[2]));
-      submitted = true;
       submitButton.disabled = true;
       setStatus("ok", "Enviant sol·licitud...");
-    });
-    document.querySelector("iframe[name='hiddenSubmitFrame']").addEventListener("load", function(){
-      if(!submitted) return;
-      form.reset();
-      submitted = false;
-      submitButton.disabled = false;
-      statusEl.className = "status";
-      statusEl.textContent = "";
-      form.style.display = "none";
-      successView.classList.add("show");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      const id = requestId();
+      const createdAt = new Date().toISOString();
+      const publicRequest = {
+        id,
+        createdAt,
+        player: inputValue("playerName"),
+        injuryDate: inputValue("injuryDate"),
+        team: inputValue("team"),
+        gender: inputValue("gender"),
+        description: inputValue("description")
+      };
+      const privateRequest = {
+        ...publicRequest,
+        email: inputValue("email"),
+        guardianName: inputValue("guardianName"),
+        phone: inputValue("phone")
+      };
+      try {
+        await Promise.all([
+          saveRequest(PRIVATE_REQUESTS_PATH, id, privateRequest),
+          saveRequest(PUBLIC_REQUESTS_PATH, id, publicRequest)
+        ]);
+        form.reset();
+        statusEl.className = "status";
+        statusEl.textContent = "";
+        form.style.display = "none";
+        successView.classList.add("show");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch(error) {
+        setStatus("err", "No s'ha pogut enviar la sol·licitud. Revisa la connexió o els permisos de Firebase.");
+      } finally {
+        submitButton.disabled = false;
+      }
     });
     newRequestButton.addEventListener("click", function(){
       successView.classList.remove("show");

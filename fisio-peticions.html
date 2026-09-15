@@ -95,12 +95,23 @@
     const tableWrap = document.getElementById("tableWrap");
     const totalEl = document.getElementById("totalRequests");
     const filtersEl = document.getElementById("filters");
+    const FIREBASE_DB_URL = "https://coord-fa09e-default-rtdb.europe-west1.firebasedatabase.app";
+    const PUBLIC_REQUESTS_PATH = "physioRequestsPublic/season-26-27";
     let rows = [];
     let activeTeam = "TOTS";
     let activeGender = "TOTS";
+    let statusMessage = "";
 
     function parseDateValue(value){
       const text = String(value || "");
+      if(/^\d{4}-\d{2}-\d{2}T/.test(text)){
+        const d = new Date(text);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+      const isoDate = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if(isoDate){
+        return new Date(Number(isoDate[1]), Number(isoDate[2]) - 1, Number(isoDate[3]));
+      }
       const formatted = text.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/);
       if(formatted){
         return new Date(Number(formatted[3]), Number(formatted[2]) - 1, Number(formatted[1]), Number(formatted[4] || 0), Number(formatted[5] || 0), Number(formatted[6] || 0));
@@ -127,6 +138,36 @@
         a.getFullYear() === b.getFullYear() &&
         a.getMonth() === b.getMonth() &&
         a.getDate() === b.getDate();
+    }
+
+    function firebaseUrl(path){
+      const base = FIREBASE_DB_URL.replace(/\/$/, "");
+      const safePath = path.split("/").map(encodeURIComponent).join("/");
+      return base + "/" + safePath + ".json";
+    }
+
+    async function fetchFirebaseRequests(){
+      const response = await fetch(firebaseUrl(PUBLIC_REQUESTS_PATH), { cache:"no-store" });
+      if(!response.ok) throw new Error("Firebase read failed");
+      const data = await response.json();
+      if(!data) return [];
+      return Object.entries(data).map(([id, request]) => ({ id, ...(request || {}) }));
+    }
+
+    function normalizeRequests(requests){
+      return requests.map(row => ({
+        id: row.id,
+        createdAt: parseDateValue(row.createdAt),
+        injuryDate: parseDateValue(row.injuryDate),
+        team: row.team,
+        gender: row.gender,
+        player: row.player,
+        description: row.description
+      })).sort((a, b) => {
+        const at = a.createdAt ? a.createdAt.getTime() : 0;
+        const bt = b.createdAt ? b.createdAt.getTime() : 0;
+        return bt - at;
+      });
     }
 
     function renderFilters(){
@@ -167,7 +208,7 @@
         (activeGender === "TOTS" || r.gender === activeGender)
       );
       totalEl.textContent = visible.length;
-      statusEl.textContent = rows.length ? "Dades resumides actualitzades manualment des del full de respostes." : "No hi ha peticions.";
+      statusEl.textContent = statusMessage || (rows.length ? "Dades carregades des de Firebase." : "No hi ha peticions.");
       renderFilters();
       if(!visible.length){
         tableWrap.innerHTML = '<div class="empty">Cap petició amb aquest filtre.</div>';
@@ -188,15 +229,17 @@
         '</tbody></table>';
     }
 
-    rows = REQUESTS.map(row => ({
-      createdAt: parseDateValue(row.createdAt),
-      injuryDate: parseDateValue(row.injuryDate),
-      team: row.team,
-      gender: row.gender,
-      player: row.player,
-      description: row.description
-    }));
-    render();
+    async function init(){
+      try {
+        rows = normalizeRequests(await fetchFirebaseRequests());
+        if(!rows.length) rows = normalizeRequests(REQUESTS);
+      } catch(error) {
+        rows = normalizeRequests(REQUESTS);
+        statusMessage = "No s'ha pogut carregar Firebase. Es mostren les darreres dades locals.";
+      }
+      render();
+    }
+    init();
   </script>
 </body>
 </html>
